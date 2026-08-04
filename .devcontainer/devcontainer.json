@@ -1,0 +1,23 @@
+{
+	"name": "heibon-vote",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye",
+
+	// このフォルダを開いて「Reopen in Container」すると、Windows側のこのフォルダが
+	// そのまま /workspaces/heibon-vote にバインドマウントされる(既定の挙動)。
+	// コンテナを消してもファイル実体はWindows側に残る。
+
+	// Obsidian vaultのdaily-notesフォルダを追加でバインドマウント(SessionEndフックの書き込み先)
+	"mounts": [
+		"source=${localEnv:USERPROFILE}/OneDrive/デスクトップ/202607_Obsidian/ObsidianVault/daily-notes,target=/mnt/obsidian-daily-notes,type=bind,consistency=cached"
+	],
+
+	"forwardPorts": [4322],
+
+	"postCreateCommand": "bash .devcontainer/postCreate.sh",
+
+	"customizations": {
+		"vscode": {
+			"extensions": []
+		}
+	}
+}

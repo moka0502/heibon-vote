@@ -1,0 +1,12 @@
+{
+  "name": "heibon-vote",
+  "private": true,
+  "version": "0.1.0",
+  "description": "真の平凡投票アプリ(属性別集計)",
+  "scripts": {
+    "dev": "serve www -l 4322"
+  },
+  "devDependencies": {
+    "serve": "^14"
+  }
+}

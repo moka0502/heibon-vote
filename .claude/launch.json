@@ -1,0 +1,12 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "heibon-vote-web",
+			"runtimeExecutable": "npx",
+			"runtimeArgs": ["serve", "www", "-l", "4322"],
+			"port": 4322,
+			"autoPort": false
+		}
+	]
+}
