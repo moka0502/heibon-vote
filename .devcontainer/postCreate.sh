@@ -24,5 +24,9 @@ sudo apt-get install -y gh
 
 # ffmpeg/fonts-liberationは今回省略(音声・画像の事前生成が発生しないため)
 
-# ローカル確認用の静的サーバー等(package.jsonのdevDependencies)
+# UI目視確認用(Playwright等からsystem chromiumを起動してスクリーンショットを撮る)。
+# fonts-noto-cjkが無いと日本語テキストがtofu(空白の四角)表示になるため必須で入れておく
+sudo apt-get install -y chromium fonts-noto-cjk
+
+# ローカルDB・APIサーバー等(package.jsonのdependencies)
 npm install
