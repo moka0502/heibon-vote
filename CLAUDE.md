@@ -6,7 +6,7 @@
 
 ## 現状(2026-08-05)
 
-DB版MVP実装済み(Plan→実装→ブラウザ動作確認まで完了)。問題バンクは初期6問(実データ根拠3問+仮置き3問)のみで、目標100問への拡充は`server/data/questions-seed.json`への追記で継続する運用。
+DB版MVP実装済み(Plan→実装→ブラウザ動作確認まで完了)。問題バンクは12問(実データ根拠6問+仮置き6問)まで拡充済み。目標100問への拡充は`server/data/questions-seed.json`への追記で継続する運用(追記だけで既存の実票・履歴を壊さず反映されることを確認済み)。
 
 母集団は`votes`テーブルに`is_dummy=1`で投入したダミー票と、実際のプレイで貯まる実票を合算して多数派判定に使う(自己増殖的に育つ設計)。
 
@@ -17,4 +17,4 @@ DB版MVP実装済み(Plan→実装→ブラウザ動作確認まで完了)。問
 - フロントは引き続きビルドツールなしVanilla HTML/CSS/JS(ESモジュール)。配色・質感トークン(`www/css/style.css`)は`kusutto-games`/`versant-practice`に合わせた近白背景`#faf9f7`+インディゴ`#5b5bd6`、フラット、`scale(0.96)`押下フィードバック
 - 多数派判定の同数タイブレークは`options.sort_order`が小さい方を採用(決定的、乱数不要)
 - 平凡度ランク・通算称号のしきい値は`server/tiers.js`に集約。現行の値は初回実装時の提案値であり、実際に遊んでみて閾値の体感が合わなければ調整する
-- このdevcontainerでのUI目視確認には`chromium`+`fonts-noto-cjk`をapt installする必要がある(素のイメージはCJKフォント無しでテキストがtofu表示になる)。postCreate.shには未反映のため、次回コンテナ再構築時は再インストールが必要
+- UI目視確認用に`chromium`+`fonts-noto-cjk`を`postCreate.sh`でインストール済み(素のイメージはCJKフォント無しでテキストがtofu表示になるため)

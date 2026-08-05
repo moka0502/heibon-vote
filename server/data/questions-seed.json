@@ -60,5 +60,65 @@
     ],
     "dummyVotes": { "udon": 540, "soba": 460 },
     "source": "仮置き(実データ未検出、2026-08-05調査時点)"
+  },
+  {
+    "id": "inu-neko",
+    "question": "犬派? 猫派?",
+    "options": [
+      { "id": "dog", "label": "犬派" },
+      { "id": "cat", "label": "猫派" }
+    ],
+    "dummyVotes": { "dog": 540, "cat": 460 },
+    "source": "アイスタット調査等(究極の選択で犬派5割/猫派4割程度)を基に按分。2026-08-05調査(https://istat.jp/archives/4067)"
+  },
+  {
+    "id": "asagohan-pan-gohan",
+    "question": "朝ごはんはパン派? ご飯派?",
+    "options": [
+      { "id": "bread", "label": "パン派" },
+      { "id": "rice", "label": "ご飯派" }
+    ],
+    "dummyVotes": { "bread": 560, "rice": 440 },
+    "source": "フリージー調査(パン派47.9%/ご飯派37.5%、残りは日によって等)の2択比率に正規化して按分。2026-08-05調査(https://hint.freeasy-survey.com/articles/37)"
+  },
+  {
+    "id": "yakitori-tare-shio",
+    "question": "焼き鳥はタレ派? 塩派?",
+    "options": [
+      { "id": "tare", "label": "タレ派" },
+      { "id": "shio", "label": "塩派" }
+    ],
+    "dummyVotes": { "tare": 520, "shio": 480 },
+    "source": "2025年調査(タレ49.8%/塩46.2%)の比率に正規化して按分。ほぼ拮抗という複数調査の傾向とも一致。2026-08-05調査(https://sirabee.com/2025/03/15/20163403409/)"
+  },
+  {
+    "id": "kutsushita-migi-hidari",
+    "question": "靴下、右足から履く? 左足から履く?",
+    "options": [
+      { "id": "right", "label": "右足から" },
+      { "id": "left", "label": "左足から" }
+    ],
+    "dummyVotes": { "right": 550, "left": 450 },
+    "source": "仮置き(実データ未検出、2026-08-05調査時点)"
+  },
+  {
+    "id": "ramen-kaedama",
+    "question": "ラーメンの替え玉、する派? しない派?",
+    "options": [
+      { "id": "do", "label": "する派" },
+      { "id": "dont", "label": "しない派" }
+    ],
+    "dummyVotes": { "do": 320, "dont": 680 },
+    "source": "仮置き(実データ未検出、2026-08-05調査時点)"
+  },
+  {
+    "id": "ofuro-kakeyu",
+    "question": "お風呂、かけ湯してから入る派? いきなり浴槽に入る派?",
+    "options": [
+      { "id": "kakeyu", "label": "かけ湯してから" },
+      { "id": "direct", "label": "いきなり浴槽に" }
+    ],
+    "dummyVotes": { "kakeyu": 620, "direct": 380 },
+    "source": "仮置き(実データ未検出、2026-08-05調査時点)"
   }
 ]
