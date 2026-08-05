@@ -10,6 +10,8 @@ async function request(path, options) {
 export const api = {
   getAttributes: () => request('/api/attributes'),
   getRandomTopics: (count) => request(`/api/topics/random?count=${count}`),
+  getAllTopics: () => request('/api/topics'),
+  getTopicBreakdown: (topicId) => request(`/api/topics/${topicId}/breakdown`),
   postVote: (payload) =>
     request('/api/votes', {
       method: 'POST',

@@ -1,5 +1,6 @@
 import { api } from './api.js';
 import { getProfile, saveProfile } from './storage.js';
+import { playResultReveal } from './effects.js';
 import {
   renderProfileForm,
   renderHome,
@@ -7,6 +8,8 @@ import {
   renderResult,
   renderHistoryList,
   renderHistoryDetail,
+  renderTopicList,
+  renderTopicBreakdown,
   renderError,
 } from './render.js';
 
@@ -21,9 +24,32 @@ function mount(node) {
 async function showHome() {
   try {
     const stats = await api.getSessionStats();
-    mount(renderHome(stats, { onStart: startQuiz, onHistory: showHistory }));
+    mount(
+      renderHome(stats, { onStart: startQuiz, onHistory: showHistory, onTopics: showTopics })
+    );
   } catch (err) {
     mount(renderError(err.message, showHome));
+  }
+}
+
+async function showTopics() {
+  try {
+    const { topics } = await api.getAllTopics();
+    mount(renderTopicList(topics, { onSelect: showTopicBreakdown, onBack: showHome }));
+  } catch (err) {
+    mount(renderError(err.message, showHome));
+  }
+}
+
+async function showTopicBreakdown(topicId) {
+  try {
+    const [{ attributes }, { topic, breakdown }] = await Promise.all([
+      api.getAttributes(),
+      api.getTopicBreakdown(topicId),
+    ]);
+    mount(renderTopicBreakdown(topic, attributes, breakdown, showTopics));
+  } catch (err) {
+    mount(renderError(err.message, showTopics));
   }
 }
 
@@ -71,6 +97,7 @@ async function finishQuiz(state) {
       api.getSessionStats(),
     ]);
     mount(renderResult(summary, votes, stats, { onHome: showHome, onHistory: showHistory }));
+    playResultReveal(appEl, summary);
   } catch (err) {
     mount(renderError(err.message, showHome));
   }

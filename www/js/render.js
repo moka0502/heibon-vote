@@ -66,7 +66,7 @@ export function renderProfileForm(attributes, onSubmit) {
   return form;
 }
 
-export function renderHome(stats, { onStart, onHistory }) {
+export function renderHome(stats, { onStart, onHistory, onTopics }) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: '挑戦しよう' }));
@@ -80,6 +80,82 @@ export function renderHome(stats, { onStart, onHistory }) {
   card.appendChild(el('button', { class: 'btn btn-primary', text: '挑戦する', onclick: onStart }));
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn-link', text: '履歴を見る', onclick: onHistory }));
+  wrap.appendChild(el('button', { class: 'btn-link', text: 'お題の内訳を見る', onclick: onTopics }));
+  return wrap;
+}
+
+export function renderTopicList(topics, { onSelect, onBack }) {
+  const wrap = el('div');
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('h2', { text: 'お題の内訳を見る' }));
+  for (const topic of topics) {
+    const item = el('div', { class: 'session-list-item', onclick: () => onSelect(topic.id) });
+    item.appendChild(el('span', { text: topic.question }));
+    card.appendChild(item);
+  }
+  wrap.appendChild(card);
+  wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onBack }));
+  return wrap;
+}
+
+export function renderTopicBreakdown(topic, attributes, breakdown, onBack) {
+  const wrap = el('div');
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('h2', { text: topic.question }));
+
+  const select = el('select');
+  for (const attribute of attributes) {
+    select.appendChild(el('option', { value: attribute.id, text: attribute.label }));
+  }
+  card.appendChild(el('div', { class: 'field' }, [select]));
+
+  const rowsContainer = el('div');
+  card.appendChild(rowsContainer);
+
+  function renderRows(attributeId) {
+    rowsContainer.replaceChildren();
+    const attribute = attributes.find((a) => a.id === attributeId);
+    const counts = breakdown[attributeId] ?? {};
+    let hasData = false;
+
+    for (const value of attribute.values) {
+      const perOption = counts[value.id] ?? {};
+      const total = topic.options.reduce((sum, o) => sum + (perOption[o.id] ?? 0), 0);
+      if (total > 0) hasData = true;
+
+      const row = el('div', { class: 'bar-row' });
+      row.appendChild(
+        el('p', { class: 'bar-row-label', text: `${value.label}(${total}件)` })
+      );
+      for (const option of topic.options) {
+        const count = perOption[option.id] ?? 0;
+        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+        const line = el('div', { class: 'bar-line' });
+        line.appendChild(el('span', { class: 'bar-option-label', text: option.label }));
+        line.appendChild(
+          el('div', { class: 'bar-track' }, [el('div', { class: 'bar', style: `width:${pct}%` })])
+        );
+        line.appendChild(el('span', { class: 'bar-count', text: `${count}` }));
+        row.appendChild(line);
+      }
+      rowsContainer.appendChild(row);
+    }
+
+    if (!hasData) {
+      rowsContainer.appendChild(
+        el('p', {
+          class: 'progress',
+          text: 'まだ十分なデータがありません(実際に何度か挑戦してみてください)。',
+        })
+      );
+    }
+  }
+
+  select.addEventListener('change', () => renderRows(select.value));
+  renderRows(attributes[0]?.id);
+
+  wrap.appendChild(card);
+  wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onBack }));
   return wrap;
 }
 
