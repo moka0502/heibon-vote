@@ -1,0 +1,64 @@
+[
+  {
+    "id": "taiyaki-atama-shippo",
+    "question": "たい焼き、頭から食べる? しっぽから食べる?",
+    "options": [
+      { "id": "head", "label": "頭から" },
+      { "id": "tail", "label": "しっぽから" }
+    ],
+    "dummyVotes": { "head": 700, "tail": 240 },
+    "source": "ロバ耳アンケート等(頭から69.9%/しっぽから24.1%)を基に按分。2026-08-05調査(https://www.moratame.net/wp/robamimi/202209_007/)"
+  },
+  {
+    "id": "kinoko-takenoko",
+    "question": "きのこの山派? たけのこの里派?",
+    "options": [
+      { "id": "takenoko", "label": "たけのこの里" },
+      { "id": "kinoko", "label": "きのこの山" }
+    ],
+    "dummyVotes": { "takenoko": 520, "kinoko": 480 },
+    "source": "複数アンケートで拮抗、僅かにたけのこ優勢との報道を基に按分。2026-08-05調査(https://www.at-s.com/life/article/ats/1301594.html)"
+  },
+  {
+    "id": "tamagoyaki-choumiryou",
+    "question": "目玉焼きに何をかける? しょうゆ・塩・ソースから選ぶなら",
+    "options": [
+      { "id": "shoyu", "label": "しょうゆ" },
+      { "id": "shio", "label": "塩" },
+      { "id": "sauce", "label": "ソース" }
+    ],
+    "dummyVotes": { "shoyu": 610, "shio": 430, "sauce": 220 },
+    "source": "キッコーマン調査(n=2737、複数回答: しょうゆ61%/塩43%/ソース22%)の回答率をそのまま按分値に使用(複数回答調査のため単一選択の実比率とは異なる点に注意)。2026-08-05調査(https://www.kikkoman.com/jp/news/2024/24041.html)"
+  },
+  {
+    "id": "curry-ichinichime-ninichime",
+    "question": "カレーは作りたて派? 一晩寝かせた派?",
+    "options": [
+      { "id": "fresh", "label": "作りたて" },
+      { "id": "rested", "label": "一晩寝かせた" }
+    ],
+    "dummyVotes": { "fresh": 35, "rested": 65 },
+    "source": "仮置き(実データ未検出、2026-08-05調査時点)。「一晩寝かせたカレーは美味い」という通説を基に按分"
+  },
+  {
+    "id": "asagata-yogata",
+    "question": "朝型? 夜型?",
+    "options": [
+      { "id": "morning", "label": "朝型" },
+      { "id": "night", "label": "夜型" },
+      { "id": "neither", "label": "どちらでもない" }
+    ],
+    "dummyVotes": { "morning": 380, "night": 420, "neither": 200 },
+    "source": "仮置き(実データ未検出、2026-08-05調査時点)"
+  },
+  {
+    "id": "udon-soba",
+    "question": "うどん派? そば派?",
+    "options": [
+      { "id": "udon", "label": "うどん" },
+      { "id": "soba", "label": "そば" }
+    ],
+    "dummyVotes": { "udon": 540, "soba": 460 },
+    "source": "仮置き(実データ未検出、2026-08-05調査時点)"
+  }
+]

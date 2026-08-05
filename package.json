@@ -4,9 +4,10 @@
   "version": "0.1.0",
   "description": "真の平凡投票アプリ(属性別集計)",
   "scripts": {
-    "dev": "serve www -l 4322"
+    "dev": "node server/index.js"
   },
-  "devDependencies": {
-    "serve": "^14"
+  "dependencies": {
+    "better-sqlite3": "^11",
+    "express": "^4"
   }
 }

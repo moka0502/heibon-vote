@@ -1,0 +1,37 @@
+const express = require('express');
+const { getMajorityOptionId } = require('../majority');
+
+function createVotesRouter(db) {
+  const router = express.Router();
+  const optionExists = db.prepare('SELECT 1 FROM options WHERE topic_id = ? AND id = ?');
+  const insertVote = db.prepare(
+    `INSERT INTO votes (topic_id, option_id, profile_json, is_dummy, majority_option_id_at_vote)
+     VALUES (?, ?, ?, 0, ?)`
+  );
+
+  router.post('/', (req, res) => {
+    const { topicId, optionId, profile } = req.body ?? {};
+    if (!topicId || !optionId) {
+      res.status(400).json({ error: 'topicId and optionId are required' });
+      return;
+    }
+    if (!optionExists.get(topicId, optionId)) {
+      res.status(404).json({ error: 'unknown topicId/optionId' });
+      return;
+    }
+
+    // 自分の一票を数える前の多数派を基準に、正誤をこの時点でスナップショットする
+    const majorityOptionId = getMajorityOptionId(db, topicId);
+    const result = insertVote.run(topicId, optionId, JSON.stringify(profile ?? {}), majorityOptionId);
+
+    res.json({
+      voteId: result.lastInsertRowid,
+      isMajorityMatch: optionId === majorityOptionId,
+      majorityOptionId,
+    });
+  });
+
+  return router;
+}
+
+module.exports = { createVotesRouter };

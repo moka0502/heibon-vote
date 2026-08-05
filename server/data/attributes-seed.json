@@ -1,0 +1,23 @@
+[
+  {
+    "id": "age",
+    "label": "年代",
+    "values": [
+      { "id": "10s", "label": "10代" },
+      { "id": "20s", "label": "20代" },
+      { "id": "30s", "label": "30代" },
+      { "id": "40s", "label": "40代" },
+      { "id": "50s", "label": "50代" },
+      { "id": "60plus", "label": "60代以上" }
+    ]
+  },
+  {
+    "id": "gender",
+    "label": "性別",
+    "values": [
+      { "id": "male", "label": "男性" },
+      { "id": "female", "label": "女性" },
+      { "id": "other", "label": "その他・回答しない" }
+    ]
+  }
+]
