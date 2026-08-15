@@ -35,6 +35,13 @@ function createSessionsRouter(db) {
   const perfectSessionCountStmt = db.prepare(
     'SELECT COUNT(*) AS count FROM quiz_sessions WHERE match_count = total_count'
   );
+  const totalSessionsStmt = db.prepare('SELECT COUNT(*) AS count FROM quiz_sessions');
+  const sessionsWithLowerOrEqualScoreStmt = db.prepare(
+    'SELECT COUNT(*) AS count FROM quiz_sessions WHERE match_count <= ?'
+  );
+  // サンプルが少なすぎる順位表示は誤解を招くため、一定数貯まるまでは出さない
+  // (属性別内訳のBREAKDOWN_MIN_REAL_VOTESと同じ考え方)。
+  const MIN_SESSIONS_FOR_PERCENTILE = 20;
 
   // /stats は /:id より先に登録する(そうしないと :id が "stats" にマッチしてしまう)
   router.get('/stats', (req, res) => {
@@ -88,6 +95,14 @@ function createSessionsRouter(db) {
     const tier = sessionTierFor(matchCount, totalCount);
     const sessionId = crypto.randomUUID();
 
+    // 自分自身を含める前の、これまでの挑戦者の中での順位(Spotify Wrapped深掘り分SW1)。
+    const { count: totalSessions } = totalSessionsStmt.get();
+    let percentile = null;
+    if (totalSessions >= MIN_SESSIONS_FOR_PERCENTILE) {
+      const { count: lowerOrEqual } = sessionsWithLowerOrEqualScoreStmt.get(matchCount);
+      percentile = Math.round((lowerOrEqual / totalSessions) * 100);
+    }
+
     const run = db.transaction(() => {
       insertSession.run(sessionId, matchCount, totalCount, tier);
       db.prepare(`UPDATE votes SET session_id = ? WHERE id IN (${placeholders})`).run(
@@ -97,7 +112,7 @@ function createSessionsRouter(db) {
     });
     run();
 
-    res.json({ sessionId, matchCount, totalCount, tier });
+    res.json({ sessionId, matchCount, totalCount, tier, percentile, totalSessions });
   });
 
   return router;

@@ -478,6 +478,15 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   if (flavorText) {
     card.appendChild(el('p', { style: 'text-align:center', text: flavorText }));
   }
+  if (typeof summary.percentile === 'number') {
+    card.appendChild(
+      el('p', {
+        class: 'progress',
+        style: 'text-align:center',
+        text: `これまでの挑戦者${summary.totalSessions}人中、あなたと同じかそれ以上「平凡」だったのは${summary.percentile}%`,
+      })
+    );
+  }
   if (stats.lifetimeTitle) {
     card.appendChild(
       el('p', { style: 'text-align:center' }, [
