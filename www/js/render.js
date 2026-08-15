@@ -579,6 +579,13 @@ export function renderSuggestionThanks(onBack) {
   return wrap;
 }
 
+export function renderOffline(onRetry) {
+  const wrap = el('div', { class: 'card' });
+  wrap.appendChild(el('p', { class: 'error', text: 'オフラインのようです。通信環境を確認してから、もう一度お試しください。' }));
+  if (onRetry) wrap.appendChild(el('button', { class: 'btn', text: '再読み込み', onclick: onRetry }));
+  return wrap;
+}
+
 export function renderError(message, onRetry) {
   // ユーザーには技術的な詳細(HTTPステータス等)を出さず、常に同じやさしい文言にする。
   // 原因調査用に生のメッセージはconsoleへ残す。

@@ -23,6 +23,7 @@ import {
   renderSuggestionForm,
   renderSuggestionThanks,
   renderError,
+  renderOffline,
   renderLoading,
 } from './render.js';
 
@@ -63,6 +64,12 @@ function showLoading() {
   appEl.replaceChildren(renderLoading());
 }
 
+// オフライン時は「通信エラー」ではなく専用の案内を出す(Native#5)。
+function mountError(message, onRetry, backTo) {
+  const node = navigator.onLine ? renderError(message, onRetry) : renderOffline(onRetry);
+  mount(node, backTo);
+}
+
 async function showHome() {
   showLoading();
   try {
@@ -82,7 +89,7 @@ async function showHome() {
       })
     );
   } catch (err) {
-    mount(renderError(err.message, showHome));
+    mountError(err.message, showHome);
   }
 }
 
@@ -93,7 +100,7 @@ function showSuggestionForm() {
         await api.postSuggestion(text);
         mount(renderSuggestionThanks(showHome), showHome);
       } catch (err) {
-        mount(renderError(err.message, showHome), showHome);
+        mountError(err.message, showHome, showHome);
       }
     }, showHome),
     showHome
@@ -122,7 +129,7 @@ async function showSettings() {
       showHome
     );
   } catch (err) {
-    mount(renderError(err.message, showHome), showHome);
+    mountError(err.message, showHome, showHome);
   }
 }
 
@@ -132,7 +139,7 @@ async function showTopics() {
     const { topics } = await api.getAllTopics();
     mount(renderTopicList(topics, { onSelect: showTopicBreakdown, onBack: showHome }), showHome);
   } catch (err) {
-    mount(renderError(err.message, showHome), showHome);
+    mountError(err.message, showHome, showHome);
   }
 }
 
@@ -152,7 +159,7 @@ async function showTopicBreakdown(topicId) {
       showTopics
     );
   } catch (err) {
-    mount(renderError(err.message, showTopics), showTopics);
+    mountError(err.message, showTopics, showTopics);
   }
 }
 
@@ -169,7 +176,7 @@ async function showCategoryPicker() {
       showHome
     );
   } catch (err) {
-    mount(renderError(err.message, showHome), showHome);
+    mountError(err.message, showHome, showHome);
   }
 }
 
@@ -180,7 +187,7 @@ async function startQuiz(category) {
     const { topics } = await api.getRandomTopics(QUESTIONS_PER_SESSION, category);
     runQuiz({ topics, profile, index: 0, voteIds: [] });
   } catch (err) {
-    mount(renderError(err.message, showHome), showHome);
+    mountError(err.message, showHome, showHome);
   }
 }
 
@@ -221,7 +228,7 @@ async function answerQuestion(state, topic, optionId) {
       showHome
     );
   } catch (err) {
-    mount(renderError(err.message, showHome), showHome);
+    mountError(err.message, showHome, showHome);
   }
 }
 
@@ -244,7 +251,7 @@ async function finishQuiz(state) {
     );
     playResultReveal(appEl, summary);
   } catch (err) {
-    mount(renderError(err.message, showHome), showHome);
+    mountError(err.message, showHome, showHome);
   }
 }
 
@@ -254,7 +261,7 @@ async function showHistory() {
     const { sessions } = await api.getSessions();
     mount(renderHistoryList(sessions, { onSelect: showHistoryDetail, onBack: showHome }), showHome);
   } catch (err) {
-    mount(renderError(err.message, showHome), showHome);
+    mountError(err.message, showHome, showHome);
   }
 }
 
@@ -264,7 +271,7 @@ async function showHistoryDetail(sessionId) {
     const { session, votes } = await api.getSession(sessionId);
     mount(renderHistoryDetail(session, votes, showHistory), showHistory);
   } catch (err) {
-    mount(renderError(err.message, showHistory), showHistory);
+    mountError(err.message, showHistory, showHistory);
   }
 }
 
@@ -279,7 +286,7 @@ async function showProfileSetup() {
       })
     );
   } catch (err) {
-    mount(renderError(err.message, showProfileSetup));
+    mountError(err.message, showProfileSetup);
   }
 }
 
