@@ -39,6 +39,7 @@ let hasPushedInitialState = false;
 function mount(node, backTo) {
   node.classList.add('screen-enter');
   appEl.replaceChildren(node);
+  window.scrollTo(0, 0);
   currentBack = backTo ?? null;
   if (!isPopping) {
     if (!hasPushedInitialState) {
