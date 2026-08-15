@@ -70,6 +70,12 @@ function renderVoteBreakdownRow(vote) {
   return row;
 }
 
+export function renderLoading() {
+  const wrap = el('div', { class: 'card loading-card' });
+  wrap.appendChild(el('div', { class: 'spinner' }));
+  return wrap;
+}
+
 export function renderIntro(onNext) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });

@@ -367,11 +367,34 @@ select {
   }
 }
 
+.loading-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bar,
   .quiz-progress-fill,
   .feedback-banner,
-  .screen-enter {
+  .screen-enter,
+  .spinner {
     animation: none !important;
     transition: none !important;
   }

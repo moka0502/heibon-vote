@@ -23,6 +23,7 @@ import {
   renderSuggestionForm,
   renderSuggestionThanks,
   renderError,
+  renderLoading,
 } from './render.js';
 
 const QUESTIONS_PER_SESSION = 10;
@@ -55,7 +56,14 @@ window.addEventListener('popstate', () => {
   isPopping = false;
 });
 
+// API待ちの画面遷移中、通信が遅いと固まって見えるのを防ぐための一時表示。
+// mount()と違い履歴には触れない(実データが届いたら通常通りmount()で置き換える)。
+function showLoading() {
+  appEl.replaceChildren(renderLoading());
+}
+
 async function showHome() {
+  showLoading();
   try {
     // Homeに来る経路はどこであれ、進行中クイズへの復帰を意味しない
     // (実際に再開させたい場合はinit()がrunQuiz()を直接呼ぶ)。
@@ -92,6 +100,7 @@ function showSuggestionForm() {
 }
 
 async function showSettings() {
+  showLoading();
   try {
     const { attributes } = await api.getAttributes();
     const currentValues = getProfile();
@@ -117,6 +126,7 @@ async function showSettings() {
 }
 
 async function showTopics() {
+  showLoading();
   try {
     const { topics } = await api.getAllTopics();
     mount(renderTopicList(topics, { onSelect: showTopicBreakdown, onBack: showHome }), showHome);
@@ -126,6 +136,7 @@ async function showTopics() {
 }
 
 async function showTopicBreakdown(topicId) {
+  showLoading();
   try {
     const [{ attributes }, { topic, breakdown, realVoteCount, breakdownMinRealVotes }] =
       await Promise.all([api.getAttributes(), api.getTopicBreakdown(topicId)]);
@@ -145,6 +156,7 @@ async function showTopicBreakdown(topicId) {
 }
 
 async function showCategoryPicker() {
+  showLoading();
   try {
     const { categories } = await api.getCategories();
     mount(
@@ -161,6 +173,7 @@ async function showCategoryPicker() {
 }
 
 async function startQuiz(category) {
+  showLoading();
   try {
     const profile = getProfile();
     const { topics } = await api.getRandomTopics(QUESTIONS_PER_SESSION, category);
@@ -206,6 +219,7 @@ async function answerQuestion(state, topic, optionId) {
 }
 
 async function finishQuiz(state) {
+  showLoading();
   try {
     const summary = await api.postSession(state.voteIds);
     clearQuizState();
@@ -228,6 +242,7 @@ async function finishQuiz(state) {
 }
 
 async function showHistory() {
+  showLoading();
   try {
     const { sessions } = await api.getSessions();
     mount(renderHistoryList(sessions, { onSelect: showHistoryDetail, onBack: showHome }), showHome);
@@ -237,6 +252,7 @@ async function showHistory() {
 }
 
 async function showHistoryDetail(sessionId) {
+  showLoading();
   try {
     const { session, votes } = await api.getSession(sessionId);
     mount(renderHistoryDetail(session, votes, showHistory), showHistory);
@@ -246,6 +262,7 @@ async function showHistoryDetail(sessionId) {
 }
 
 async function showProfileSetup() {
+  showLoading();
   try {
     const { attributes } = await api.getAttributes();
     mount(
