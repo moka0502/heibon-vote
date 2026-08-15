@@ -2,11 +2,27 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const ATTRIBUTES_SEED_PATH = path.join(__dirname, 'data', 'attributes-seed.json');
+const CATEGORIES_SEED_PATH = path.join(__dirname, 'data', 'categories-seed.json');
 const QUESTIONS_SEED_PATH = path.join(__dirname, 'data', 'questions-seed.json');
 
 function seed(db) {
   seedAttributes(db);
+  seedCategories(db);
   seedTopics(db);
+}
+
+function seedCategories(db) {
+  const categories = JSON.parse(fs.readFileSync(CATEGORIES_SEED_PATH, 'utf8'));
+  const insertCategory = db.prepare(
+    `INSERT INTO categories (id, label, sort_order) VALUES (?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET label = excluded.label, sort_order = excluded.sort_order`
+  );
+  const run = db.transaction((cats) => {
+    cats.forEach((category, index) => {
+      insertCategory.run(category.id, category.label, index);
+    });
+  });
+  run(categories);
 }
 
 function seedAttributes(db) {
@@ -29,7 +45,13 @@ function seedAttributes(db) {
 
 function seedTopics(db) {
   const topics = JSON.parse(fs.readFileSync(QUESTIONS_SEED_PATH, 'utf8'));
-  const insertTopic = db.prepare('INSERT OR IGNORE INTO topics (id, question) VALUES (?, ?)');
+  // category/statusは追記のたびに変わりうる(カテゴリ組み替え・active⇄stock)ため、
+  // 既存行もquestion/category/statusを常に同期する
+  const insertTopic = db.prepare(
+    `INSERT INTO topics (id, question, category, status) VALUES (?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET
+       question = excluded.question, category = excluded.category, status = excluded.status`
+  );
   const insertOption = db.prepare(
     'INSERT OR IGNORE INTO options (topic_id, id, label, sort_order) VALUES (?, ?, ?, ?)'
   );
@@ -42,7 +64,7 @@ function seedTopics(db) {
 
   const run = db.transaction((topicList) => {
     for (const topic of topicList) {
-      insertTopic.run(topic.id, topic.question);
+      insertTopic.run(topic.id, topic.question, topic.category, topic.status || 'active');
       topic.options.forEach((option, index) => {
         insertOption.run(topic.id, option.id, option.label, index);
       });

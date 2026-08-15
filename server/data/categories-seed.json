@@ -1,0 +1,13 @@
+[
+  { "id": "food", "label": "食事" },
+  { "id": "money", "label": "お金" },
+  { "id": "romance", "label": "恋愛" },
+  { "id": "seasonal", "label": "季節行事" },
+  { "id": "health", "label": "健康・カラダ" },
+  { "id": "home-routine", "label": "住まい・身支度" },
+  { "id": "leisure", "label": "余暇・娯楽" },
+  { "id": "work-style", "label": "仕事・働き方" },
+  { "id": "digital-habits", "label": "デジタル習慣" },
+  { "id": "personal", "label": "持ち物" },
+  { "id": "jinx", "label": "ジンクス・運試し" }
+]

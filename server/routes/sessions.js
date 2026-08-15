@@ -1,10 +1,14 @@
 const express = require('express');
 const crypto = require('node:crypto');
 const { sessionTierFor, lifetimeTitleFor } = require('../tiers');
+const { getVoteCounts } = require('../majority');
 
 function createSessionsRouter(db) {
   const router = express.Router();
 
+  const optionStmt = db.prepare(
+    'SELECT id, label FROM options WHERE topic_id = ? ORDER BY sort_order'
+  );
   const insertSession = db.prepare(
     'INSERT INTO quiz_sessions (id, match_count, total_count, session_tier) VALUES (?, ?, ?, ?)'
   );
@@ -48,7 +52,15 @@ function createSessionsRouter(db) {
       res.status(404).json({ error: 'not found' });
       return;
     }
-    res.json({ session, votes: getSessionVotesStmt.all(req.params.id) });
+    const votes = getSessionVotesStmt.all(req.params.id).map((vote) => {
+      const counts = getVoteCounts(db, vote.topicId);
+      const total = counts.reduce((sum, c) => sum + c.count, 0);
+      const percentages = Object.fromEntries(
+        counts.map((c) => [c.optionId, total > 0 ? Math.round((c.count / total) * 100) : 0])
+      );
+      return { ...vote, options: optionStmt.all(vote.topicId), percentages };
+    });
+    res.json({ session, votes });
   });
 
   router.post('/', (req, res) => {

@@ -16,6 +16,17 @@ function el(tag, attrs = {}, children = []) {
   return node;
 }
 
+// バーは0%で描画してから目標幅へアニメーションさせる(Slido/Mentimeter的な「結果が伸びてくる」演出)。
+// 1回のrAFだとブラウザが0%とtarget%を同一フレームでまとめてしまい、
+// 遷移(transition)が発火しないことがあるため2段にしている。
+function animateBarWidth(barEl, pct) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      barEl.style.width = `${pct}%`;
+    });
+  });
+}
+
 function formatDate(sqliteDatetime) {
   // SQLiteのdatetime('now')はUTCの 'YYYY-MM-DD HH:MM:SS' 形式で返る
   const date = new Date(`${sqliteDatetime}Z`);
@@ -23,21 +34,77 @@ function formatDate(sqliteDatetime) {
 }
 
 function renderVoteBreakdownRow(vote) {
-  const isMatch = vote.optionId === vote.majorityOptionId;
   const row = el('div', { class: 'question-row' });
   row.appendChild(el('p', { class: 'question-text', text: vote.question }));
-  row.appendChild(
-    el('p', {
-      class: isMatch ? 'match' : 'mismatch',
-      text: `あなた: ${vote.optionLabel} / 多数派: ${vote.majorityOptionLabel ?? '不明'}${isMatch ? '(一致)' : ''}`,
-    })
-  );
+
+  if (!vote.options || !vote.percentages) {
+    // 古いレスポンス形状(options/percentagesなし)への保険。通常はここには来ない。
+    const isMatch = vote.optionId === vote.majorityOptionId;
+    row.appendChild(
+      el('p', {
+        class: isMatch ? 'match' : 'mismatch',
+        text: `あなた: ${vote.optionLabel} / 多数派: ${vote.majorityOptionLabel ?? '不明'}${isMatch ? '(一致)' : ''}`,
+      })
+    );
+    return row;
+  }
+
+  const bars = [];
+  for (const option of vote.options) {
+    const pct = vote.percentages[option.id] ?? 0;
+    const tags = [
+      option.id === vote.optionId ? 'あなた' : null,
+      option.id === vote.majorityOptionId ? '多数派' : null,
+    ].filter(Boolean);
+    const label = tags.length ? `${option.label}(${tags.join('・')})` : option.label;
+
+    const bar = el('div', { class: 'bar' });
+    const line = el('div', { class: 'bar-line' });
+    line.appendChild(el('span', { class: 'bar-option-label', text: label }));
+    line.appendChild(el('div', { class: 'bar-track' }, [bar]));
+    line.appendChild(el('span', { class: 'bar-count', text: `${pct}%` }));
+    row.appendChild(line);
+    bars.push([bar, pct]);
+  }
+  for (const [bar, pct] of bars) animateBarWidth(bar, pct);
   return row;
 }
 
-export function renderProfileForm(attributes, onSubmit) {
+export function renderIntro(onNext) {
+  const wrap = el('div');
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('h2', { text: '「平凡」は、実はすごい' }));
+  card.appendChild(
+    el('p', {
+      text: 'このアプリは、二択のお題に答えて「世間の多数派」とどれだけ一致できるかを競うクイズです。10問中、何問"平凡"でいられるか試してみましょう。',
+    })
+  );
+  card.appendChild(
+    el('p', {
+      text: '一致すれば「平凡」、外れれば「平凡じゃない」。どちらも面白い結果です。少数派だったお題ほど、あなたの個性が見えてきます。',
+    })
+  );
+  card.appendChild(
+    el('p', {
+      class: 'progress',
+      text: '次に、年代・性別・血液型・利き手を聞きます。これは「A型の人はこう答えがち」のような属性別の傾向を見せるためだけに使い、多数派の判定自体には影響しません。',
+    })
+  );
+  card.appendChild(el('button', { class: 'btn btn-primary', text: 'はじめる', onclick: onNext }));
+  wrap.appendChild(card);
+  return wrap;
+}
+
+export function renderProfileForm(attributes, onSubmit, options = {}) {
+  const {
+    currentValues = null,
+    title = 'はじめに、あなたについて教えてください',
+    submitLabel = 'はじめる',
+    onCancel = null,
+  } = options;
+
   const form = el('form', { class: 'card' });
-  form.appendChild(el('h2', { text: 'はじめに、あなたについて教えてください' }));
+  form.appendChild(el('h2', { text: title }));
 
   const selects = {};
   for (const attribute of attributes) {
@@ -47,12 +114,15 @@ export function renderProfileForm(attributes, onSubmit) {
     for (const value of attribute.values) {
       select.appendChild(el('option', { value: value.id, text: value.label }));
     }
+    if (currentValues?.[attribute.id]) {
+      select.value = currentValues[attribute.id];
+    }
     selects[attribute.id] = select;
     field.appendChild(select);
     form.appendChild(field);
   }
 
-  form.appendChild(el('button', { class: 'btn btn-primary', type: 'submit', text: 'はじめる' }));
+  form.appendChild(el('button', { class: 'btn btn-primary', type: 'submit', text: submitLabel }));
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -63,10 +133,15 @@ export function renderProfileForm(attributes, onSubmit) {
     onSubmit(values);
   });
 
-  return form;
+  if (!onCancel) return form;
+
+  const wrap = el('div');
+  wrap.appendChild(form);
+  wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onCancel }));
+  return wrap;
 }
 
-export function renderHome(stats, { onStart, onHistory, onTopics }) {
+export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, onSuggest }) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: '挑戦しよう' }));
@@ -81,6 +156,33 @@ export function renderHome(stats, { onStart, onHistory, onTopics }) {
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn-link', text: '履歴を見る', onclick: onHistory }));
   wrap.appendChild(el('button', { class: 'btn-link', text: 'お題の内訳を見る', onclick: onTopics }));
+  wrap.appendChild(el('button', { class: 'btn-link', text: 'あなたについての設定', onclick: onSettings }));
+  wrap.appendChild(el('button', { class: 'btn-link', text: 'お題を提案する', onclick: onSuggest }));
+  return wrap;
+}
+
+export function renderCategoryPicker(categories, { onSelectRandom, onSelectCategory, onBack }) {
+  const wrap = el('div');
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('h2', { text: 'お題を選ぶ' }));
+  card.appendChild(
+    el('button', {
+      class: 'btn btn-primary',
+      text: 'ランダム(全部から10問)',
+      onclick: onSelectRandom,
+    })
+  );
+  for (const category of categories) {
+    card.appendChild(
+      el('button', {
+        class: 'btn',
+        text: `${category.label}(${category.count}問)`,
+        onclick: () => onSelectCategory(category.id),
+      })
+    );
+  }
+  wrap.appendChild(card);
+  wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onBack }));
   return wrap;
 }
 
@@ -98,10 +200,28 @@ export function renderTopicList(topics, { onSelect, onBack }) {
   return wrap;
 }
 
-export function renderTopicBreakdown(topic, attributes, breakdown, onBack) {
+export function renderTopicBreakdown(
+  topic,
+  attributes,
+  breakdown,
+  { realVoteCount, breakdownMinRealVotes },
+  onBack
+) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: topic.question }));
+
+  if (realVoteCount < breakdownMinRealVotes) {
+    card.appendChild(
+      el('p', {
+        class: 'progress',
+        text: `属性別の傾向はまだ表示できません(実際の回答 ${realVoteCount} / ${breakdownMinRealVotes}件)。もっとみんなが挑戦すると見られるようになります。`,
+      })
+    );
+    wrap.appendChild(card);
+    wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onBack }));
+    return wrap;
+  }
 
   const select = el('select');
   for (const attribute of attributes) {
@@ -118,6 +238,7 @@ export function renderTopicBreakdown(topic, attributes, breakdown, onBack) {
     const counts = breakdown[attributeId] ?? {};
     let hasData = false;
 
+    const bars = [];
     for (const value of attribute.values) {
       const perOption = counts[value.id] ?? {};
       const total = topic.options.reduce((sum, o) => sum + (perOption[o.id] ?? 0), 0);
@@ -130,16 +251,17 @@ export function renderTopicBreakdown(topic, attributes, breakdown, onBack) {
       for (const option of topic.options) {
         const count = perOption[option.id] ?? 0;
         const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+        const bar = el('div', { class: 'bar' });
         const line = el('div', { class: 'bar-line' });
         line.appendChild(el('span', { class: 'bar-option-label', text: option.label }));
-        line.appendChild(
-          el('div', { class: 'bar-track' }, [el('div', { class: 'bar', style: `width:${pct}%` })])
-        );
+        line.appendChild(el('div', { class: 'bar-track' }, [bar]));
         line.appendChild(el('span', { class: 'bar-count', text: `${count}` }));
         row.appendChild(line);
+        bars.push([bar, pct]);
       }
       rowsContainer.appendChild(row);
     }
+    for (const [bar, pct] of bars) animateBarWidth(bar, pct);
 
     if (!hasData) {
       rowsContainer.appendChild(
@@ -161,17 +283,103 @@ export function renderTopicBreakdown(topic, attributes, breakdown, onBack) {
 
 export function renderQuizQuestion(topic, index, total, onAnswer) {
   const wrap = el('div', { class: 'card' });
+
+  const progressTrack = el('div', { class: 'quiz-progress-track' }, [
+    el('div', { class: 'quiz-progress-fill' }),
+  ]);
+  wrap.appendChild(progressTrack);
   wrap.appendChild(el('p', { class: 'progress', text: `${index + 1} / ${total} 問目` }));
   wrap.appendChild(el('h2', { text: topic.question }));
+
+  const buttons = [];
   for (const option of topic.options) {
-    wrap.appendChild(
-      el('button', { class: 'btn', text: option.label, onclick: () => onAnswer(option.id) })
-    );
+    const btn = el('button', { class: 'btn', text: option.label });
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      // 選んだ選択肢を一瞬ハイライトしてから次へ進む(タップした実感を持たせる)。
+      for (const b of buttons) b.disabled = true;
+      btn.classList.add('btn-selected');
+      setTimeout(() => onAnswer(option.id), 180);
+    });
+    buttons.push(btn);
+    wrap.appendChild(btn);
   }
+
+  animateBarWidth(progressTrack.firstChild, ((index + 1) / total) * 100);
   return wrap;
 }
 
-export function renderResult(summary, detailVotes, stats, { onHome, onHistory }) {
+export function renderQuestionFeedback(
+  topic,
+  chosenOptionId,
+  isMajorityMatch,
+  majorityOptionId,
+  percentages,
+  onNext
+) {
+  const wrap = el('div', { class: 'card' });
+  wrap.appendChild(
+    el('div', { class: `feedback-banner ${isMajorityMatch ? 'is-match' : 'is-mismatch'}` }, [
+      el('span', { class: 'feedback-icon', text: isMajorityMatch ? '○' : '✕' }),
+      el('span', {
+        text: isMajorityMatch ? '平凡! 多数派と一致でした' : '平凡じゃない! 多数派とは不一致でした',
+      }),
+    ])
+  );
+  wrap.appendChild(el('h2', { text: topic.question }));
+
+  const bars = [];
+  for (const option of topic.options) {
+    const pct = percentages[option.id] ?? 0;
+    const tags = [
+      option.id === chosenOptionId ? 'あなた' : null,
+      option.id === majorityOptionId ? '多数派' : null,
+    ].filter(Boolean);
+    const label = tags.length ? `${option.label}(${tags.join('・')})` : option.label;
+
+    const bar = el('div', { class: 'bar' });
+    const line = el('div', { class: 'bar-line' });
+    line.appendChild(el('span', { class: 'bar-option-label', text: label }));
+    line.appendChild(el('div', { class: 'bar-track' }, [bar]));
+    line.appendChild(el('span', { class: 'bar-count', text: `${pct}%` }));
+    wrap.appendChild(line);
+    bars.push([bar, pct]);
+  }
+
+  wrap.appendChild(el('button', { class: 'btn btn-primary', text: '次へ', onclick: onNext }));
+  for (const [bar, pct] of bars) animateBarWidth(bar, pct);
+  return wrap;
+}
+
+function shareText(summary) {
+  return `平凡投票アプリで${summary.matchCount}/${summary.totalCount}問「${summary.tier}」でした。あなたは世間の多数派と何問一致できる?`;
+}
+
+function renderShareButton(summary) {
+  const btn = el('button', { class: 'btn', text: '結果をシェアする' });
+  btn.addEventListener('click', async () => {
+    const text = shareText(summary);
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch {
+        // ユーザーがシェアをキャンセルしただけの場合もあるため、静かに無視する
+      }
+      return;
+    }
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text);
+      const original = btn.textContent;
+      btn.textContent = 'コピーしました!';
+      setTimeout(() => {
+        btn.textContent = original;
+      }, 1500);
+    }
+  });
+  return btn;
+}
+
+export function renderResult(summary, detailVotes, stats, { onHome, onHistory, onRetry }) {
   const wrap = el('div');
 
   const card = el('div', { class: 'card' });
@@ -187,6 +395,8 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory })
     );
   }
   card.appendChild(el('p', { class: 'progress', text: `通算満点: ${stats.perfectCount}回` }));
+  card.appendChild(el('button', { class: 'btn btn-primary', text: 'もう一度挑戦する', onclick: onRetry }));
+  card.appendChild(renderShareButton(summary));
   wrap.appendChild(card);
 
   const detailCard = el('div', { class: 'card' });
@@ -196,7 +406,7 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory })
   }
   wrap.appendChild(detailCard);
 
-  wrap.appendChild(el('button', { class: 'btn btn-primary', text: 'ホームに戻る', onclick: onHome }));
+  wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onHome }));
   wrap.appendChild(el('button', { class: 'btn-link', text: '履歴を見る', onclick: onHistory }));
   return wrap;
 }
@@ -240,6 +450,47 @@ export function renderHistoryDetail(session, votes, onBack) {
   wrap.appendChild(detailCard);
 
   wrap.appendChild(el('button', { class: 'btn-link', text: '履歴一覧に戻る', onclick: onBack }));
+  return wrap;
+}
+
+export function renderSuggestionForm(onSubmit, onCancel) {
+  const wrap = el('div');
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('h2', { text: 'お題を提案する' }));
+  card.appendChild(
+    el('p', { text: '「こんな二択のお題を入れてほしい」というアイデアを送ってください。' })
+  );
+
+  const form = el('form');
+  const textarea = el('textarea', {
+    rows: '4',
+    maxlength: '500',
+    placeholder: '例: エスカレーターで歩く派? 立ち止まる派?',
+  });
+  textarea.style.width = '100%';
+  form.appendChild(textarea);
+  form.appendChild(el('button', { class: 'btn btn-primary', type: 'submit', text: '送る' }));
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const text = textarea.value.trim();
+    if (!text) return;
+    onSubmit(text);
+  });
+
+  card.appendChild(form);
+  wrap.appendChild(card);
+  wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onCancel }));
+  return wrap;
+}
+
+export function renderSuggestionThanks(onBack) {
+  const wrap = el('div');
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('h2', { text: 'ありがとうございます!' }));
+  card.appendChild(el('p', { text: '届いたアイデアはお題の追加時に参考にさせてもらいます。' }));
+  wrap.appendChild(card);
+  wrap.appendChild(el('button', { class: 'btn btn-primary', text: 'ホームに戻る', onclick: onBack }));
   return wrap;
 }
 

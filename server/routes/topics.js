@@ -1,4 +1,9 @@
 const express = require('express');
+const { getLatestRealVoteRows } = require('../votes-dedup');
+
+// 属性別の傾向は、実データ(is_dummy=0、同一voter_idは最新1票のみ)がこの件数に届くまで
+// 「まだ十分でない」として隠す(2026-08-15指示: サンプルが少なすぎる分析は見せない)。
+const BREAKDOWN_MIN_REAL_VOTES = 100;
 
 function createTopicsRouter(db) {
   const router = express.Router();
@@ -7,15 +12,19 @@ function createTopicsRouter(db) {
   );
   const topicStmt = db.prepare('SELECT id, question FROM topics WHERE id = ?');
   const attributeIdsStmt = db.prepare('SELECT id FROM attributes');
-  const topicVotesStmt = db.prepare(
-    'SELECT option_id AS optionId, profile_json AS profileJson FROM votes WHERE topic_id = ?'
-  );
 
   router.get('/random', (req, res) => {
     const count = Math.min(Math.max(Number(req.query.count) || 10, 1), 100);
-    const topicRows = db
-      .prepare('SELECT id, question FROM topics ORDER BY RANDOM() LIMIT ?')
-      .all(count);
+    const category = typeof req.query.category === 'string' ? req.query.category : null;
+    const topicRows = category
+      ? db
+          .prepare(
+            "SELECT id, question FROM topics WHERE status = 'active' AND category = ? ORDER BY RANDOM() LIMIT ?"
+          )
+          .all(category, count)
+      : db
+          .prepare("SELECT id, question FROM topics WHERE status = 'active' ORDER BY RANDOM() LIMIT ?")
+          .all(count);
     const topics = topicRows.map((topic) => ({
       ...topic,
       options: optionStmt.all(topic.id),
@@ -24,7 +33,9 @@ function createTopicsRouter(db) {
   });
 
   router.get('/', (req, res) => {
-    const topicRows = db.prepare('SELECT id, question FROM topics ORDER BY question').all();
+    const topicRows = db
+      .prepare("SELECT id, question FROM topics WHERE status = 'active' ORDER BY question")
+      .all();
     const topics = topicRows.map((topic) => ({
       ...topic,
       options: optionStmt.all(topic.id),
@@ -42,7 +53,8 @@ function createTopicsRouter(db) {
     const attributeIds = attributeIdsStmt.all().map((row) => row.id);
     const breakdown = Object.fromEntries(attributeIds.map((id) => [id, {}]));
 
-    for (const vote of topicVotesStmt.all(topic.id)) {
+    const realVotes = getLatestRealVoteRows(db, topic.id);
+    for (const vote of realVotes) {
       let profile;
       try {
         profile = JSON.parse(vote.profileJson);
@@ -56,8 +68,14 @@ function createTopicsRouter(db) {
         perValue[vote.optionId] = (perValue[vote.optionId] ?? 0) + 1;
       }
     }
+    const realVoteCount = realVotes.length;
 
-    res.json({ topic: { ...topic, options: optionStmt.all(topic.id) }, breakdown });
+    res.json({
+      topic: { ...topic, options: optionStmt.all(topic.id) },
+      breakdown,
+      realVoteCount,
+      breakdownMinRealVotes: BREAKDOWN_MIN_REAL_VOTES,
+    });
   });
 
   return router;

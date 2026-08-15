@@ -1,9 +1,14 @@
+// 閾値は2026-08-15、実際のお題(questions-seed.json)のdummyVotes比率を使ったモンテカルロ
+// シミュレーション(母集団分布どおりに回答する「典型的な人」を20000セッション分試算)で検証済み。
+// 元の閾値(個性派>=0.2)だと「唯一無二」の出現率が0.02%(20000回中4回)しかなく実質到達不能だったため、
+// 0.3に引き上げて約0.4%(1/250程度)まで緩和した。「平凡」(0.5〜0.8)は64.8%とちょうど良い塊になっており
+// 妥当と判断、変更なし。
 function sessionTierFor(matchCount, totalCount) {
   if (matchCount === totalCount) return '真の平凡(今回)';
   const ratio = matchCount / totalCount;
   if (ratio >= 0.8) return 'かなり平凡';
   if (ratio >= 0.5) return '平凡';
-  if (ratio >= 0.2) return '個性派';
+  if (ratio >= 0.3) return '個性派';
   return '唯一無二';
 }
 

@@ -19,5 +19,24 @@
       { "id": "female", "label": "女性" },
       { "id": "other", "label": "その他・回答しない" }
     ]
+  },
+  {
+    "id": "blood_type",
+    "label": "血液型",
+    "values": [
+      { "id": "a", "label": "A型" },
+      { "id": "b", "label": "B型" },
+      { "id": "o", "label": "O型" },
+      { "id": "ab", "label": "AB型" }
+    ]
+  },
+  {
+    "id": "handedness",
+    "label": "利き手",
+    "values": [
+      { "id": "right", "label": "右利き" },
+      { "id": "left", "label": "左利き" },
+      { "id": "both", "label": "両利き" }
+    ]
   }
 ]

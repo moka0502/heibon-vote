@@ -9,7 +9,11 @@ async function request(path, options) {
 
 export const api = {
   getAttributes: () => request('/api/attributes'),
-  getRandomTopics: (count) => request(`/api/topics/random?count=${count}`),
+  getCategories: () => request('/api/categories'),
+  getRandomTopics: (count, category) =>
+    request(
+      `/api/topics/random?count=${count}${category ? `&category=${encodeURIComponent(category)}` : ''}`
+    ),
   getAllTopics: () => request('/api/topics'),
   getTopicBreakdown: (topicId) => request(`/api/topics/${topicId}/breakdown`),
   postVote: (payload) =>
@@ -27,4 +31,10 @@ export const api = {
   getSessions: () => request('/api/sessions'),
   getSession: (id) => request(`/api/sessions/${id}`),
   getSessionStats: () => request('/api/sessions/stats'),
+  postSuggestion: (text) =>
+    request('/api/suggestions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    }),
 };
