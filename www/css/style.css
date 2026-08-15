@@ -112,7 +112,7 @@ button {
 }
 
 .btn-link {
-  display: inline-block;
+  display: block;
   width: auto;
   background: none;
   border: none;
@@ -234,12 +234,9 @@ select {
 }
 
 .bar-option-label {
-  width: 6.5em;
+  min-width: 6.5em;
   flex-shrink: 0;
   color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .bar-track {

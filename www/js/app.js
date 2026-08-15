@@ -57,6 +57,11 @@ window.addEventListener('popstate', () => {
 
 async function showHome() {
   try {
+    // Homeに来る経路はどこであれ、進行中クイズへの復帰を意味しない
+    // (実際に再開させたい場合はinit()がrunQuiz()を直接呼ぶ)。
+    // クリアしないと、クイズ中に戻るボタンでHomeへ離脱した後リロードすると
+    // 中断したクイズへ強制的に戻されてしまう。
+    clearQuizState();
     const stats = await api.getSessionStats();
     mount(
       renderHome(stats, {
