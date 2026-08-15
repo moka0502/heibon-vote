@@ -144,7 +144,7 @@
       "yubune": 48
     },
     "source": "@DIME調査(2020年、全体ではシャワー派52%/湯船派47%)を基に按分。調査元により結果に幅があるため代表値を採用。2026-08-15調査(https://dime.jp/genre/1017932/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "hamigaki-asa-timing",
@@ -165,7 +165,7 @@
       "after": 75
     },
     "source": "たまひよ調査(成人対象、朝食後68.1%/朝食前22.7%/磨かない7.4%)のうち「磨かない」を除き、朝食前・朝食後の比率(22.7:68.1)に正規化して按分。2026-08-15調査(https://st.benesse.ne.jp/ikuji/content/?id=21198)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "smartphone-os",
@@ -459,7 +459,7 @@
       "night": 61
     },
     "source": "アンケート調査(朝シャンを取り入れている人は約39%)を基に按分。2026-08-15調査(https://www.dreamnews.jp/press/0000349445)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "furusato-nouzei-yaru",
@@ -543,7 +543,7 @@
       "warmer": 34
     },
     "source": "クロス・マーケティング調査(2025年、25℃以下35.8%+26℃30.2%=66.0%、27℃24.5%+28℃以上9.4%=33.9%)を基に按分。2026-08-15調査(https://www.cross-m.co.jp/report/trend-eye/20250724airconditioner)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "medama-kizami-katasa",
@@ -816,7 +816,7 @@
       "okanai": 39
     },
     "source": "Yahoo!アンケート(2021年7月実施、必要61.3%/必要ない38.7%)を基に按分。洋式トイレの普及で不要派が増えているとの指摘もあり、調査時期・対象で結果に幅がある。2026-08-15調査(https://otonanswer.jp/post/92982/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "bed-futon",
@@ -837,7 +837,7 @@
       "futon": 40
     },
     "source": "5000人アンケート(ベッド派約60%/布団派約40%)を基に按分。2026-08-15調査(https://dime.jp/genre/1427106/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "kanshoku-suru-shinai",
@@ -1950,6 +1950,132 @@
       "on": 24
     },
     "source": "アイリッジ調査(2024年12月発表、15〜69歳対象、通知設定をオンからオフに変更した経験がある人76%)を基に按分。2026-08-15調査(https://manamina.valuesccg.com/articles/3904)",
+    "status": "active"
+  },
+  {
+    "id": "sentaku-soto-heya",
+    "question": "洗濯物は外干し派? 部屋干し派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "soto",
+        "label": "外干し"
+      },
+      {
+        "id": "heya",
+        "label": "部屋干し"
+      }
+    ],
+    "dummyVotes": {
+      "soto": 67,
+      "heya": 33
+    },
+    "source": "アンケート調査(1100人対象、外干し59.7%/部屋干し28.8%との報告)の比率に正規化して按分。2026-08-15調査(https://uchi.tokyo-gas.co.jp/topics/5293)",
+    "status": "active"
+  },
+  {
+    "id": "mezamashi-sumaho-tokei",
+    "question": "目覚ましはスマホのアラーム派? 目覚まし時計派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "sumaho",
+        "label": "スマホのアラーム"
+      },
+      {
+        "id": "tokei",
+        "label": "目覚まし時計"
+      }
+    ],
+    "dummyVotes": {
+      "sumaho": 60,
+      "tokei": 40
+    },
+    "source": "kufura調査(スマホのアラームのみを使う人が約6割)を基に按分。2026-08-15調査(https://kufura.jp/life/lifeslyle/690364)",
+    "status": "active"
+  },
+  {
+    "id": "sentaku-senzai-ekitai-funmatsu",
+    "question": "洗濯洗剤は液体派? 粉末派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "ekitai",
+        "label": "液体"
+      },
+      {
+        "id": "funmatsu",
+        "label": "粉末"
+      }
+    ],
+    "dummyVotes": {
+      "ekitai": 82,
+      "funmatsu": 18
+    },
+    "source": "kufura調査(既婚女性229人対象、液体洗剤派が8割超)を基に按分。2026-08-15調査(https://kufura.jp/life/washing/247878)",
+    "status": "active"
+  },
+  {
+    "id": "haburashi-dendou-shudou",
+    "question": "歯みがきは電動歯ブラシ派? 手動歯ブラシ派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "dendou",
+        "label": "電動歯ブラシ"
+      },
+      {
+        "id": "shudou",
+        "label": "手動歯ブラシ"
+      }
+    ],
+    "dummyVotes": {
+      "dendou": 28,
+      "shudou": 72
+    },
+    "source": "ウミガメ株式会社調査(2024年3月、10〜20代男女対象、普段から電動歯ブラシを使用している人28%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000001.000138834.html)",
+    "status": "active"
+  },
+  {
+    "id": "washlet-hobo-maikai",
+    "question": "自宅の温水洗浄便座(ウォシュレット)はほぼ毎回使う派? 使わないことが多い派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "tsukau",
+        "label": "ほぼ毎回使う"
+      },
+      {
+        "id": "tsukawanai",
+        "label": "使わないことが多い"
+      }
+    ],
+    "dummyVotes": {
+      "tsukau": 53,
+      "tsukawanai": 47
+    },
+    "source": "nippon.com調査(2026年2月、自宅にウォシュレットがある人のうち「ほぼ毎回」使うと回答した人53%)を基に按分。2026-08-15調査(https://www.nippon.com/ja/japan-data/h02695/)",
+    "status": "active"
+  },
+  {
+    "id": "asa-senganryo-mizu",
+    "question": "朝の洗顔は洗顔料を使う派? 水(お湯)だけ派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "senganryo",
+        "label": "洗顔料を使う"
+      },
+      {
+        "id": "mizu",
+        "label": "水(お湯)だけ"
+      }
+    ],
+    "dummyVotes": {
+      "senganryo": 58,
+      "mizu": 42
+    },
+    "source": "花王 洗顔実態調査(朝の洗顔で洗顔料や石鹸を使わず水・お湯だけで洗う人が4割以上)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000020.000122153.html)",
     "status": "active"
   }
 ]
