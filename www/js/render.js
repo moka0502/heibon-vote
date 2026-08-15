@@ -44,6 +44,20 @@ function animateCountUp(el, target, { duration = 600, suffix = '' } = {}) {
   requestAnimationFrame(tick);
 }
 
+// 通算称号(server/tiers.jsのlifetimeTitleForと同じ閾値)まで、あと何回満点が要るかを示す。
+// 称号システムに「次のランクまでの距離感」がなかったことへの対応(Robinhood深掘り分R2)。
+const LIFETIME_TITLE_THRESHOLDS = [
+  { count: 1, title: '平凡の卵' },
+  { count: 3, title: '平凡上級者' },
+  { count: 10, title: '真の平凡' },
+];
+
+function nextLifetimeTitleHint(perfectCount) {
+  const next = LIFETIME_TITLE_THRESHOLDS.find((t) => perfectCount < t.count);
+  if (!next) return null;
+  return `あと${next.count - perfectCount}回満点で「${next.title}」`;
+}
+
 function formatDate(sqliteDatetime) {
   // SQLiteのdatetime('now')はUTCの 'YYYY-MM-DD HH:MM:SS' 形式で返る
   const date = new Date(`${sqliteDatetime}Z`);
@@ -187,6 +201,10 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
     card.appendChild(el('p', {}, [el('span', { class: 'badge', text: stats.lifetimeTitle })]));
   }
   card.appendChild(el('p', { class: 'progress', text: `通算満点: ${stats.perfectCount}回` }));
+  const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
+  if (nextTitleHint) {
+    card.appendChild(el('p', { class: 'progress', text: nextTitleHint }));
+  }
   card.appendChild(el('button', { class: 'btn btn-primary', text: '挑戦する', onclick: onStart }));
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn-link btn-link-emphasis', text: '履歴を見る', onclick: onHistory }));
@@ -468,6 +486,10 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
     );
   }
   card.appendChild(el('p', { class: 'progress', text: `通算満点: ${stats.perfectCount}回` }));
+  const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
+  if (nextTitleHint) {
+    card.appendChild(el('p', { class: 'progress', text: nextTitleHint }));
+  }
   card.appendChild(el('button', { class: 'btn btn-primary', text: 'もう一度挑戦する', onclick: onRetry }));
   card.appendChild(renderShareButton(summary));
   wrap.appendChild(card);
