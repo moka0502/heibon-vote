@@ -48,7 +48,9 @@ body {
 #app {
   max-width: 480px;
   margin: 0 auto;
-  padding: 16px 20px 48px;
+  padding: 16px 20px calc(48px + env(safe-area-inset-bottom));
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
 }
 
 .screen-enter {
@@ -73,6 +75,12 @@ body {
   padding: 20px;
   margin-bottom: 16px;
   box-shadow: 0 1px 3px rgba(31, 31, 36, 0.06);
+}
+
+/* 結果画面・履歴詳細のスコアカードは最重要情報なので、余白を広げて強弱をつける */
+.card-hero {
+  padding: 28px 20px;
+  margin-bottom: 24px;
 }
 
 /* ページ見出し(Home/カテゴリ選択/履歴等)は控えめに、クイズの質問文(.question-heading)は
@@ -112,7 +120,9 @@ button {
 }
 
 .btn:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
+  transform: scale(0.98);
+  border-color: var(--bg);
 }
 
 .btn.btn-selected:disabled {

@@ -271,7 +271,7 @@ export function renderTopicBreakdown(
       rowsContainer.appendChild(
         el('p', {
           class: 'progress',
-          text: 'まだ十分なデータがありません(実際に何度か挑戦してみてください)。',
+          text: 'この属性ではまだ十分なデータがありません。みんなが挑戦するほど、傾向がくっきり見えてきます。',
         })
       );
     }
@@ -386,7 +386,7 @@ function renderShareButton(summary) {
 export function renderResult(summary, detailVotes, stats, { onHome, onHistory, onRetry }) {
   const wrap = el('div');
 
-  const card = el('div', { class: 'card' });
+  const card = el('div', { class: 'card card-hero' });
   card.appendChild(
     el('div', { class: 'result-score', text: `${summary.matchCount} / ${summary.totalCount}` })
   );
@@ -420,7 +420,12 @@ export function renderHistoryList(sessions, { onSelect, onBack }) {
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: '履歴' }));
   if (sessions.length === 0) {
-    card.appendChild(el('p', { class: 'progress', text: 'まだ挑戦履歴がありません。' }));
+    card.appendChild(
+      el('p', {
+        class: 'progress',
+        text: 'まだ挑戦履歴がありません。最初の10問で、世間の多数派とどれだけ「平凡」でいられるか試してみましょう。',
+      })
+    );
   }
   for (const session of sessions) {
     const item = el('div', { class: 'session-list-item', onclick: () => onSelect(session.id) });
@@ -438,7 +443,7 @@ export function renderHistoryList(sessions, { onSelect, onBack }) {
 export function renderHistoryDetail(session, votes, onBack) {
   const wrap = el('div');
 
-  const card = el('div', { class: 'card' });
+  const card = el('div', { class: 'card card-hero' });
   card.appendChild(
     el('div', { class: 'result-score', text: `${session.matchCount} / ${session.totalCount}` })
   );
