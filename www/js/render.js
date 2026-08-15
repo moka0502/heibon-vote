@@ -351,6 +351,17 @@ export function renderTopicBreakdown(
 export function renderQuizQuestion(topic, index, total, onAnswer) {
   const wrap = el('div', { class: 'card' });
 
+  // 残り問題数を「カードの厚み」で物理的に感じさせる(Tinder/Bumble深掘り分B1)。
+  // 最後の1問では後ろに積むカードがないので省く。
+  const hasNext = index + 1 < total;
+  const stack = hasNext
+    ? el('div', { class: 'quiz-card-stack' }, [
+        el('div', { class: 'quiz-card-stack-shadow quiz-card-stack-shadow-2' }),
+        el('div', { class: 'quiz-card-stack-shadow quiz-card-stack-shadow-1' }),
+        wrap,
+      ])
+    : wrap;
+
   // Stories式に問題ごとに区切られたセグメント表示にする(2026-08-15、IG1対応)。
   const segments = [];
   for (let i = 0; i < total; i++) {
@@ -375,7 +386,7 @@ export function renderQuizQuestion(topic, index, total, onAnswer) {
     wrap.appendChild(btn);
   }
 
-  return wrap;
+  return stack;
 }
 
 export function renderQuestionFeedback(

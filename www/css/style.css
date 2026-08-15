@@ -84,6 +84,38 @@ body {
   margin-bottom: 24px;
 }
 
+/* クイズカードの後ろに次のカードが透けて見える「積み重ね」表現(B1)。 */
+.quiz-card-stack {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+.quiz-card-stack .card {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+}
+
+.quiz-card-stack-shadow {
+  position: absolute;
+  inset: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.quiz-card-stack-shadow-1 {
+  transform: translateY(8px) scale(0.97);
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.quiz-card-stack-shadow-2 {
+  transform: translateY(16px) scale(0.94);
+  opacity: 0.4;
+  z-index: -1;
+}
+
 /* ページ見出し(Home/カテゴリ選択/履歴等)は控えめに、クイズの質問文(.question-heading)は
    回答者の意識をその1問に集中させるため、あえて大きく・重くする(Typeform的な重み付け)。 */
 h2 {
