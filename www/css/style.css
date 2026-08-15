@@ -114,6 +114,24 @@ button {
   text-align: left;
   font-size: 1rem;
   transition: transform 0.08s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(0);
+  animation: ripple-expand 0.5s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple-expand {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }
 
 .btn:active {

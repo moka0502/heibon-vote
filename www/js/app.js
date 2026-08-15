@@ -52,6 +52,29 @@ function mount(node, backTo) {
   }
 }
 
+// タップ位置に応じて波紋が広がるリップルエフェクト(Material You深掘り分M2)。
+// ボタンはmount()のたびに作り直されるため、要素ごとにリスナーを付けるのではなく
+// documentへの委譲で全画面共通に対応する。
+document.addEventListener(
+  'click',
+  (event) => {
+    const btn = event.target.closest('.btn');
+    if (!btn || btn.classList.contains('btn-link') || btn.disabled) return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    ripple.style.left = `${event.clientX - rect.left - size / 2}px`;
+    ripple.style.top = `${event.clientY - rect.top - size / 2}px`;
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+  },
+  { capture: true }
+);
+
 window.addEventListener('popstate', () => {
   isPopping = true;
   (currentBack ?? showHome)();
