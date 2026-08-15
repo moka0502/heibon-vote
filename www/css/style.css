@@ -75,6 +75,19 @@ body {
   box-shadow: 0 1px 3px rgba(31, 31, 36, 0.06);
 }
 
+/* ページ見出し(Home/カテゴリ選択/履歴等)は控えめに、クイズの質問文(.question-heading)は
+   回答者の意識をその1問に集中させるため、あえて大きく・重くする(Typeform的な重み付け)。 */
+h2 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.question-heading {
+  font-size: 1.35rem;
+  line-height: 1.4;
+}
+
 button {
   font: inherit;
   cursor: pointer;
@@ -117,6 +130,12 @@ button {
   font-weight: 600;
 }
 
+.btn-outline {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .btn-link {
   display: block;
   width: auto;
@@ -126,6 +145,11 @@ button {
   text-decoration: underline;
   padding: 12px 0;
   min-height: 44px;
+}
+
+.btn-link-emphasis {
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .progress {
@@ -262,6 +286,13 @@ select {
   background: var(--accent);
   border-radius: 999px;
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 内訳バーで「あなたが選んだ選択肢」以外を落ち着かせ、自分の一票の行方が
+   一目で追えるようにする(常にインディゴ1色だと意味づけが伝わらなかったため)。 */
+.bar-muted {
+  background: var(--text-muted);
+  opacity: 0.35;
 }
 
 .bar-count {

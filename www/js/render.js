@@ -58,7 +58,7 @@ function renderVoteBreakdownRow(vote) {
     ].filter(Boolean);
     const label = tags.length ? `${option.label}(${tags.join('・')})` : option.label;
 
-    const bar = el('div', { class: 'bar' });
+    const bar = el('div', { class: option.id === vote.optionId ? 'bar' : 'bar bar-muted' });
     const line = el('div', { class: 'bar-line' });
     line.appendChild(el('span', { class: 'bar-option-label', text: label }));
     line.appendChild(el('div', { class: 'bar-track' }, [bar]));
@@ -154,7 +154,7 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
   card.appendChild(el('p', { class: 'progress', text: `通算満点: ${stats.perfectCount}回` }));
   card.appendChild(el('button', { class: 'btn btn-primary', text: '挑戦する', onclick: onStart }));
   wrap.appendChild(card);
-  wrap.appendChild(el('button', { class: 'btn-link', text: '履歴を見る', onclick: onHistory }));
+  wrap.appendChild(el('button', { class: 'btn-link btn-link-emphasis', text: '履歴を見る', onclick: onHistory }));
   wrap.appendChild(el('button', { class: 'btn-link', text: 'お題の内訳を見る', onclick: onTopics }));
   wrap.appendChild(el('button', { class: 'btn-link', text: 'あなたについての設定', onclick: onSettings }));
   wrap.appendChild(el('button', { class: 'btn-link', text: 'お題を提案する', onclick: onSuggest }));
@@ -175,7 +175,7 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
   for (const category of categories) {
     card.appendChild(
       el('button', {
-        class: 'btn',
+        class: 'btn btn-outline',
         text: `${category.label}(${category.count}問)`,
         onclick: () => onSelectCategory(category.id),
       })
@@ -293,7 +293,7 @@ export function renderQuizQuestion(topic, index, total, onAnswer) {
   ]);
   wrap.appendChild(progressTrack);
   wrap.appendChild(el('p', { class: 'progress', text: `${index + 1} / ${total} 問目` }));
-  wrap.appendChild(el('h2', { text: topic.question }));
+  wrap.appendChild(el('h2', { class: 'question-heading', text: topic.question }));
 
   const buttons = [];
   for (const option of topic.options) {
@@ -330,7 +330,7 @@ export function renderQuestionFeedback(
       }),
     ])
   );
-  wrap.appendChild(el('h2', { text: topic.question }));
+  wrap.appendChild(el('h2', { class: 'question-heading', text: topic.question }));
 
   const bars = [];
   for (const option of topic.options) {
@@ -341,7 +341,7 @@ export function renderQuestionFeedback(
     ].filter(Boolean);
     const label = tags.length ? `${option.label}(${tags.join('・')})` : option.label;
 
-    const bar = el('div', { class: 'bar' });
+    const bar = el('div', { class: option.id === chosenOptionId ? 'bar' : 'bar bar-muted' });
     const line = el('div', { class: 'bar-line' });
     line.appendChild(el('span', { class: 'bar-option-label', text: label }));
     line.appendChild(el('div', { class: 'bar-track' }, [bar]));
