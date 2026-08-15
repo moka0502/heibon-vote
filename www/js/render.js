@@ -333,9 +333,12 @@ export function renderTopicBreakdown(
 export function renderQuizQuestion(topic, index, total, onAnswer) {
   const wrap = el('div', { class: 'card' });
 
-  const progressTrack = el('div', { class: 'quiz-progress-track' }, [
-    el('div', { class: 'quiz-progress-fill' }),
-  ]);
+  // Stories式に問題ごとに区切られたセグメント表示にする(2026-08-15、IG1対応)。
+  const segments = [];
+  for (let i = 0; i < total; i++) {
+    segments.push(el('div', { class: i <= index ? 'quiz-progress-segment is-filled' : 'quiz-progress-segment' }));
+  }
+  const progressTrack = el('div', { class: 'quiz-progress-track' }, segments);
   wrap.appendChild(progressTrack);
   wrap.appendChild(el('p', { class: 'progress', text: `${index + 1} / ${total} 問目` }));
   wrap.appendChild(el('h2', { class: 'question-heading', text: topic.question }));
@@ -354,7 +357,6 @@ export function renderQuizQuestion(topic, index, total, onAnswer) {
     wrap.appendChild(btn);
   }
 
-  animateBarWidth(progressTrack.firstChild, ((index + 1) / total) * 100);
   return wrap;
 }
 
