@@ -218,6 +218,10 @@ export function renderTopicBreakdown(
         text: `属性別の傾向はまだ表示できません(実際の回答 ${realVoteCount} / ${breakdownMinRealVotes}件)。もっとみんなが挑戦すると見られるようになります。`,
       })
     );
+    const pct = Math.min(100, Math.round((realVoteCount / breakdownMinRealVotes) * 100));
+    const bar = el('div', { class: 'bar' });
+    card.appendChild(el('div', { class: 'bar-track' }, [bar]));
+    animateBarWidth(bar, pct);
     wrap.appendChild(card);
     wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onBack }));
     return wrap;
@@ -469,12 +473,19 @@ export function renderSuggestionForm(onSubmit, onCancel) {
   });
   textarea.style.width = '100%';
   form.appendChild(textarea);
+  const validationError = el('p', { class: 'error', style: 'display:none', text: '入力してから送ってください。' });
+  form.appendChild(validationError);
   form.appendChild(el('button', { class: 'btn btn-primary', type: 'submit', text: '送る' }));
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const text = textarea.value.trim();
-    if (!text) return;
+    if (!text) {
+      validationError.style.display = 'block';
+      textarea.focus();
+      return;
+    }
+    validationError.style.display = 'none';
     onSubmit(text);
   });
 
@@ -495,8 +506,13 @@ export function renderSuggestionThanks(onBack) {
 }
 
 export function renderError(message, onRetry) {
+  // ユーザーには技術的な詳細(HTTPステータス等)を出さず、常に同じやさしい文言にする。
+  // 原因調査用に生のメッセージはconsoleへ残す。
+  console.error('renderError:', message);
   const wrap = el('div', { class: 'card' });
-  wrap.appendChild(el('p', { class: 'error', text: `エラーが発生しました: ${message}` }));
+  wrap.appendChild(
+    el('p', { class: 'error', text: '通信がうまくいきませんでした。もう一度お試しください。' })
+  );
   if (onRetry) wrap.appendChild(el('button', { class: 'btn', text: '再読み込み', onclick: onRetry }));
   return wrap;
 }
