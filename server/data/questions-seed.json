@@ -942,7 +942,7 @@
       "shinai": 49
     },
     "source": "アンケート調査(2013年、何らかのギャンブルをすると回答した人が51.4%、しないが48.6%)を基に按分。2026-08-15調査(https://research-panel.jp/rpdr/view.php?eid=257414&aid=1068385)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "udedokei-tsukeru",
@@ -2454,6 +2454,216 @@
       "sonota": 78
     },
     "source": "アンケート調査(日用品・身だしなみ用品の中で「リップクリーム」を必ず持ち歩くと回答した人が2割超)を基に按分。2026-08-15調査(https://arinna.co.jp/mellow/cosmetics-4/)",
+    "status": "active"
+  },
+  {
+    "id": "uranai-shinjiru-shinjinai",
+    "question": "占いは信じる派? 信じない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "shinjiru",
+        "label": "信じる"
+      },
+      {
+        "id": "shinjinai",
+        "label": "信じない"
+      }
+    ],
+    "dummyVotes": {
+      "shinjiru": 74,
+      "shinjinai": 26
+    },
+    "source": "マイボイスコム調査(占いを「信じない」と回答した人26.5%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000346.000007815.html)",
+    "status": "active"
+  },
+  {
+    "id": "ketsuekigata-uranai-shinjiru",
+    "question": "血液型占い(性格診断)を信じる派? 信じない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "shinjiru",
+        "label": "信じる"
+      },
+      {
+        "id": "shinjinai",
+        "label": "信じない"
+      }
+    ],
+    "dummyVotes": {
+      "shinjiru": 64,
+      "shinjinai": 36
+    },
+    "source": "Lani調査(2023年4月、血液型占い・血液型診断を「信じている」と回答した人64%)を基に按分。2026-08-15調査(https://lani.co.jp/190314)",
+    "status": "active"
+  },
+  {
+    "id": "omikuji-shinjiru-shinjinai",
+    "question": "おみくじの結果を信じる派? 信じない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "shinjiru",
+        "label": "信じる"
+      },
+      {
+        "id": "shinjinai",
+        "label": "信じない"
+      }
+    ],
+    "dummyVotes": {
+      "shinjiru": 66,
+      "shinjinai": 34
+    },
+    "source": "合同会社Laniアンケート(おみくじの結果を「信じる」と回答した人66%)を基に按分。2026-08-15調査(https://www.dreamnews.jp/press/0000278489/)",
+    "status": "active"
+  },
+  {
+    "id": "omikuji-hiku-hikanai",
+    "question": "初詣でおみくじを引く派? 引かない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "hiku",
+        "label": "引く"
+      },
+      {
+        "id": "hikanai",
+        "label": "引かない"
+      }
+    ],
+    "dummyVotes": {
+      "hiku": 48,
+      "hikanai": 52
+    },
+    "source": "合同会社Laniアンケート(初詣に行った人のうちおみくじを引いた人は47.5%)を基に按分。2026-08-15調査(https://www.dreamnews.jp/press/0000278489/)",
+    "status": "active"
+  },
+  {
+    "id": "rokuyou-kinisuru",
+    "question": "大安・仏滅などの「六曜」を気にする派? 気にしない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "kininaru",
+        "label": "気にする"
+      },
+      {
+        "id": "kininai",
+        "label": "気にしない"
+      }
+    ],
+    "dummyVotes": {
+      "kininaru": 48,
+      "kininai": 52
+    },
+    "source": "NEXER調査(大安や仏滅などの「六曜」を普段から気にしていると回答した人47.7%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000869.000044800.html)",
+    "status": "active"
+  },
+  {
+    "id": "yotsuba-clover-mitsuketa",
+    "question": "四つ葉のクローバーを見つけたことがある派? 一度もない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "aru",
+        "label": "ある"
+      },
+      {
+        "id": "nai",
+        "label": "一度もない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 80,
+      "nai": 20
+    },
+    "source": "ウェザーニュース調査(2023年5月、7986人対象、四つ葉のクローバーを一度も見つけた経験がない人は約2割)を基に按分。2026-08-15調査(https://weathernews.jp/s/topics/202305/030095/)",
+    "status": "active"
+  },
+  {
+    "id": "tesou-mitemoratta",
+    "question": "占いで手相を見てもらったことがある派? ない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "aru",
+        "label": "ある"
+      },
+      {
+        "id": "nai",
+        "label": "ない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 75,
+      "nai": 25
+    },
+    "source": "プロペディア調査(2024年1月、占い経験者のうち手相をみてもらったことがある人は約75%)を基に按分。占い未経験者を含めた全体ではもっと少ない可能性がある。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000008.000135658.html)",
+    "status": "active"
+  },
+  {
+    "id": "hatsuyume-fuji-taka-nasu",
+    "question": "初夢で「一富士二鷹三茄子」を見たことがある派? 見たことがない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "aru",
+        "label": "ある"
+      },
+      {
+        "id": "nai",
+        "label": "ない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 10,
+      "nai": 90
+    },
+    "source": "株式会社NEXER(日本トレンドリサーチ)調査(初夢で「一富士二鷹三茄子」を見たことがある人は約1割)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000073.000087626.html)",
+    "status": "active"
+  },
+  {
+    "id": "powerspot-itta-ittenai",
+    "question": "パワースポットに行ったことがある派? ない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "aru",
+        "label": "ある"
+      },
+      {
+        "id": "nai",
+        "label": "ない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 57,
+      "nai": 43
+    },
+    "source": "ナビット調査(1000人対象、パワースポットに行ったことが「ある」56.9%)を基に按分。2026-08-15調査(https://www.navit-j.com/media/?p=107042)",
+    "status": "active"
+  },
+  {
+    "id": "nazuke-kakusuu-kinisuru",
+    "question": "赤ちゃんの名前は画数(姓名判断)を気にする派? 気にしない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "kinisuru",
+        "label": "気にする"
+      },
+      {
+        "id": "kininai",
+        "label": "気にしない"
+      }
+    ],
+    "dummyVotes": {
+      "kinisuru": 70,
+      "kininai": 30
+    },
+    "source": "名付けポン調査(赤ちゃんの名前を付けるとき画数を気にして付けた先輩ママ・パパは7割)を基に按分。2026-08-15調査(https://pon-navi.net/nazuke/seimeihandan/nazuke-kakusuu-kinisuru)",
     "status": "active"
   }
 ]
