@@ -26,6 +26,7 @@ body {
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
   min-height: 100vh;
+  overscroll-behavior-y: contain;
 }
 
 .app-header {

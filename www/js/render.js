@@ -132,6 +132,14 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
 
   const form = el('form', { class: 'card' });
   form.appendChild(el('h2', { text: title }));
+  if (currentValues) {
+    form.appendChild(
+      el('p', {
+        class: 'progress',
+        text: 'ここで変更しても、これまでの挑戦履歴やスコアは変わりません。次回以降の回答に使われます。',
+      })
+    );
+  }
 
   const selects = {};
   for (const attribute of attributes) {
@@ -217,6 +225,12 @@ export function renderTopicList(topics, { onSelect, onBack }) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: 'お題の内訳を見る' }));
+  card.appendChild(
+    el('p', {
+      class: 'progress',
+      text: '気になるお題を選ぶと、選択肢ごとの割合や年代・血液型などの属性別の傾向が見られます。',
+    })
+  );
   for (const topic of topics) {
     const item = el('div', { class: 'session-list-item', onclick: () => onSelect(topic.id) });
     item.appendChild(el('span', { text: topic.question }));
@@ -424,6 +438,14 @@ function renderShareButton(summary) {
   return btn;
 }
 
+// 満点・最下位ランクだけ、淡々とした事実提示に少し意外性のある一言を添える
+// (Spotify Wrapped深掘り分SW2)。中間ランクは狙いすぎると嘘っぽくなるため据え置き。
+function resultFlavorText(tier) {
+  if (tier === '真の平凡(今回)') return '実はあなたは、"普通"を体現する才能の持ち主かもしれません。';
+  if (tier === '唯一無二') return '実はあなたは、かなり個性的な選択をする人でした。';
+  return null;
+}
+
 export function renderResult(summary, detailVotes, stats, { onHome, onHistory, onRetry }) {
   const wrap = el('div');
 
@@ -432,6 +454,10 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
     el('div', { class: 'result-score', text: `${summary.matchCount} / ${summary.totalCount}` })
   );
   card.appendChild(el('div', { class: 'result-tier', text: summary.tier }));
+  const flavorText = resultFlavorText(summary.tier);
+  if (flavorText) {
+    card.appendChild(el('p', { style: 'text-align:center', text: flavorText }));
+  }
   if (stats.lifetimeTitle) {
     card.appendChild(
       el('p', { style: 'text-align:center' }, [
