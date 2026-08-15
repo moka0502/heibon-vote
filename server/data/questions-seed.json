@@ -249,7 +249,7 @@
       "fold": 61
     },
     "source": "男性対象アンケート(長財布38%/二つ折り財布59%)の比率に正規化して按分。女性は長財布派が多いとの調査もあり、性別で傾向が逆転する点に注意。2026-08-15調査(https://simple-wallet.net/wallet-selection-select_method/long-wallet-vs-folded-wallet/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "neru-toki-denki",
@@ -963,7 +963,7 @@
       "tsukenai": 26
     },
     "source": "成人男性500人アンケート(4人に1人(26.4%)が腕時計をつけないと回答)を基に按分。2026-08-15調査(https://first-class.ne.jp/columns/watch_survey)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "love-give-or-receive",
@@ -2244,6 +2244,216 @@
       "ittenai": 87
     },
     "source": "楽天インサイト調査(2021年、直近1年以内にキャンプに行っていない人が87.3%)を基に按分。2026-08-15調査(https://insight.rakuten.co.jp/report/20210630/)",
+    "status": "active"
+  },
+  {
+    "id": "ecobag-mochiaruku",
+    "question": "エコバッグを持ち歩く派? 持ち歩かない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "mochiaruku",
+        "label": "持ち歩く"
+      },
+      {
+        "id": "mochiarukanai",
+        "label": "持ち歩かない"
+      }
+    ],
+    "dummyVotes": {
+      "mochiaruku": 79,
+      "mochiarukanai": 21
+    },
+    "source": "LINEリサーチ調査(ふだんの買い物で持参したエコバッグを使う人は約79%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000003447.000001594.html)",
+    "status": "active"
+  },
+  {
+    "id": "mybottle-mochiaruku",
+    "question": "マイボトル(水筒)を持ち歩く派? 持ち歩かない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "mochiaruku",
+        "label": "持ち歩く"
+      },
+      {
+        "id": "mochiarukanai",
+        "label": "持ち歩かない"
+      }
+    ],
+    "dummyVotes": {
+      "mochiaruku": 75,
+      "mochiarukanai": 25
+    },
+    "source": "水分補給に関するアンケート調査(マイボトルの利用は75%)を基に按分。2026-08-15調査(https://www.atpress.ne.jp/news/295461)",
+    "status": "active"
+  },
+  {
+    "id": "mobile-battery-mochiaruku",
+    "question": "外出時にモバイルバッテリーを持ち歩く派? 持ち歩かない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "mochiaruku",
+        "label": "持ち歩く"
+      },
+      {
+        "id": "mochiarukanai",
+        "label": "持ち歩かない"
+      }
+    ],
+    "dummyVotes": {
+      "mochiaruku": 36,
+      "mochiarukanai": 64
+    },
+    "source": "クロス・マーケティング調査(2025年10月、外出時にモバイルバッテリーを持ち歩く人35.8%)を基に按分。2026-08-15調査(https://www.cross-m.co.jp/report/trend-eye/20251029mobilebattery)",
+    "status": "active"
+  },
+  {
+    "id": "earphone-yusen-wireless",
+    "question": "イヤホンは有線派? ワイヤレス派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "wireless",
+        "label": "ワイヤレス"
+      },
+      {
+        "id": "yusen",
+        "label": "有線"
+      }
+    ],
+    "dummyVotes": {
+      "wireless": 80,
+      "yusen": 20
+    },
+    "source": "パナソニック調査(2024年、20代社会人のワイヤレスイヤホン使用率は約8割)を基に按分。年代により差があり、全年代では有線の所有率も依然高いとの調査もある。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000877.000024101.html)",
+    "status": "active"
+  },
+  {
+    "id": "mask-tsukeru-hi-ooi",
+    "question": "マスクを着ける日が多い派? ほとんど着けない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "ooi",
+        "label": "着ける日が多い"
+      },
+      {
+        "id": "sukunai",
+        "label": "ほとんど着けない"
+      }
+    ],
+    "dummyVotes": {
+      "ooi": 69,
+      "sukunai": 31
+    },
+    "source": "調査(2025年、普段マスクを「着ける日が多い」56.8%/「ほとんど着けない」25.9%)の比率に正規化して按分。2026-08-15調査(https://hoitto-hc.com/19157/)",
+    "status": "active"
+  },
+  {
+    "id": "techou-kami-sumaho",
+    "question": "スケジュール管理は紙の手帳派? スマホ(アプリ)派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "techou",
+        "label": "紙の手帳"
+      },
+      {
+        "id": "sumaho",
+        "label": "スマホ(アプリ)"
+      }
+    ],
+    "dummyVotes": {
+      "techou": 53,
+      "sumaho": 47
+    },
+    "source": "JMAM(日本能率協会マネジメントセンター)調査(スケジュール管理のメインツール「手帳」29.3%/「スマートフォン」26.3%)の比率に正規化して按分。2026-08-15調査(https://www.jmam.co.jp/topics/1234712_1893.html)",
+    "status": "active"
+  },
+  {
+    "id": "kousui-tsukeru-tsukenai",
+    "question": "香水を日常的につける派? つけない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "tsukeru",
+        "label": "つける"
+      },
+      {
+        "id": "tsukenai",
+        "label": "つけない"
+      }
+    ],
+    "dummyVotes": {
+      "tsukeru": 5,
+      "tsukenai": 95
+    },
+    "source": "2025年最新調査(日常的に香水をつける人はわずか5.3%)を基に按分。2026-08-15調査(https://haute-jewel.com/%E9%A6%99%E6%B0%B4%E3%81%A4%E3%81%91%E3%82%8B%E4%BA%BA%E3%81%8C%E6%B8%9B%E3%81%A3%E3%81%9F%E3%81%A3%E3%81%A6%E6%9C%AC%E5%BD%93%EF%BC%9F2025%E5%B9%B4%E6%9C%80%E6%96%B0%E8%AA%BF%E6%9F%BB%E3%81%A7/)",
+    "status": "active"
+  },
+  {
+    "id": "bag-ryuck-tote",
+    "question": "通勤・通学バッグはリュック派? トートバッグなど手提げ派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "ryuck",
+        "label": "リュック"
+      },
+      {
+        "id": "tote",
+        "label": "トートバッグなど手提げ"
+      }
+    ],
+    "dummyVotes": {
+      "ryuck": 58,
+      "tote": 42
+    },
+    "source": "マイナビニュース調査(20代・30代では6割弱がリュックタイプの通勤バッグを使用と回答)を基に按分。年代により差が大きい。2026-08-15調査(https://news.mynavi.jp/article/20220614-2363081/)",
+    "status": "active"
+  },
+  {
+    "id": "sunglasses-kakeru-kakenai",
+    "question": "サングラスをかける派? かけない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "kakeru",
+        "label": "かける"
+      },
+      {
+        "id": "kakenai",
+        "label": "かけない"
+      }
+    ],
+    "dummyVotes": {
+      "kakeru": 48,
+      "kakenai": 52
+    },
+    "source": "GLAFAS(メガネ・サングラス総合情報サイト)調査(サングラス利用者は5割弱)を基に按分。2026-08-15調査(https://www.glafas.com/news/topics/210416eyewear_users_survey.html)",
+    "status": "active"
+  },
+  {
+    "id": "lip-cream-mochiaruku",
+    "question": "リップクリームを必ず持ち歩く派? そうでない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "mochiaruku",
+        "label": "必ず持ち歩く"
+      },
+      {
+        "id": "sonota",
+        "label": "そうでない"
+      }
+    ],
+    "dummyVotes": {
+      "mochiaruku": 22,
+      "sonota": 78
+    },
+    "source": "アンケート調査(日用品・身だしなみ用品の中で「リップクリーム」を必ず持ち歩くと回答した人が2割超)を基に按分。2026-08-15調査(https://arinna.co.jp/mellow/cosmetics-4/)",
     "status": "active"
   }
 ]
