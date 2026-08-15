@@ -1488,7 +1488,7 @@
       "nai": 9
     },
     "source": "調査のチカラ(残業は発生しないと答えた人9%)を基に按分。2026-08-15調査(https://chosa.itmedia.co.jp/categories/career/89884)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "shussha-hitsuyou",
@@ -1509,7 +1509,7 @@
       "fuhitsuyou": 23
     },
     "source": "Job総研「2026年 出社に関する実態調査」(出社は必要だと思う派76.8%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000276.000013597.html)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "tenshoku-kentouchuu",
@@ -1530,7 +1530,7 @@
       "shiteinai": 42
     },
     "source": "doda調査(ビジネスパーソン2,000人対象、転職済み・予定あり・検討中の合計57.5%)を基に按分。2026-08-15調査(https://doda.jp/guide/ishiki/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "fukugyou-suru-shinai",
@@ -1551,7 +1551,7 @@
       "shinai": 94
     },
     "source": "労働政策研究・研修機構(JILPT)調査(副業をしている人6.0%)を基に按分。2026-08-15調査(https://www.jil.go.jp/press/documents/20230519.pdf)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "bounenkai-sanka",
@@ -1572,7 +1572,7 @@
       "fusanka": 44
     },
     "source": "Job総研調査(2023年、忘年会に行きたくない人44.2%/行きたい人55.8%)を基に按分。2026-08-15調査(https://jobsoken.jp/info/j-58/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "hiruyasumi-hitori",
@@ -1593,7 +1593,7 @@
       "dareka": 38
     },
     "source": "プラス株式会社「職場の居心地WEB調査」(職場での昼休みを一人で過ごしている人61.2%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000008.000106100.html)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "suit-tsukin",
@@ -1614,7 +1614,7 @@
       "casual": 70
     },
     "source": "オフィスワーカー1012人調査(スーツ勤務29.6%、残りはオフィスカジュアル・制服等)を基に按分。2026-08-15調査(https://officenomikata.jp/news/15995/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "nomikai-suki-nigate",
@@ -1635,7 +1635,7 @@
       "nigate": 67
     },
     "source": "アンケート調査(会社の飲み会が好き33.4%/苦手66.7%)を基に按分。2026-08-15調査(https://woman.mynavi.jp/article/170526-14/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "baisoku-shichou",
@@ -1741,5 +1741,89 @@
     },
     "source": "テレワーク・リモートワーク総合研究所調査(顔出しする派の合計57.47%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000101.000069473.html)",
     "status": "stock"
+  },
+  {
+    "id": "lunch-bento-gaishoku",
+    "question": "職場の昼食は手作り弁当(持参)派? 外食・購入派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "bento",
+        "label": "手作り弁当(持参)"
+      },
+      {
+        "id": "other",
+        "label": "外食・購入"
+      }
+    ],
+    "dummyVotes": {
+      "bento": 35,
+      "other": 65
+    },
+    "source": "JRTA(日本弁当サービス協会)調査(2015年、ビジネスパーソンの弁当持参率34.8%)を基に按分。2026-08-15調査(https://www.jrta.co.jp/pdf/research/business_person/person_vol7.pdf)",
+    "status": "active"
+  },
+  {
+    "id": "telework-genzai",
+    "question": "現在、テレワーク(在宅勤務)をしている派? していない派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "shiteiru",
+        "label": "している"
+      },
+      {
+        "id": "shiteinai",
+        "label": "していない"
+      }
+    ],
+    "dummyVotes": {
+      "shiteiru": 15,
+      "shiteinai": 85
+    },
+    "source": "日本生産性本部調査(2025年1月発表、テレワーク実施率14.6%で過去最低を更新)を基に按分。2026-08-15調査(https://kyodonewsprwire.jp/release/202501273401)",
+    "status": "active"
+  },
+  {
+    "id": "yukyu-torishi-yasui",
+    "question": "有給休暇は取りやすいと感じる派? 取りにくいと感じる派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "yasui",
+        "label": "取りやすい"
+      },
+      {
+        "id": "nikui",
+        "label": "取りにくい"
+      }
+    ],
+    "dummyVotes": {
+      "yasui": 74,
+      "nikui": 26
+    },
+    "source": "日本労働調査組合「中小企業の有給取得に関するアンケート」(有給休暇をある程度自由に取得できると回答した人74.3%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000009.000074057.html)",
+    "status": "active"
+  },
+  {
+    "id": "tenkin-ikitakunai",
+    "question": "転勤は受け入れる派? できれば行きたくない派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "ukeireru",
+        "label": "受け入れる"
+      },
+      {
+        "id": "ikitakunai",
+        "label": "できれば行きたくない"
+      }
+    ],
+    "dummyVotes": {
+      "ukeireru": 47,
+      "ikitakunai": 53
+    },
+    "source": "労働政策研究・研修機構(JILPT)「ビジネス・レーバー・トレンド」2026年8・9月号(回答者の約53%が転勤に「行きたくない」と回答)を基に按分。2026-08-15調査(https://www.jil.go.jp/kokunai/blt/backnumber/2026/08_09/special_03.html)",
+    "status": "active"
   }
 ]
