@@ -273,6 +273,21 @@ select {
   gap: 8px;
   margin-bottom: 6px;
   font-size: 0.85rem;
+  border-radius: 8px;
+}
+
+/* 自分の一票が反映された行だけ、着地の瞬間に一度だけ淡くハイライトする */
+.bar-line-you {
+  animation: pulse-you 0.8s ease;
+}
+
+@keyframes pulse-you {
+  from {
+    background: var(--accent-soft);
+  }
+  to {
+    background: transparent;
+  }
 }
 
 .bar-option-label {
@@ -394,7 +409,8 @@ select {
   .quiz-progress-fill,
   .feedback-banner,
   .screen-enter,
-  .spinner {
+  .spinner,
+  .bar-line-you {
     animation: none !important;
     transition: none !important;
   }

@@ -200,7 +200,7 @@ function runQuiz(state) {
 
 async function answerQuestion(state, topic, optionId) {
   try {
-    const { voteId, isMajorityMatch, majorityOptionId, percentages } = await api.postVote({
+    const { voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes } = await api.postVote({
       topicId: topic.id,
       optionId,
       profile: state.profile,
@@ -208,8 +208,14 @@ async function answerQuestion(state, topic, optionId) {
     });
     const nextState = { ...state, index: state.index + 1, voteIds: [...state.voteIds, voteId] };
     mount(
-      renderQuestionFeedback(topic, optionId, isMajorityMatch, majorityOptionId, percentages, () =>
-        runQuiz(nextState)
+      renderQuestionFeedback(
+        topic,
+        optionId,
+        isMajorityMatch,
+        majorityOptionId,
+        percentages,
+        totalVotes,
+        () => runQuiz(nextState)
       ),
       showHome
     );

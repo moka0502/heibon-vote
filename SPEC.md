@@ -97,7 +97,7 @@
 | `GET /api/topics/random?count=10&category=xxx` | ランダムにactive問題を出題。`category`省略で全カテゴリから |
 | `GET /api/topics` | active問題の一覧(お題の内訳を見る画面用) |
 | `GET /api/topics/:id/breakdown` | 属性別内訳(100件未満は非表示扱い) |
-| `POST /api/votes` | `{topicId, optionId, profile, voterId}` → `{voteId, isMajorityMatch, majorityOptionId, percentages}` |
+| `POST /api/votes` | `{topicId, optionId, profile, voterId}` → `{voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes}`。`totalVotes`はその時点の母集団総数(ダミー+実データ、または実データのみ、`server/majority.js`の閾値ロジックに従う) |
 | `POST /api/sessions` | `{voteIds}` → 10問分のvoteIdを1セッションに束ね、サーバー側で正誤を再計算・確定 → `{sessionId, matchCount, totalCount, tier}` |
 | `GET /api/sessions` | 履歴一覧(新しい順) |
 | `GET /api/sessions/:id` | セッション詳細+各問の内訳(%バー用) |

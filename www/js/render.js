@@ -27,6 +27,23 @@ function animateBarWidth(barEl, pct) {
   });
 }
 
+// バーの伸びと歩調を合わせて数字もカウントアップさせる(Robinhood深掘り分R1: バーの幅は
+// アニメーションするのに隣の数字が瞬間表示だと不自然、という指摘への対応)。
+function animateCountUp(el, target, { duration = 600, suffix = '' } = {}) {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = `${target}${suffix}`;
+    return;
+  }
+  const start = performance.now();
+  function tick(now) {
+    const elapsed = Math.min(1, (now - start) / duration);
+    const eased = 1 - (1 - elapsed) ** 3;
+    el.textContent = `${Math.round(target * eased)}${suffix}`;
+    if (elapsed < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
 function formatDate(sqliteDatetime) {
   // SQLiteのdatetime('now')はUTCの 'YYYY-MM-DD HH:MM:SS' 形式で返る
   const date = new Date(`${sqliteDatetime}Z`);
@@ -59,14 +76,18 @@ function renderVoteBreakdownRow(vote) {
     const label = tags.length ? `${option.label}(${tags.join('・')})` : option.label;
 
     const bar = el('div', { class: option.id === vote.optionId ? 'bar' : 'bar bar-muted' });
+    const countEl = el('span', { class: 'bar-count', text: '0%' });
     const line = el('div', { class: 'bar-line' });
     line.appendChild(el('span', { class: 'bar-option-label', text: label }));
     line.appendChild(el('div', { class: 'bar-track' }, [bar]));
-    line.appendChild(el('span', { class: 'bar-count', text: `${pct}%` }));
+    line.appendChild(countEl);
     row.appendChild(line);
-    bars.push([bar, pct]);
+    bars.push([bar, countEl, pct]);
   }
-  for (const [bar, pct] of bars) animateBarWidth(bar, pct);
+  for (const [bar, countEl, pct] of bars) {
+    animateBarWidth(bar, pct);
+    animateCountUp(countEl, pct, { suffix: '%' });
+  }
   return row;
 }
 
@@ -262,16 +283,20 @@ export function renderTopicBreakdown(
         const count = perOption[option.id] ?? 0;
         const pct = total > 0 ? Math.round((count / total) * 100) : 0;
         const bar = el('div', { class: 'bar' });
+        const countEl = el('span', { class: 'bar-count', text: '0' });
         const line = el('div', { class: 'bar-line' });
         line.appendChild(el('span', { class: 'bar-option-label', text: option.label }));
         line.appendChild(el('div', { class: 'bar-track' }, [bar]));
-        line.appendChild(el('span', { class: 'bar-count', text: `${count}` }));
+        line.appendChild(countEl);
         row.appendChild(line);
-        bars.push([bar, pct]);
+        bars.push([bar, countEl, pct, count]);
       }
       rowsContainer.appendChild(row);
     }
-    for (const [bar, pct] of bars) animateBarWidth(bar, pct);
+    for (const [bar, countEl, pct, count] of bars) {
+      animateBarWidth(bar, pct);
+      animateCountUp(countEl, count);
+    }
 
     if (!hasData) {
       rowsContainer.appendChild(
@@ -325,6 +350,7 @@ export function renderQuestionFeedback(
   isMajorityMatch,
   majorityOptionId,
   percentages,
+  totalVotes,
   onNext
 ) {
   const wrap = el('div', { class: 'card' });
@@ -337,27 +363,36 @@ export function renderQuestionFeedback(
     ])
   );
   wrap.appendChild(el('h2', { class: 'question-heading', text: topic.question }));
+  if (typeof totalVotes === 'number') {
+    wrap.appendChild(el('p', { class: 'progress', text: `${totalVotes}件の回答から算出` }));
+  }
 
   const bars = [];
   for (const option of topic.options) {
     const pct = percentages[option.id] ?? 0;
+    const isYours = option.id === chosenOptionId;
     const tags = [
-      option.id === chosenOptionId ? 'あなた' : null,
+      isYours ? 'あなた' : null,
       option.id === majorityOptionId ? '多数派' : null,
     ].filter(Boolean);
     const label = tags.length ? `${option.label}(${tags.join('・')})` : option.label;
 
-    const bar = el('div', { class: option.id === chosenOptionId ? 'bar' : 'bar bar-muted' });
-    const line = el('div', { class: 'bar-line' });
+    const bar = el('div', { class: isYours ? 'bar' : 'bar bar-muted' });
+    const countEl = el('span', { class: 'bar-count', text: '0%' });
+    // 自分の一票が反映された行だけ、着地の瞬間を一度だけ強調する演出(Slido深掘り分S3)。
+    const line = el('div', { class: isYours ? 'bar-line bar-line-you' : 'bar-line' });
     line.appendChild(el('span', { class: 'bar-option-label', text: label }));
     line.appendChild(el('div', { class: 'bar-track' }, [bar]));
-    line.appendChild(el('span', { class: 'bar-count', text: `${pct}%` }));
+    line.appendChild(countEl);
     wrap.appendChild(line);
-    bars.push([bar, pct]);
+    bars.push([bar, countEl, pct]);
   }
 
   wrap.appendChild(el('button', { class: 'btn btn-primary', text: '次へ', onclick: onNext }));
-  for (const [bar, pct] of bars) animateBarWidth(bar, pct);
+  for (const [bar, countEl, pct] of bars) {
+    animateBarWidth(bar, pct);
+    animateCountUp(countEl, pct, { suffix: '%' });
+  }
   return wrap;
 }
 

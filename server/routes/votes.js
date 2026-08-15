@@ -42,6 +42,7 @@ function createVotesRouter(db) {
       isMajorityMatch: optionId === majorityOptionId,
       majorityOptionId,
       percentages,
+      totalVotes: total,
     });
   });
 
