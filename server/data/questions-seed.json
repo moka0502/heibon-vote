@@ -81,7 +81,7 @@
       "cat": 46
     },
     "source": "アイスタット調査等(究極の選択で犬派5割/猫派4割程度)を基に按分。2026-08-05調査(https://istat.jp/archives/4067)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "asagohan-pan-gohan",
@@ -522,7 +522,7 @@
       "outdoor": 30
     },
     "source": "MERY調査(Z世代対象、インドア派が7割近くと報告)を基に概算按分。調査対象や時期によりインドア派6〜7割程度で幅がある。2026-08-15調査(https://mery.jp/2486968)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "aircon-ondo-natsu",
@@ -585,7 +585,7 @@
       "dislike": 13
     },
     "source": "ナビット調査(2024年10月、1000人対象、「好き」+「どちらかといえば好き」計86.9%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000001677.000080271.html)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "sports-kansen-suru",
@@ -606,7 +606,7 @@
       "no": 40
     },
     "source": "Timely Researchアンケート(スポーツ観戦をする人は全体の約60%)を基に按分。2026-08-15調査(https://www.dims.ne.jp/timelyresearch/2019/190712/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "hanami-iku",
@@ -2076,6 +2076,174 @@
       "mizu": 42
     },
     "source": "花王 洗顔実態調査(朝の洗顔で洗顔料や石鹸を使わず水・お湯だけで洗う人が4割以上)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000020.000122153.html)",
+    "status": "active"
+  },
+  {
+    "id": "eiga-eigakan-haishin",
+    "question": "映画は映画館で観る派? テレビ・配信で観る派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "eigakan",
+        "label": "映画館で観る"
+      },
+      {
+        "id": "haishin",
+        "label": "テレビ・配信で観る"
+      }
+    ],
+    "dummyVotes": {
+      "eigakan": 44,
+      "haishin": 56
+    },
+    "source": "クロス・マーケティング調査(2025年、映画の鑑賞方法「テレビ放送で観る」45.8%/「映画館に観に行く」36.2%)の比率に正規化して按分。2026-08-15調査(https://www.cross-m.co.jp/report/trend-eye/20250827cinema)",
+    "status": "active"
+  },
+  {
+    "id": "karaoke-suki-nigate",
+    "question": "カラオケは好き派? 苦手派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "suki",
+        "label": "好き"
+      },
+      {
+        "id": "nigate",
+        "label": "苦手"
+      }
+    ],
+    "dummyVotes": {
+      "suki": 46,
+      "nigate": 54
+    },
+    "source": "日本リサーチセンター(NRC)調査(カラオケが好き34.0%/嫌い39.4%)の比率に正規化して按分。2026-08-15調査(https://www.nrc.co.jp/report/170412.html)",
+    "status": "active"
+  },
+  {
+    "id": "dokusho-suki-nigate",
+    "question": "読書は好き派? 苦手派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "suki",
+        "label": "好き"
+      },
+      {
+        "id": "nigate",
+        "label": "苦手"
+      }
+    ],
+    "dummyVotes": {
+      "suki": 82,
+      "nigate": 18
+    },
+    "source": "日本財団「18歳意識調査」(2020年10月、読書が「好き」59.7%/「嫌い」12.8%)の比率に正規化して按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000148.000025872.html)",
+    "status": "active"
+  },
+  {
+    "id": "game-suru-shinai",
+    "question": "ゲーム(スマホ・PC等)をする派? しない派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "suru",
+        "label": "する"
+      },
+      {
+        "id": "shinai",
+        "label": "しない"
+      }
+    ],
+    "dummyVotes": {
+      "suru": 55,
+      "shinai": 45
+    },
+    "source": "eSports World調査(全国10〜50代対象、PCゲーム・スマホゲームをしないと回答した人45.0%)を基に按分。2026-08-15調査(https://esports-world.jp/news/40312)",
+    "status": "active"
+  },
+  {
+    "id": "pet-katteiru-katteinai",
+    "question": "ペットを飼っている派? 飼っていない派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "katteiru",
+        "label": "飼っている"
+      },
+      {
+        "id": "katteinai",
+        "label": "飼っていない"
+      }
+    ],
+    "dummyVotes": {
+      "katteiru": 43,
+      "katteinai": 57
+    },
+    "source": "ウォーカープラス調査(2024年8月、ペット飼育率43.1%)を基に按分。2026-08-15調査(https://www.walkerplus.com/article/1218336/)",
+    "status": "active"
+  },
+  {
+    "id": "oshikatsu-suru-shinai",
+    "question": "推し活をしている派? していない派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "suru",
+        "label": "している"
+      },
+      {
+        "id": "shinai",
+        "label": "していない"
+      }
+    ],
+    "dummyVotes": {
+      "suru": 27,
+      "shinai": 73
+    },
+    "source": "モニタス調査(15〜69歳全国対象、推し活をしている27.3%/していない72.8%)を基に按分。2026-08-15調査(https://monitas.co.jp/data-and-knowledge/report/fandom-survey.html)",
+    "status": "active"
+  },
+  {
+    "id": "ryokou-keikaku-ikiatari",
+    "question": "旅行は計画をしっかり立てる派? 行き当たりばったり派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "keikaku",
+        "label": "計画をしっかり立てる"
+      },
+      {
+        "id": "ikiatari",
+        "label": "行き当たりばったり"
+      }
+    ],
+    "dummyVotes": {
+      "keikaku": 73,
+      "ikiatari": 27
+    },
+    "source": "阪急交通社調査(旅行の計画的派57%/行き当たりばったり派21%)の比率に正規化して按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000546.000007099.html)",
+    "status": "active"
+  },
+  {
+    "id": "camp-ikimashita",
+    "question": "直近1年でキャンプに行った派? 行っていない派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "itta",
+        "label": "行った"
+      },
+      {
+        "id": "ittenai",
+        "label": "行っていない"
+      }
+    ],
+    "dummyVotes": {
+      "itta": 13,
+      "ittenai": 87
+    },
+    "source": "楽天インサイト調査(2021年、直近1年以内にキャンプに行っていない人が87.3%)を基に按分。2026-08-15調査(https://insight.rakuten.co.jp/report/20210630/)",
     "status": "active"
   }
 ]
