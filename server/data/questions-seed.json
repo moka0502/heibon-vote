@@ -186,7 +186,7 @@
       "android": 51
     },
     "source": "MMD研究所調査(2026年2月、18-69歳4万人対象、iPhone49.0%/Android50.8%)を基に按分。2026-08-15調査(https://mmdlabo.jp/investigation/detail_2527.html)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "osake-nomu-nomanai",
@@ -1656,7 +1656,7 @@
       "touhai": 48
     },
     "source": "NTTドコモ モバイル社会研究所調査(2024年9月、全体の5割強が倍速視聴することがある)を基に按分。2026-08-15調査(https://www.moba-ken.jp/project/lifestyle/20240924.html)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "denshi-vs-kami-book",
@@ -1677,7 +1677,7 @@
       "denshi": 9
     },
     "source": "ナビット調査(1000人対象、紙の本派76.5%/電子書籍派7.7%の比率に正規化)を基に按分。2026-08-15調査(https://www.navit-j.com/media/?p=98474)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "tv-realtime",
@@ -1698,7 +1698,7 @@
       "minai": 37
     },
     "source": "LINEリサーチ調査(テレビをリアルタイムで見る人6割超)を基に按分。2026-08-15調査(https://www.screens-lab.jp/article/29012)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "tsuchi-settei",
@@ -1719,7 +1719,7 @@
       "default": 70
     },
     "source": "NTTドコモ モバイル社会研究所調査(2023年2月、自身で通知の設定・解除をしているのは約3割)を基に按分。2026-08-15調査(https://www.moba-ken.jp/project/lifestyle/20230525.html)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "web-kaigi-kaodashi",
@@ -1740,7 +1740,7 @@
       "shinai": 43
     },
     "source": "テレワーク・リモートワーク総合研究所調査(顔出しする派の合計57.47%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000101.000069473.html)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "lunch-bento-gaishoku",
@@ -1824,6 +1824,132 @@
       "ikitakunai": 53
     },
     "source": "労働政策研究・研修機構(JILPT)「ビジネス・レーバー・トレンド」2026年8・9月号(回答者の約53%が転勤に「行きたくない」と回答)を基に按分。2026-08-15調査(https://www.jil.go.jp/kokunai/blt/backnumber/2026/08_09/special_03.html)",
+    "status": "active"
+  },
+  {
+    "id": "music-subsc-cd",
+    "question": "音楽はサブスク(定額配信)派? CD・購入派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "subsc",
+        "label": "サブスク(定額配信)"
+      },
+      {
+        "id": "cd",
+        "label": "CD・購入"
+      }
+    ],
+    "dummyVotes": {
+      "subsc": 44,
+      "cd": 56
+    },
+    "source": "日本の音楽市場データ(2022年、オーディオレコード(CD等)56%/音楽配信(サブスク等)44%)を基に按分。2026-08-15調査(https://www.saishintech.com/2023/03/japanese-music-market-cd-vs-streaming-mar-2023/)",
+    "status": "active"
+  },
+  {
+    "id": "sumaho-lock-yubi-kao",
+    "question": "スマホの画面ロックは指紋認証派? 顔認証派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "yubi",
+        "label": "指紋認証"
+      },
+      {
+        "id": "kao",
+        "label": "顔認証"
+      }
+    ],
+    "dummyVotes": {
+      "yubi": 73,
+      "kao": 27
+    },
+    "source": "MMD研究所調査(2020年12月、15〜69歳428人対象、指紋認証42.7%/顔認証16.0%)の比率に正規化して按分。2026-08-15調査(https://mmdlabo.jp/investigation/detail_1928.html)",
+    "status": "active"
+  },
+  {
+    "id": "password-tsukaimawasu",
+    "question": "パスワードは使い回す派? サービスごとに変える派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "tsukaimawasu",
+        "label": "使い回す"
+      },
+      {
+        "id": "kaeru",
+        "label": "サービスごとに変える"
+      }
+    ],
+    "dummyVotes": {
+      "tsukaimawasu": 60,
+      "kaeru": 40
+    },
+    "source": "Yahoo!JAPANアンケート(パスワードを使い回していると回答した人が約6割)を基に按分。2026-08-15調査(https://internet.watch.impress.co.jp/docs/news/1387210.html)",
+    "status": "active"
+  },
+  {
+    "id": "sumaho-case-tsukau",
+    "question": "スマホケースを使う派? 使わない派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "tsukau",
+        "label": "使う"
+      },
+      {
+        "id": "tsukawanai",
+        "label": "使わない"
+      }
+    ],
+    "dummyVotes": {
+      "tsukau": 93,
+      "tsukawanai": 7
+    },
+    "source": "LINEリサーチ調査(2021年12月、15〜59歳5252人対象、スマホケースを使っていない人は7%)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000003580.000001594.html)",
+    "status": "active"
+  },
+  {
+    "id": "sns-fukusuu-account",
+    "question": "SNSは複数のアカウントを使い分ける派? 1つのアカウントのみ派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "fukusuu",
+        "label": "複数を使い分ける"
+      },
+      {
+        "id": "hitotsu",
+        "label": "1つのみ"
+      }
+    ],
+    "dummyVotes": {
+      "fukusuu": 62,
+      "hitotsu": 38
+    },
+    "source": "BIGLOBE調査(2017年、10代のSNS利用者のうち61.5%が複数アカウントを使い分けていると回答)を基に按分。年代により差が大きく、20代では9割超との調査もある。2026-08-15調査(https://www.biglobe.co.jp/pressroom/info/2017/03/170328-1)",
+    "status": "active"
+  },
+  {
+    "id": "notification-off-keiken",
+    "question": "アプリの通知設定をオンからオフに変更したことがある派? ずっとオンのまま派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "off",
+        "label": "オフにしたことがある"
+      },
+      {
+        "id": "on",
+        "label": "ずっとオンのまま"
+      }
+    ],
+    "dummyVotes": {
+      "off": 76,
+      "on": 24
+    },
+    "source": "アイリッジ調査(2024年12月発表、15〜69歳対象、通知設定をオンからオフに変更した経験がある人76%)を基に按分。2026-08-15調査(https://manamina.valuesccg.com/articles/3904)",
     "status": "active"
   }
 ]
