@@ -84,6 +84,13 @@ function createSessionsRouter(db) {
       res.status(400).json({ error: `voteIds must contain exactly ${QUESTIONS_PER_SESSION} entries` });
       return;
     }
+    // voteIdsに数値以外(オブジェクト等)が混じっていると、後段のSQLプレースホルダ
+    // バインドで`RangeError: Too few parameter values were provided`が投げられ500に
+    // なっていた(2026-08-16、大規模テストで発見)。ここで型を検証し400で弾く。
+    if (!voteIds.every((id) => Number.isInteger(id))) {
+      res.status(400).json({ error: 'voteIds must be an array of integers' });
+      return;
+    }
 
     const placeholders = voteIds.map(() => '?').join(',');
     const votes = db
@@ -94,15 +101,18 @@ function createSessionsRouter(db) {
       )
       .all(...voteIds);
 
+    // 「存在しない」と「既に別のセッションに使われている」を別々のメッセージで返すと、
+    // 外部から特定のvoteIdの実在・使用状況を列挙できてしまう(2026-08-16、大規模テストの
+    // 意地悪テストで発見)。クライアントもエラー内容で分岐しないため、あえて同じ文言にする。
     if (votes.length !== voteIds.length) {
-      res.status(400).json({ error: 'one or more voteIds not found' });
+      res.status(400).json({ error: 'one or more voteIds are invalid' });
       return;
     }
     // 既に別のセッションに使われたvoteIdを再送すると、session_idの無条件UPDATEで
     // 元のセッションからvoteが奪われ、元のセッションの内訳が空になってしまう
     // (2026-08-16、大規模テストの意地悪テストで発見)。
     if (votes.some((v) => v.sessionId !== null)) {
-      res.status(400).json({ error: 'one or more voteIds already belong to another session' });
+      res.status(400).json({ error: 'one or more voteIds are invalid' });
       return;
     }
 

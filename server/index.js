@@ -21,6 +21,16 @@ app.use('/api/sessions', createSessionsRouter(db));
 app.use('/api/suggestions', createSuggestionsRouter(db));
 app.use(express.static(path.join(__dirname, '..', 'www')));
 
+// グローバル例外ハンドラ(2026-08-16、大規模テストのセキュリティ観点で発見)。
+// これがないと、ルートハンドラ内の同期例外(不正なリクエスト由来のものを含む)が
+// Expressの既定エラーハンドラに落ち、サーバーの絶対パスを含むスタックトレースが
+// そのままHTMLでクライアントに返ってしまう。ここで捕捉し、詳細はサーバー側の
+// ログにのみ残し、クライアントには汎用的なエラーだけを返す。
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'internal server error' });
+});
+
 app.listen(PORT, () => {
   console.log(`heibon-vote server listening on http://localhost:${PORT}`);
 });
