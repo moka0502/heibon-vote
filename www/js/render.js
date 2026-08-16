@@ -255,6 +255,12 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: 'お題を選ぶ' }));
   card.appendChild(
+    el('p', {
+      class: 'progress',
+      text: '気になるジャンルで挑戦してもいいし、まずはランダムに10問答えてみてもOK。',
+    })
+  );
+  card.appendChild(
     el('button', {
       class: 'btn btn-primary',
       text: 'ランダム(全部から10問)',
@@ -560,7 +566,7 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   wrap.appendChild(card);
 
   const detailCard = el('div', { class: 'card' });
-  detailCard.appendChild(el('h3', { text: '内訳' }));
+  detailCard.appendChild(el('h3', { text: 'くわしい内訳' }));
   for (const vote of detailVotes) {
     detailCard.appendChild(renderVoteBreakdownRow(vote));
   }
@@ -608,7 +614,7 @@ export function renderHistoryDetail(session, votes, onBack) {
   wrap.appendChild(card);
 
   const detailCard = el('div', { class: 'card' });
-  detailCard.appendChild(el('h3', { text: '内訳' }));
+  detailCard.appendChild(el('h3', { text: 'くわしい内訳' }));
   for (const vote of votes) {
     detailCard.appendChild(renderVoteBreakdownRow(vote));
   }
