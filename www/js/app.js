@@ -44,6 +44,8 @@ let pendingDirection = null; // null=通常の遷移(進む)、'back'=popstate�
 let hasPushedInitialState = false;
 
 function mount(node, backTo) {
+  // 最初の画面が描画された時点で起動スプラッシュ(Native#9)を消す。
+  document.getElementById('splash')?.remove();
   // 進む(pushState)は右から、戻る(popstate)は左からスライドインさせ、
   // 階層のどちら向きに動いたか方向性を感じられるようにする(Native#3)。
   const isBack = pendingDirection === 'back';

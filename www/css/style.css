@@ -30,6 +30,25 @@ body {
   overflow-x: hidden;
 }
 
+/* JS読み込み完了までの一瞬の白画面を防ぐスプラッシュ(Native#9)。アイコン(www/icons/)と
+   同じ「インディゴ背景に平」を踏襲し、新しい配色判断は増やさない。app.js側のmount()の
+   初回呼び出しで削除する。 */
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+}
+
+#splash span {
+  color: var(--accent-contrast);
+  font-size: 3rem;
+  font-weight: 700;
+}
+
 .app-header {
   padding: 24px 20px 8px;
   text-align: center;

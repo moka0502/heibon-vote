@@ -6,6 +6,10 @@ export function playResultReveal(root, { matchCount, totalCount }) {
   const tierEl = root.querySelector('.result-tier');
   if (!scoreEl || !tierEl) return;
 
+  // 満点(真の平凡)だけ特別な瞬間として演出を強めにする(Tinder/Bumble深掘り分B3:
+  // 演出強度が常に一定だった指摘への対応)。それ以外は従来どおりの控えめな演出のまま。
+  const isPerfect = matchCount === totalCount;
+
   const counter = { value: 0 };
   scoreEl.textContent = `0 / ${totalCount}`;
 
@@ -19,10 +23,19 @@ export function playResultReveal(root, { matchCount, totalCount }) {
   });
 
   gsap.from(tierEl, {
-    scale: 0.5,
+    scale: isPerfect ? 0.3 : 0.5,
     opacity: 0,
-    duration: 0.4,
+    duration: isPerfect ? 0.6 : 0.4,
     delay: 0.5,
-    ease: 'back.out(1.7)',
+    ease: isPerfect ? 'elastic.out(1, 0.5)' : 'back.out(1.7)',
   });
+
+  const heroEl = root.querySelector('.card-hero');
+  if (isPerfect && heroEl) {
+    gsap.fromTo(
+      heroEl,
+      { boxShadow: '0 0 0 0 rgba(91, 91, 214, 0.35)' },
+      { boxShadow: '0 0 0 16px rgba(91, 91, 214, 0)', duration: 1, delay: 0.5, ease: 'power1.out' }
+    );
+  }
 }
