@@ -488,7 +488,7 @@ function shareText(summary) {
 }
 
 function renderShareButton(summary) {
-  const btn = el('button', { class: 'btn', text: '結果をシェアする' });
+  const btn = el('button', { class: 'btn btn-outline', text: '結果をシェアする' });
   btn.addEventListener('click', async () => {
     const text = shareText(summary);
     if (navigator.share) {
@@ -675,7 +675,7 @@ export function renderSuggestionThanks(onBack) {
 export function renderOffline(onRetry) {
   const wrap = el('div', { class: 'card' });
   wrap.appendChild(el('p', { class: 'error', text: 'オフラインのようです。通信環境を確認してから、もう一度お試しください。' }));
-  if (onRetry) wrap.appendChild(el('button', { class: 'btn', text: '再読み込み', onclick: onRetry }));
+  if (onRetry) wrap.appendChild(el('button', { class: 'btn btn-outline', text: '再読み込み', onclick: onRetry }));
   return wrap;
 }
 
@@ -687,6 +687,6 @@ export function renderError(message, onRetry) {
   wrap.appendChild(
     el('p', { class: 'error', text: '通信がうまくいきませんでした。もう一度お試しください。' })
   );
-  if (onRetry) wrap.appendChild(el('button', { class: 'btn', text: '再読み込み', onclick: onRetry }));
+  if (onRetry) wrap.appendChild(el('button', { class: 'btn btn-outline', text: '再読み込み', onclick: onRetry }));
   return wrap;
 }
