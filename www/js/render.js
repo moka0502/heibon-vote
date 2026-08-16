@@ -233,7 +233,7 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: '挑戦しよう' }));
   card.appendChild(
-    el('p', { text: 'ランダムな10問に答えて、世間の多数派とどれだけ一致できるか試そう。' })
+    el('p', { text: '色々なカテゴリの10問に答えて、世間の多数派とどれだけ一致できるか試そう。' })
   );
   if (stats.lifetimeTitle) {
     card.appendChild(
