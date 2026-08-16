@@ -132,7 +132,7 @@ function showSuggestionForm() {
     renderSuggestionForm(async (text) => {
       try {
         await api.postSuggestion(text);
-        mount(renderSuggestionThanks(showHome), showHome);
+        mount(renderSuggestionThanks(text, showHome), showHome);
       } catch (err) {
         mountError(err.message, showHome, showHome);
       }

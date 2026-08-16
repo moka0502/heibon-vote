@@ -670,11 +670,15 @@ export function renderSuggestionForm(onSubmit, onCancel) {
   return wrap;
 }
 
-export function renderSuggestionThanks(onBack) {
+export function renderSuggestionThanks(text, onBack) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: 'ありがとうございます!' }));
-  card.appendChild(el('p', { text: '届いたアイデアはお題の追加時に参考にさせてもらいます。' }));
+  // 汎用文言だけでなく、実際に送った内容を引用して「ちゃんと届いた」実感を持たせる(T3)。
+  const preview = text.length > 40 ? `${text.slice(0, 40)}…` : text;
+  card.appendChild(
+    el('p', { text: `「${preview}」、確かに届きました。お題の追加時に参考にさせてもらいます。` })
+  );
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn btn-primary', text: 'ホームに戻る', onclick: onBack }));
   return wrap;
