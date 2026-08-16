@@ -185,19 +185,31 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
     );
   }
 
-  const selects = {};
+  // ネイティブselect依存から、Duolingo風の大きくタップできる選択肢ボタンへ(D3)。
+  const selectedValues = {};
   for (const attribute of attributes) {
     const field = el('div', { class: 'field' });
-    field.appendChild(el('label', { text: attribute.label, for: `attr-${attribute.id}` }));
-    const select = el('select', { id: `attr-${attribute.id}`, name: attribute.id });
+    field.appendChild(el('span', { class: 'field-label', text: attribute.label }));
+    selectedValues[attribute.id] = currentValues?.[attribute.id] ?? attribute.values[0].id;
+
+    const optionButtons = [];
+    const optionsWrap = el('div', { class: 'attribute-options' });
     for (const value of attribute.values) {
-      select.appendChild(el('option', { value: value.id, text: value.label }));
+      const isSelected = value.id === selectedValues[attribute.id];
+      const optionBtn = el('button', {
+        type: 'button',
+        class: `btn btn-outline attribute-option${isSelected ? ' is-selected' : ''}`,
+        text: value.label,
+      });
+      optionBtn.addEventListener('click', () => {
+        selectedValues[attribute.id] = value.id;
+        for (const b of optionButtons) b.classList.remove('is-selected');
+        optionBtn.classList.add('is-selected');
+      });
+      optionButtons.push(optionBtn);
+      optionsWrap.appendChild(optionBtn);
     }
-    if (currentValues?.[attribute.id]) {
-      select.value = currentValues[attribute.id];
-    }
-    selects[attribute.id] = select;
-    field.appendChild(select);
+    field.appendChild(optionsWrap);
     form.appendChild(field);
   }
 
@@ -205,11 +217,7 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const values = {};
-    for (const [id, select] of Object.entries(selects)) {
-      values[id] = select.value;
-    }
-    onSubmit(values);
+    onSubmit({ ...selectedValues });
   });
 
   if (!onCancel) return form;

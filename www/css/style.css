@@ -345,11 +345,31 @@ button {
   margin-bottom: 16px;
 }
 
-.field label {
+.field label,
+.field-label {
   display: block;
   margin-bottom: 6px;
   font-size: 0.9rem;
   color: var(--text-muted);
+}
+
+/* プロフィール設定をnative selectからタップ式の選択肢チップへ(D3)。 */
+.attribute-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attribute-option {
+  width: auto;
+  margin-bottom: 0;
+  padding: 10px 16px;
+}
+
+.attribute-option.is-selected {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
 }
 
 select {
