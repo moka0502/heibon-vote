@@ -51,7 +51,7 @@
 ## 投票の正誤判定(`server/routes/votes.js` / `server/routes/sessions.js`)
 
 - `POST /api/votes`時点で、その一票を数える**前**の多数派を`majority_option_id_at_vote`としてスナップショットし、`votes`テーブルに保存する
-- クライアントには、その一票を含めた最新の内訳(`percentages`)と、その一票が多数派と一致したか(`isMajorityMatch`)を返す
+- クライアントには、その一票を含めた最新の内訳(`percentages`)と、その一票が多数派と一致したか(`isMajorityMatch`)を返す。`percentages`は`server/majority.js`の`percentagesFor()`で計算し、最後の選択肢だけ「残り」として算出することで合計が必ず100%になるようにしている(各選択肢を独立に`Math.round`すると101%等になる実例が確認されたため、2026-08-16に修正)
 - `POST /api/sessions`(10問終わった時点)では、クライアントの自己申告を一切信用せず、`votes.majority_option_id_at_vote`と`votes.option_id`をサーバー側で突き合わせて`match_count`を再計算する。`voteIds`はちょうど10件でないと400、既に別のセッションに使われたvoteIdが含まれる場合も400(2026-08-16、大規模テストで発見した不具合への対応。以前はどちらも未検証で、他セッションのvoteIdを再送すると元セッションの内訳が消える不具合があった)
 
 ## 重複投票の扱い(`server/votes-dedup.js`)

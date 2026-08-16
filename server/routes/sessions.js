@@ -1,7 +1,7 @@
 const express = require('express');
 const crypto = require('node:crypto');
 const { sessionTierFor, lifetimeTitleFor } = require('../tiers');
-const { getVoteCounts } = require('../majority');
+const { getVoteCounts, percentagesFor } = require('../majority');
 
 function createSessionsRouter(db) {
   const router = express.Router();
@@ -65,10 +65,7 @@ function createSessionsRouter(db) {
     }
     const votes = getSessionVotesStmt.all(req.params.id).map((vote) => {
       const counts = getVoteCounts(db, vote.topicId);
-      const total = counts.reduce((sum, c) => sum + c.count, 0);
-      const percentages = Object.fromEntries(
-        counts.map((c) => [c.optionId, total > 0 ? Math.round((c.count / total) * 100) : 0])
-      );
+      const percentages = percentagesFor(counts);
       return { ...vote, options: optionStmt.all(vote.topicId), percentages };
     });
     res.json({ session, votes });

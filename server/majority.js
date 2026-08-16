@@ -43,4 +43,28 @@ function getMajorityOptionId(db, topicId) {
   return best ? best.optionId : null;
 }
 
-module.exports = { getMajorityOptionId, getVoteCounts, REAL_VOTE_MAJORITY_THRESHOLD };
+// 各選択肢の割合を独立にMath.roundすると、四捨五入の影響で合計が100%に
+// ならないことがある(例: 88.4%/13.6% → 88%/13%は合計101%になる代わりに丸まる場合あり。
+// 実データで122問中1問、合計101%になる事例を確認した。2026-08-16、大規模テストで発見)。
+// 最後の選択肢だけ「残り」として計算することで、合計が必ず100%になるようにする。
+function percentagesFor(counts) {
+  const total = counts.reduce((sum, c) => sum + c.count, 0);
+  const result = {};
+  let assigned = 0;
+  counts.forEach((c, index) => {
+    if (total === 0) {
+      result[c.optionId] = 0;
+      return;
+    }
+    if (index === counts.length - 1) {
+      result[c.optionId] = 100 - assigned;
+    } else {
+      const pct = Math.round((c.count / total) * 100);
+      result[c.optionId] = pct;
+      assigned += pct;
+    }
+  });
+  return result;
+}
+
+module.exports = { getMajorityOptionId, getVoteCounts, percentagesFor, REAL_VOTE_MAJORITY_THRESHOLD };

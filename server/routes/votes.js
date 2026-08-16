@@ -1,5 +1,5 @@
 const express = require('express');
-const { getMajorityOptionId, getVoteCounts } = require('../majority');
+const { getMajorityOptionId, getVoteCounts, percentagesFor } = require('../majority');
 
 function createVotesRouter(db) {
   const router = express.Router();
@@ -33,9 +33,7 @@ function createVotesRouter(db) {
     // 自分の一票を含めた最新の内訳を、そのまま画面のフィードバックに使う
     const counts = getVoteCounts(db, topicId);
     const total = counts.reduce((sum, c) => sum + c.count, 0);
-    const percentages = Object.fromEntries(
-      counts.map((c) => [c.optionId, total > 0 ? Math.round((c.count / total) * 100) : 0])
-    );
+    const percentages = percentagesFor(counts);
 
     res.json({
       voteId: result.lastInsertRowid,
