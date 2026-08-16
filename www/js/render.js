@@ -511,28 +511,92 @@ export function renderQuestionFeedback(
 }
 
 function shareText(summary) {
-  return `平凡投票アプリで${summary.matchCount}/${summary.totalCount}問「${summary.tier}」でした。あなたは世間の多数派と何問一致できる?`;
+  const categoryPart = summary.categoryLabel ? `「${summary.categoryLabel}」で` : '';
+  return `平凡投票アプリで${categoryPart}${summary.matchCount}/${summary.totalCount}問「${summary.tier}」でした。あなたは世間の多数派と何問一致できる?`;
+}
+
+// テキストのみのシェアだと拡散力が弱いという指摘を受け、結果を画像化する
+// (2026-08-16)。SNS(X等)はビジュアル付きの投稿の方が反応率が高いため。
+function drawShareCard(summary) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1080;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#faf9f7';
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.roundRect(60, 60, 960, 960, 40);
+  ctx.fill();
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#6b6b76';
+  ctx.font = '600 40px system-ui, sans-serif';
+  ctx.fillText('平凡投票アプリ', 540, 190);
+
+  if (summary.categoryLabel) {
+    ctx.font = '400 34px system-ui, sans-serif';
+    ctx.fillText(`「${summary.categoryLabel}」に挑戦`, 540, 250);
+  }
+
+  ctx.fillStyle = '#1f1f24';
+  ctx.font = '700 170px system-ui, sans-serif';
+  ctx.fillText(`${summary.matchCount} / ${summary.totalCount}`, 540, 470);
+
+  ctx.fillStyle = '#5b5bd6';
+  ctx.font = '600 76px system-ui, sans-serif';
+  ctx.fillText(summary.tier, 540, 600);
+
+  ctx.fillStyle = '#6b6b76';
+  ctx.font = '400 36px system-ui, sans-serif';
+  ctx.fillText('あなたは世間の多数派と何問一致できる?', 540, 880);
+
+  return canvas;
+}
+
+function canvasToBlob(canvas) {
+  return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
 function renderShareButton(summary) {
   const btn = el('button', { class: 'btn btn-outline', text: '結果をシェアする' });
   btn.addEventListener('click', async () => {
     const text = shareText(summary);
-    if (navigator.share) {
+    const blob = await canvasToBlob(drawShareCard(summary));
+    const file = blob ? new File([blob], 'heibon-vote-result.png', { type: 'image/png' }) : null;
+
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({ text });
+        await navigator.share({ files: [file], text });
       } catch {
         // ユーザーがシェアをキャンセルしただけの場合もあるため、静かに無視する
       }
       return;
     }
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch {
+        // 同上
+      }
+      return;
+    }
+    // Web Share API非対応のブラウザ向けフォールバック: 画像をダウンロードしてもらう
+    if (file) {
+      const url = URL.createObjectURL(file);
+      const a = el('a', { href: url, download: file.name });
+      a.click();
+      URL.revokeObjectURL(url);
+    }
     if (navigator.clipboard) {
       await navigator.clipboard.writeText(text);
       const original = btn.textContent;
-      btn.textContent = 'コピーしました!';
+      btn.textContent = '画像を保存・テキストをコピーしました!';
       setTimeout(() => {
         btn.textContent = original;
-      }, 1500);
+      }, 2000);
     }
   });
   return btn;

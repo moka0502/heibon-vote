@@ -60,6 +60,7 @@
 - **同一端末の複数回答は最新1票のみ集計**: `localStorage`に`voterId`(UUID)を持たせ、投票に添付。`votes.voter_id`列、集計は`server/votes-dedup.js`の`getLatestRealVoteRows`で常にvoter_idごとの最新行のみ使用
 - **PWA化**: `www/manifest.webmanifest` + `www/sw.js`(静的シェルのみcache-first、`/api/*`は素通し)+ アイコン(`www/icons/`、chromiumでのスクリーンショット生成、インディゴ背景に「平」)
 - **演出強化**: kusutto-games同様、GSAPをCDNではなくローカル同梱。結果画面のスコアをカウントアップ+ランクをポップインさせる演出のみ(`www/js/effects.js`)
+- **シェア画像化**(2026-08-16): テキストのみのシェアは拡散力が弱いという指摘を受け、結果をCanvasで1080x1080の画像化(`www/js/render.js`の`drawShareCard`)。`navigator.canShare({files})`対応ブラウザは画像+テキストで共有、非対応は画像ダウンロード+テキストコピーにフォールバック。シェア文にカテゴリ名も含めるよう変更
 
 次期ロードマップ(画面遷移図・UI参考アプリ・iOSネイティブ機能候補・セキュリティチェックリスト)はArtifactに整理済み: https://claude.ai/code/artifact/f06b23ca-950b-4854-8798-e36e4b4555b9
 
