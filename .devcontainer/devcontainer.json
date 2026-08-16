@@ -13,6 +13,16 @@
 
 	"forwardPorts": [4322],
 
+	// PORTSパネルの右クリック「Port Visibility」メニューが出ない環境向けに、
+	// 設定ファイル経由でPrivate可視性を明示指定(2026-08-16、UIメニュー不在問題への対応)。
+	// Codespaces由来の機能でローカルDev Containersでも読まれる想定だが未検証。
+	"portsAttributes": {
+		"4322": {
+			"label": "heibon-vote",
+			"visibility": "private"
+		}
+	},
+
 	"postCreateCommand": "bash .devcontainer/postCreate.sh",
 
 	"customizations": {
