@@ -16,7 +16,7 @@ heibon-voteはNode.js/Express + better-sqlite3の**サーバーが必須**(投�
 
 | 方法 | Private/Public | 費用 | 安定性・持続性 | 備考 |
 |---|---|---|---|---|
-| **Tailscale**(推奨・未検証だが有力) | Private(自分の端末同士のみ) | 無料(個人利用なら制限に掛からない: 2026-04時点で6ユーザー・デバイス数無制限) | 高い。PC/devcontainerが起動していれば常時アクセス可 | スマホとPC双方にTailscaleアプリを入れ、同じアカウントの"tailnet"に参加させる。同じWiFiでなくてもどこからでも自分の端末からアクセス可能。VPN上でLAN内と同じように`http://<Tailscale IP>:4322`で見られる想定。**次回優先的に試す候補** |
+| **Tailscale**(✅確認済み・**採用。基本これで行く**) | Private(自分の端末同士のみ) | 無料(個人利用なら制限に掛からない: 2026-04時点で6ユーザー・デバイス数無制限) | 高い。ただしdevcontainerを**rebuild**するとログイン状態ごと消える(**再起動**だけなら残る) | 2026-08-16に実機(iPhone、`iphone-12-pro`名義で既にtailnet参加済み)で動作確認済み。詳細手順は下記セクションと`.claude/skills/phone-access/SKILL.md`参照。「スマホから見たい」と言われたらこのスキルで対応する |
 | LAN IP直打ち | Private(同一WiFi限定) | 無料 | 不安定。WSL2のNAT/Windows Firewallの設定次第で届かないことがある(2026-08-16に一度失敗、原因未特定のまま保留) | `ipconfig`でWindowsのIPv4を調べて`http://<IP>:4322`。追加設定なしで繋がるかは環境依存 |
 | VS Code Dev Tunnels(Private) | Private(サインインしたアカウントのみ、リモートからも可) | 無料 | 本来は高いはずだが、**この環境では「Port Visibility」メニュー自体が出ない問題が未解決**(2026-08-16確認) | 原因未診断。次回はVS Codeのアカウントサインイン状態を確認するところから始める |
 | VS Code Dev Tunnels(Public) | Public | 無料 | 同上、メニュー不在で試せていない | 同上 |
@@ -35,8 +35,19 @@ heibon-voteはNode.js/Express + better-sqlite3の**サーバーが必須**(投�
 ## 現時点の結論・次にやること
 
 - ユーザーは**有料オプションは今のところ検討しない**方針(2026-08-16時点)
-- 「毎回一時的に見られればいい」なら → Tailscaleを試す予定だったが、この環境(Dockerコンテナ)には`/dev/net/tun`が無く`CAP_NET_ADMIN`も落とされているため、標準モードでは動かせないと判明。ユーザースペースモード(`tailscaled --tun=userspace-networking`、権限不要、インバウンド接続はlocalhostの同ポートへ転送される)なら動く見込みだが、公式インストールスクリプトの`sudo`実行が権限確認で止まっている(2026-08-16時点で未完了、ユーザーの明示許可待ち)
-- 「常時アクセス可能な固定URLがほしい」なら無料での現実的な選択肢は Oracle Cloud Always Free VPS のみ(Cloudflare Named Tunnelは独自ドメイン代が発生するため「無料」ではない)
+- 「毎回一時的に見られればいい」なら → **Tailscaleに決定・確認済み**(下記「✅採用: Tailscaleでの起動手順」参照)
+- 「常時アクセス可能な固定URLがほしい」なら無料での現実的な選択肢は Oracle Cloud Always Free VPS のみ(Cloudflare Named Tunnelは独自ドメイン代が発生するため「無料」ではない)。ただし今のところ「毎回一時的に見られればいい」で足りているため未着手
+
+## ✅採用: Tailscaleでの起動手順(2026-08-16、実機のiPhoneで確認済み)
+
+この環境(Dockerコンテナ)には`/dev/net/tun`が無く`CAP_NET_ADMIN`も落とされているため、標準的なTailscaleの使い方(TUNデバイス経由でtailnet IPに直接アクセス)は使えない。代わりに以下の2点で回避している。これがこの環境固有の要点:
+
+1. **userspace-networkingモード**でtailscaledを起動(TUNデバイス不要、権限不要)
+2. ポートの公開は tailnet IPへの直接アクセスではなく **`tailscale serve`**(HTTPSリバースプロキシとして`127.0.0.1:4322`を`https://<マシン名>.<tailnet名>.ts.net/`に橋渡し)を使う
+
+具体的なコマンドは`.claude/skills/phone-access/SKILL.md`に手順化済み。「スマホから見たい」「サーバー落ちてる?」と言われたら、Claudeはこのスキルを実行して対応する。ユーザー側の準備は「iPhoneのTailscaleアプリで同じアカウントにログインしておく」のみ(`iphone-12-pro`として2026-08-16時点で参加済み)。
+
+**注意点(重要)**: Tailscaleの認証状態(`/var/lib/tailscale`)はdevcontainerのバインドマウント対象外の場所に保存されるため、コンテナを**再起動**しただけなら残るが、**rebuild**すると消えて`tailscale up`での再ログイン(ブラウザでの認証URL開封、対話操作)が必要になる。バイナリのインストール自体は`.devcontainer/postCreate.sh`に追加済みなので、rebuild後も`tailscale`コマンド自体は使える状態で立ち上がる。
 
 ## 試行中: devcontainer.jsonの`portsAttributes`でPrivate可視性を明示(2026-08-16)
 

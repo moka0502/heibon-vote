@@ -112,7 +112,7 @@ async function showHome() {
     // クリアしないと、クイズ中に戻るボタンでHomeへ離脱した後リロードすると
     // 中断したクイズへ強制的に戻されてしまう。
     clearQuizState();
-    const stats = await api.getSessionStats();
+    const stats = await api.getSessionStats(getVoterId());
     mount(
       renderHome(stats, {
         onStart: showCategoryPicker,
@@ -204,7 +204,7 @@ async function showCategoryPicker() {
     mount(
       renderCategoryPicker(categories, {
         onSelectRandom: () => startQuiz(),
-        onSelectCategory: (categoryId, categoryLabel) => startQuiz(categoryId, categoryLabel),
+        onSelectCategory: (categoryId, categoryLabel, part) => startQuiz(categoryId, categoryLabel, part),
         onBack: showHome,
       }),
       showHome
@@ -214,12 +214,13 @@ async function showCategoryPicker() {
   }
 }
 
-async function startQuiz(category, categoryLabel) {
+async function startQuiz(category, categoryLabel, part) {
   showLoading();
   try {
     const profile = getProfile();
-    const { topics } = await api.getRandomTopics(QUESTIONS_PER_SESSION, category);
-    runQuiz({ topics, profile, index: 0, voteIds: [], categoryLabel });
+    const { topics } = await api.getRandomTopics(QUESTIONS_PER_SESSION, category, part);
+    const fullCategoryLabel = categoryLabel && part ? `${categoryLabel} Part${part}` : categoryLabel;
+    runQuiz({ topics, profile, index: 0, voteIds: [], categoryLabel: fullCategoryLabel });
   } catch (err) {
     mountError(err.message, showHome, showHome);
   }
@@ -269,17 +270,18 @@ async function answerQuestion(state, topic, optionId) {
 async function finishQuiz(state) {
   showLoading();
   try {
-    const summary = await api.postSession(state.voteIds);
+    const voterId = getVoterId();
+    const summary = await api.postSession(state.voteIds, voterId);
     clearQuizState();
     const [{ votes }, stats] = await Promise.all([
       api.getSession(summary.sessionId),
-      api.getSessionStats(),
+      api.getSessionStats(voterId),
     ]);
     mount(
       renderResult({ ...summary, categoryLabel: state.categoryLabel }, votes, stats, {
         onHome: showHome,
         onHistory: showHistory,
-        onRetry: () => startQuiz(),
+        onRetry: () => showCategoryPicker(),
       }),
       showHome
     );
@@ -292,7 +294,7 @@ async function finishQuiz(state) {
 async function showHistory() {
   showLoading();
   try {
-    const { sessions } = await api.getSessions();
+    const { sessions } = await api.getSessions(getVoterId());
     mount(renderHistoryList(sessions, { onSelect: showHistoryDetail, onBack: showHome }), showHome);
   } catch (err) {
     mountError(err.message, showHome, showHome);

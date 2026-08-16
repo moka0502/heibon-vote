@@ -10,9 +10,9 @@ async function request(path, options) {
 export const api = {
   getAttributes: () => request('/api/attributes'),
   getCategories: () => request('/api/categories'),
-  getRandomTopics: (count, category) =>
+  getRandomTopics: (count, category, part) =>
     request(
-      `/api/topics/random?count=${count}${category ? `&category=${encodeURIComponent(category)}` : ''}`
+      `/api/topics/random?count=${count}${category ? `&category=${encodeURIComponent(category)}` : ''}${part ? `&part=${part}` : ''}`
     ),
   getAllTopics: () => request('/api/topics'),
   getTopicBreakdown: (topicId) => request(`/api/topics/${topicId}/breakdown`),
@@ -22,15 +22,15 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }),
-  postSession: (voteIds) =>
+  postSession: (voteIds, voterId) =>
     request('/api/sessions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ voteIds }),
+      body: JSON.stringify({ voteIds, voterId }),
     }),
-  getSessions: () => request('/api/sessions'),
+  getSessions: (voterId) => request(`/api/sessions?voterId=${encodeURIComponent(voterId)}`),
   getSession: (id) => request(`/api/sessions/${id}`),
-  getSessionStats: () => request('/api/sessions/stats'),
+  getSessionStats: (voterId) => request(`/api/sessions/stats?voterId=${encodeURIComponent(voterId)}`),
   postSuggestion: (text) =>
     request('/api/suggestions', {
       method: 'POST',

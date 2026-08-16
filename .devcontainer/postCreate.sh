@@ -22,6 +22,15 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githu
 sudo apt-get update
 sudo apt-get install -y gh
 
+# Tailscale(スマホからのアクセス用。バインドマウントされないコンテナ内state配置のため、
+# バイナリのインストールのみここで自動化する。tailscaledの起動・`tailscale up`ログインは
+# コンテナ起動ごとの手動/スキル実行に委ねる。手順はPHONE-ACCESS-OPTIONS.md、
+# 自動実行は.claude/skills/phone-access/SKILL.mdを参照)
+curl -fsSL https://pkgs.tailscale.com/stable/debian/bullseye.noarmor.gpg | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
+curl -fsSL https://pkgs.tailscale.com/stable/debian/bullseye.tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list > /dev/null
+sudo apt-get update
+sudo apt-get install -y tailscale
+
 # ffmpeg/fonts-liberationは今回省略(音声・画像の事前生成が発生しないため)
 
 # UI目視確認用(Playwright等からsystem chromiumを起動してスクリーンショットを撮る)。

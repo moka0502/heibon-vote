@@ -1,13 +1,13 @@
 [
-  { "id": "food", "label": "食事" },
-  { "id": "money", "label": "お金" },
-  { "id": "romance", "label": "恋愛" },
-  { "id": "seasonal", "label": "季節行事" },
-  { "id": "health", "label": "健康・カラダ" },
-  { "id": "home-routine", "label": "住まい・身支度" },
-  { "id": "leisure", "label": "余暇・娯楽" },
-  { "id": "work-style", "label": "仕事・働き方" },
-  { "id": "digital-habits", "label": "デジタル習慣" },
-  { "id": "personal", "label": "持ち物" },
-  { "id": "jinx", "label": "ジンクス・運試し" }
+  { "id": "food", "label": "食事", "launched": true },
+  { "id": "money", "label": "お金", "launched": true },
+  { "id": "romance", "label": "恋愛", "launched": true },
+  { "id": "seasonal", "label": "季節行事", "launched": true },
+  { "id": "health", "label": "健康・カラダ", "launched": true },
+  { "id": "home-routine", "label": "住まい・身支度", "launched": false },
+  { "id": "leisure", "label": "余暇・娯楽", "launched": false },
+  { "id": "work-style", "label": "仕事・働き方", "launched": false },
+  { "id": "digital-habits", "label": "デジタル習慣", "launched": false },
+  { "id": "personal", "label": "持ち物", "launched": false },
+  { "id": "jinx", "label": "ジンクス・運試し", "launched": false }
 ]

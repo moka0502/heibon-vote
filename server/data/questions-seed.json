@@ -735,27 +735,6 @@
     "status": "active"
   },
   {
-    "id": "okozukai-sei",
-    "question": "夫のお小遣いは決まった額の「お小遣い制」派? 自由に使える派?",
-    "category": "money",
-    "options": [
-      {
-        "id": "fixed",
-        "label": "お小遣い制"
-      },
-      {
-        "id": "free",
-        "label": "自由に使える"
-      }
-    ],
-    "dummyVotes": {
-      "fixed": 45,
-      "free": 55
-    },
-    "source": "調査(夫でお小遣い制を採用している割合45.2%)を基に按分。妻は29.0%との報告もあり、性別で傾向が異なる点に注意。2026-08-15調査(https://financial-field.com/household/entry-109167)",
-    "status": "active"
-  },
-  {
     "id": "kakeibo-tsukeru",
     "question": "家計簿はつけている派? つけていない派?",
     "category": "money",
@@ -900,6 +879,27 @@
       "atsumenai": 28
     },
     "source": "マイボイスコム調査(ポイントを積極的に貯めたり使ったりする人は7割強)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000001053.000007815.html)",
+    "status": "active"
+  },
+  {
+    "id": "seimei-hoken-kanyu",
+    "question": "生命保険に入っている派? 入っていない派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "yes",
+        "label": "入っている"
+      },
+      {
+        "id": "no",
+        "label": "入っていない"
+      }
+    ],
+    "dummyVotes": {
+      "yes": 89,
+      "no": 11
+    },
+    "source": "公益財団法人生命保険文化センター「2024(令和6)年度 生命保険に関する全国実態調査」(2人以上世帯の世帯加入率89.2%)を基に按分。単身世帯は45.6%と大きく異なる点に注意。2026-08-16調査(https://www.jili.or.jp/research/report/9850.html)",
     "status": "active"
   },
   {

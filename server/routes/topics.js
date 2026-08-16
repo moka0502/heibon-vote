@@ -24,15 +24,46 @@ function createTopicsRouter(db) {
         ? 10
         : Math.min(Math.max(rawCount, 1), 100);
     const category = typeof req.query.category === 'string' ? req.query.category : null;
-    const topicRows = category
-      ? db
-          .prepare(
-            "SELECT id, question FROM topics WHERE status = 'active' AND category = ? ORDER BY RANDOM() LIMIT ?"
-          )
-          .all(category, count)
-      : db
-          .prepare("SELECT id, question FROM topics WHERE status = 'active' ORDER BY RANDOM() LIMIT ?")
-          .all(count);
+    // part=1: そのカテゴリの中で常に同じ固定10問(挿入順=rowid順)。
+    // part=2: part=1で使った10問を除いた残り全部からランダムに10問。
+    // カテゴリのお題数が半端(11問等)でも、ボタンには常に「10問ぴったりの束」として見せるための仕組み
+    // (2026-08-16、カテゴリボタンの「(11問)」のような表示が気持ち悪いという指摘を受けて追加)。
+    const part = category ? Number(req.query.part) : null;
+    let topicRows;
+    if (part === 1) {
+      topicRows = db
+        .prepare(
+          "SELECT id, question FROM topics WHERE status = 'active' AND category = ? ORDER BY rowid LIMIT 10"
+        )
+        .all(category);
+    } else if (part === 2) {
+      topicRows = db
+        .prepare(
+          `SELECT id, question FROM (
+             SELECT id, question, rowid FROM topics
+             WHERE status = 'active' AND category = ?
+             ORDER BY rowid LIMIT -1 OFFSET 10
+           ) ORDER BY RANDOM() LIMIT 10`
+        )
+        .all(category);
+    } else if (category) {
+      topicRows = db
+        .prepare(
+          "SELECT id, question FROM topics WHERE status = 'active' AND category = ? ORDER BY RANDOM() LIMIT ?"
+        )
+        .all(category, count);
+    } else {
+      // カテゴリ非指定のランダムは、初回リリースでカテゴリを絞っている間(categories.launched)は
+      // その範囲だけを母集団にする(2026-08-16、5カテゴリでの初回リリース対応)。
+      topicRows = db
+        .prepare(
+          `SELECT t.id, t.question FROM topics t
+           JOIN categories c ON c.id = t.category
+           WHERE t.status = 'active' AND c.launched = 1
+           ORDER BY RANDOM() LIMIT ?`
+        )
+        .all(count);
+    }
     const topics = topicRows.map((topic) => ({
       ...topic,
       options: optionStmt.all(topic.id),
@@ -42,7 +73,13 @@ function createTopicsRouter(db) {
 
   router.get('/', (req, res) => {
     const topicRows = db
-      .prepare("SELECT id, question FROM topics WHERE status = 'active' ORDER BY question")
+      .prepare(
+        `SELECT t.id, t.question, t.category, c.label AS categoryLabel
+         FROM topics t
+         JOIN categories c ON c.id = t.category
+         WHERE t.status = 'active' AND c.launched = 1
+         ORDER BY c.sort_order, t.question`
+      )
       .all();
     const topics = topicRows.map((topic) => ({
       ...topic,

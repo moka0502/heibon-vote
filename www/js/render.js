@@ -276,13 +276,27 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
     })
   );
   for (const category of categories) {
-    card.appendChild(
-      el('button', {
-        class: 'btn btn-outline',
-        text: `${category.label}(${category.count}問)`,
-        onclick: () => onSelectCategory(category.id, category.label),
-      })
-    );
+    // 「食事(11問)」のような半端な数を見せず、常に10問ぴったりの「Part」単位で選ばせる。
+    // Part1は固定10問、Part2は残りが10問貯まったカテゴリだけに出す(2026-08-16)。
+    const parts = Math.floor(category.count / 10);
+    if (parts >= 1) {
+      card.appendChild(
+        el('button', {
+          class: 'btn btn-outline category-option',
+          text: `${category.label} Part1`,
+          onclick: () => onSelectCategory(category.id, category.label, 1),
+        })
+      );
+    }
+    if (parts >= 2) {
+      card.appendChild(
+        el('button', {
+          class: 'btn btn-outline category-option',
+          text: `${category.label} Part2`,
+          onclick: () => onSelectCategory(category.id, category.label, 2),
+        })
+      );
+    }
   }
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onBack }));
@@ -299,7 +313,12 @@ export function renderTopicList(topics, { onSelect, onBack }) {
       text: '気になるお題を選ぶと、選択肢ごとの割合や年代・血液型などの属性別の傾向が見られます。',
     })
   );
+  let currentCategory = null;
   for (const topic of topics) {
+    if (topic.category !== currentCategory) {
+      currentCategory = topic.category;
+      card.appendChild(el('h3', { class: 'topic-list-category', text: topic.categoryLabel }));
+    }
     const item = el('div', { class: 'session-list-item', onclick: () => onSelect(topic.id) });
     item.appendChild(el('span', { text: topic.question }));
     card.appendChild(item);
@@ -527,6 +546,24 @@ function resultFlavorText(tier) {
   return null;
 }
 
+// 段階ラベル(sessionTierFor)だけだと8/10と9/10が同じ枠に入り粗く感じるため、
+// 実際のスコアに応じて連続的に動く矢印で位置を補う(server/tiers.jsと同じ閾値0.3/0.5/0.8)。
+function renderTierMeter(matchCount, totalCount) {
+  const track = el('div', { class: 'tier-meter-track' });
+  const labels = el('div', { class: 'tier-meter-labels' }, [
+    el('span', { text: '唯一無二' }),
+    el('span', { text: '個性派' }),
+    el('span', { text: '個性あり' }),
+    el('span', { text: '平凡寄り' }),
+    el('span', { text: '真の平凡' }),
+  ]);
+  const ratio = totalCount === 0 ? 0 : matchCount / totalCount;
+  const marker = el('div', { class: 'tier-meter-marker' });
+  marker.style.left = `${Math.min(98, Math.max(2, ratio * 100))}%`;
+  track.appendChild(marker);
+  return el('div', { class: 'tier-meter' }, [track, labels]);
+}
+
 export function renderResult(summary, detailVotes, stats, { onHome, onHistory, onRetry }) {
   const wrap = el('div');
 
@@ -541,16 +578,17 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
     el('div', { class: 'result-score', text: `${summary.matchCount} / ${summary.totalCount}` })
   );
   card.appendChild(el('div', { class: 'result-tier', text: summary.tier }));
+  card.appendChild(renderTierMeter(summary.matchCount, summary.totalCount));
   const flavorText = resultFlavorText(summary.tier);
   if (flavorText) {
     card.appendChild(el('p', { style: 'text-align:center', text: flavorText }));
   }
-  if (typeof summary.percentile === 'number') {
+  if (typeof summary.moreCommonCount === 'number') {
     card.appendChild(
       el('p', {
         class: 'progress',
         style: 'text-align:center',
-        text: `これまでの挑戦者${summary.totalSessions}人中、あなたと同じかそれ以上「平凡」だったのは${summary.percentile}%`,
+        text: `これまでの挑戦者${summary.totalSessions}人中、あなたより「共感性が高く、定番を理解し、万人受けする王道」だった人は${summary.moreCommonCount}人でした`,
       })
     );
   }

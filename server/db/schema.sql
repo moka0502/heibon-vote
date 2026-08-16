@@ -1,7 +1,11 @@
 CREATE TABLE IF NOT EXISTS categories (
   id TEXT PRIMARY KEY,
   label TEXT NOT NULL,
-  sort_order INTEGER NOT NULL
+  sort_order INTEGER NOT NULL,
+  -- 初回リリースのスコープを絞るためのフラグ(2026-08-16)。0のカテゴリはカテゴリ選択・
+  -- お題一覧・カテゴリ非指定のランダム出題のいずれにも出ない。データ自体は残したまま
+  -- 段階的に公開範囲を広げる運用(topics.statusのactive/stockと同じ考え方)。
+  launched INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS topics (
@@ -40,6 +44,7 @@ CREATE TABLE IF NOT EXISTS quiz_sessions (
   match_count INTEGER NOT NULL,
   total_count INTEGER NOT NULL,
   session_tier TEXT NOT NULL,
+  voter_id TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

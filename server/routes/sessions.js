@@ -10,12 +10,12 @@ function createSessionsRouter(db) {
     'SELECT id, label FROM options WHERE topic_id = ? ORDER BY sort_order'
   );
   const insertSession = db.prepare(
-    'INSERT INTO quiz_sessions (id, match_count, total_count, session_tier) VALUES (?, ?, ?, ?)'
+    'INSERT INTO quiz_sessions (id, match_count, total_count, session_tier, voter_id) VALUES (?, ?, ?, ?, ?)'
   );
   const listSessionsStmt = db.prepare(
     `SELECT id, match_count AS matchCount, total_count AS totalCount,
             session_tier AS sessionTier, created_at AS createdAt
-     FROM quiz_sessions ORDER BY created_at DESC`
+     FROM quiz_sessions WHERE voter_id = ? ORDER BY created_at DESC`
   );
   const getSessionStmt = db.prepare(
     `SELECT id, match_count AS matchCount, total_count AS totalCount,
@@ -33,11 +33,12 @@ function createSessionsRouter(db) {
      ORDER BY v.id`
   );
   const perfectSessionCountStmt = db.prepare(
-    'SELECT COUNT(*) AS count FROM quiz_sessions WHERE match_count = total_count'
+    'SELECT COUNT(*) AS count FROM quiz_sessions WHERE match_count = total_count AND voter_id = ?'
   );
   const totalSessionsStmt = db.prepare('SELECT COUNT(*) AS count FROM quiz_sessions');
-  const sessionsWithLowerOrEqualScoreStmt = db.prepare(
-    'SELECT COUNT(*) AS count FROM quiz_sessions WHERE match_count <= ?'
+  // あなたより一致数が多かった(=あなたより平凡だった)人数を数える。
+  const sessionsWithHigherScoreStmt = db.prepare(
+    'SELECT COUNT(*) AS count FROM quiz_sessions WHERE match_count > ?'
   );
   // サンプルが少なすぎる順位表示は誤解を招くため、一定数貯まるまでは出さない
   // (属性別内訳のBREAKDOWN_MIN_REAL_VOTESと同じ考え方)。
@@ -49,12 +50,22 @@ function createSessionsRouter(db) {
 
   // /stats は /:id より先に登録する(そうしないと :id が "stats" にマッチしてしまう)
   router.get('/stats', (req, res) => {
-    const { count } = perfectSessionCountStmt.get();
+    const { voterId } = req.query;
+    if (typeof voterId !== 'string' || voterId === '') {
+      res.json({ perfectCount: 0, lifetimeTitle: null });
+      return;
+    }
+    const { count } = perfectSessionCountStmt.get(voterId);
     res.json({ perfectCount: count, lifetimeTitle: lifetimeTitleFor(count) });
   });
 
   router.get('/', (req, res) => {
-    res.json({ sessions: listSessionsStmt.all() });
+    const { voterId } = req.query;
+    if (typeof voterId !== 'string' || voterId === '') {
+      res.json({ sessions: [] });
+      return;
+    }
+    res.json({ sessions: listSessionsStmt.all(voterId) });
   });
 
   router.get('/:id', (req, res) => {
@@ -72,9 +83,13 @@ function createSessionsRouter(db) {
   });
 
   router.post('/', (req, res) => {
-    const { voteIds } = req.body ?? {};
+    const { voteIds, voterId } = req.body ?? {};
     if (!Array.isArray(voteIds) || voteIds.length === 0) {
       res.status(400).json({ error: 'voteIds is required' });
+      return;
+    }
+    if (typeof voterId !== 'string' || voterId === '') {
+      res.status(400).json({ error: 'voterId is required' });
       return;
     }
     if (voteIds.length !== QUESTIONS_PER_SESSION) {
@@ -118,16 +133,16 @@ function createSessionsRouter(db) {
     const tier = sessionTierFor(matchCount, totalCount);
     const sessionId = crypto.randomUUID();
 
-    // 自分自身を含める前の、これまでの挑戦者の中での順位(Spotify Wrapped深掘り分SW1)。
+    // 自分自身を含める前の、これまでの挑戦者の中での「あなたより平凡だった人数」(Spotify Wrapped深掘り分SW1)。
     const { count: totalSessions } = totalSessionsStmt.get();
-    let percentile = null;
+    let moreCommonCount = null;
     if (totalSessions >= MIN_SESSIONS_FOR_PERCENTILE) {
-      const { count: lowerOrEqual } = sessionsWithLowerOrEqualScoreStmt.get(matchCount);
-      percentile = Math.round((lowerOrEqual / totalSessions) * 100);
+      const { count } = sessionsWithHigherScoreStmt.get(matchCount);
+      moreCommonCount = count;
     }
 
     const run = db.transaction(() => {
-      insertSession.run(sessionId, matchCount, totalCount, tier);
+      insertSession.run(sessionId, matchCount, totalCount, tier, voterId);
       db.prepare(`UPDATE votes SET session_id = ? WHERE id IN (${placeholders})`).run(
         sessionId,
         ...voteIds
@@ -135,7 +150,7 @@ function createSessionsRouter(db) {
     });
     run();
 
-    res.json({ sessionId, matchCount, totalCount, tier, percentile, totalSessions });
+    res.json({ sessionId, matchCount, totalCount, tier, moreCommonCount, totalSessions });
   });
 
   return router;

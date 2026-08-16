@@ -14,12 +14,12 @@ function seed(db) {
 function seedCategories(db) {
   const categories = JSON.parse(fs.readFileSync(CATEGORIES_SEED_PATH, 'utf8'));
   const insertCategory = db.prepare(
-    `INSERT INTO categories (id, label, sort_order) VALUES (?, ?, ?)
-     ON CONFLICT(id) DO UPDATE SET label = excluded.label, sort_order = excluded.sort_order`
+    `INSERT INTO categories (id, label, sort_order, launched) VALUES (?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET label = excluded.label, sort_order = excluded.sort_order, launched = excluded.launched`
   );
   const run = db.transaction((cats) => {
     cats.forEach((category, index) => {
-      insertCategory.run(category.id, category.label, index);
+      insertCategory.run(category.id, category.label, index, category.launched === false ? 0 : 1);
     });
   });
   run(categories);
@@ -27,9 +27,13 @@ function seedCategories(db) {
 
 function seedAttributes(db) {
   const attributes = JSON.parse(fs.readFileSync(ATTRIBUTES_SEED_PATH, 'utf8'));
-  const insertAttribute = db.prepare('INSERT OR IGNORE INTO attributes (id, label) VALUES (?, ?)');
+  const insertAttribute = db.prepare(
+    `INSERT INTO attributes (id, label) VALUES (?, ?)
+     ON CONFLICT(id) DO UPDATE SET label = excluded.label`
+  );
   const insertValue = db.prepare(
-    'INSERT OR IGNORE INTO attribute_values (attribute_id, id, label, sort_order) VALUES (?, ?, ?, ?)'
+    `INSERT INTO attribute_values (attribute_id, id, label, sort_order) VALUES (?, ?, ?, ?)
+     ON CONFLICT(attribute_id, id) DO UPDATE SET label = excluded.label, sort_order = excluded.sort_order`
   );
 
   const run = db.transaction((attrs) => {

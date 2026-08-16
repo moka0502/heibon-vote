@@ -32,6 +32,20 @@ function migrate(db) {
     // seed()が直後に全topicのcategoryをUPSERTで埋めるため、ここではNULL許容で追加するだけでよい
     db.exec('ALTER TABLE topics ADD COLUMN category TEXT');
   }
+
+  const sessionColumns = db.prepare('PRAGMA table_info(quiz_sessions)').all();
+  const hasSessionVoterId = sessionColumns.some((col) => col.name === 'voter_id');
+  if (!hasSessionVoterId) {
+    db.exec('ALTER TABLE quiz_sessions ADD COLUMN voter_id TEXT');
+  }
+
+  const categoryColumns = db.prepare('PRAGMA table_info(categories)').all();
+  const hasLaunched = categoryColumns.some((col) => col.name === 'launched');
+  if (!hasLaunched) {
+    // seed()が直後にcategories-seed.jsonのlaunched値でUPSERTするため、
+    // ここではDEFAULT 1(全カテゴリ公開扱い)で追加するだけでよい
+    db.exec('ALTER TABLE categories ADD COLUMN launched INTEGER NOT NULL DEFAULT 1');
+  }
 }
 
 module.exports = { openDb };
