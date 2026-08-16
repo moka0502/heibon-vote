@@ -32,17 +32,26 @@ const appEl = document.getElementById('app');
 
 // ブラウザの戻る/スワイプバックと画面遷移を連動させる仕組み(2026-08-15対応)。
 // 各画面をmountするとき「戻ったらどの画面に行くか」を渡しておき、popstate発火時に
-// それを呼び出す。isPopping中はmountがpushStateしないようにして、履歴を二重に積まない。
+// それを呼び出す。
+//
+// pendingDirectionは「次のmount()呼び出しがpopstate起因かどうか」を表す。
+// 多くのshow*()関数はmount()の前にawait api.X()を挟むため、popstateハンドラの
+// 同期処理が終わった後(=isPoppingを同期的にfalseへ戻した後)にmount()が実行される
+// ことがある。そのため真偽値をpopstateハンドラ内だけで完結させず、mount()が実際に
+// 消費するまで保持し続ける設計にしている(mount()呼び出し時にfalseへ戻す)。
 let currentBack = null;
-let isPopping = false;
+let pendingDirection = null; // null=通常の遷移(進む)、'back'=popstate起因(戻る)
 let hasPushedInitialState = false;
 
 function mount(node, backTo) {
-  node.classList.add('screen-enter');
+  // 進む(pushState)は右から、戻る(popstate)は左からスライドインさせ、
+  // 階層のどちら向きに動いたか方向性を感じられるようにする(Native#3)。
+  const isBack = pendingDirection === 'back';
+  node.classList.add(isBack ? 'screen-enter-back' : 'screen-enter-forward');
   appEl.replaceChildren(node);
   window.scrollTo(0, 0);
   currentBack = backTo ?? null;
-  if (!isPopping) {
+  if (!isBack) {
     if (!hasPushedInitialState) {
       history.replaceState({}, '');
       hasPushedInitialState = true;
@@ -50,6 +59,7 @@ function mount(node, backTo) {
       history.pushState({}, '');
     }
   }
+  pendingDirection = null;
 }
 
 // タップ位置に応じて波紋が広がるリップルエフェクト(Material You深掘り分M2)。
@@ -76,9 +86,8 @@ document.addEventListener(
 );
 
 window.addEventListener('popstate', () => {
-  isPopping = true;
+  pendingDirection = 'back';
   (currentBack ?? showHome)();
-  isPopping = false;
 });
 
 // API待ちの画面遷移中、通信が遅いと固まって見えるのを防ぐための一時表示。

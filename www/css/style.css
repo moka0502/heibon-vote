@@ -27,6 +27,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
   min-height: 100vh;
   overscroll-behavior-y: contain;
+  overflow-x: hidden;
 }
 
 .app-header {
@@ -54,18 +55,35 @@ body {
   padding-right: max(20px, env(safe-area-inset-right));
 }
 
-.screen-enter {
-  animation: screen-enter 0.25s ease both;
+/* 画面遷移に方向性を持たせる(Native#3)。進む(pushState)は右から、戻る(popstate)は
+   左からスライドインさせ、階層のどちら向きに動いたかを体感できるようにする。 */
+.screen-enter-forward {
+  animation: screen-enter-forward 0.25s ease both;
 }
 
-@keyframes screen-enter {
+.screen-enter-back {
+  animation: screen-enter-back 0.25s ease both;
+}
+
+@keyframes screen-enter-forward {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateX(24px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes screen-enter-back {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -486,7 +504,8 @@ select {
   .bar,
   .quiz-progress-segment,
   .feedback-banner,
-  .screen-enter,
+  .screen-enter-forward,
+  .screen-enter-back,
   .spinner,
   .bar-line-you {
     animation: none !important;
