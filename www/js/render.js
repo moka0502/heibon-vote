@@ -58,6 +58,17 @@ function nextLifetimeTitleHint(perfectCount) {
   return `あと${next.count - perfectCount}回満点で「${next.title}」`;
 }
 
+// 通算称号バッジの色調をランクごとに変える(server/tiers.jsのlifetimeTitleForと対応、UI#15)。
+const LIFETIME_TITLE_BADGE_CLASS = {
+  平凡の卵: 'badge badge-tier-1',
+  平凡上級者: 'badge badge-tier-2',
+  真の平凡: 'badge badge-tier-3',
+};
+
+function lifetimeTitleBadgeClass(title) {
+  return LIFETIME_TITLE_BADGE_CLASS[title] ?? 'badge';
+}
+
 function formatDate(sqliteDatetime) {
   // SQLiteのdatetime('now')はUTCの 'YYYY-MM-DD HH:MM:SS' 形式で返る
   const date = new Date(`${sqliteDatetime}Z`);
@@ -198,7 +209,9 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
     el('p', { text: 'ランダムな10問に答えて、世間の多数派とどれだけ一致できるか試そう。' })
   );
   if (stats.lifetimeTitle) {
-    card.appendChild(el('p', {}, [el('span', { class: 'badge', text: stats.lifetimeTitle })]));
+    card.appendChild(
+      el('p', {}, [el('span', { class: lifetimeTitleBadgeClass(stats.lifetimeTitle), text: stats.lifetimeTitle })])
+    );
   }
   card.appendChild(el('p', { class: 'progress', text: `通算満点: ${stats.perfectCount}回` }));
   const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
@@ -501,7 +514,10 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   if (stats.lifetimeTitle) {
     card.appendChild(
       el('p', { style: 'text-align:center' }, [
-        el('span', { class: 'badge', text: `通算称号: ${stats.lifetimeTitle}` }),
+        el('span', {
+          class: lifetimeTitleBadgeClass(stats.lifetimeTitle),
+          text: `通算称号: ${stats.lifetimeTitle}`,
+        }),
       ])
     );
   }

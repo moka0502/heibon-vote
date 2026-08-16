@@ -241,6 +241,25 @@ button {
   background: var(--accent);
   color: var(--accent-contrast);
   font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* 通算称号は単色ピル固定だとランクが上がっても差が出なかったため、ランクごとに
+   色調を変える(UI#15)。低ランクほど落ち着いた色、最高ランクは金色でひときわ目立つように。 */
+.badge-tier-1 {
+  background: #e8dcc8;
+  color: #7a5c2e;
+}
+
+.badge-tier-2 {
+  background: #dfe1ea;
+  color: #4b5170;
+}
+
+.badge-tier-3 {
+  background: linear-gradient(135deg, #f5d47a, #d9a94a);
+  color: #5c3d0a;
+  box-shadow: 0 0 0 1px rgba(217, 169, 74, 0.4), 0 2px 6px rgba(217, 169, 74, 0.35);
 }
 
 .question-row {
