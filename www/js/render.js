@@ -69,6 +69,25 @@ function lifetimeTitleBadgeClass(title) {
   return LIFETIME_TITLE_BADGE_CLASS[title] ?? 'badge';
 }
 
+// Homeの副次リンクをテキストだけでなくアイコンでも識別できるようにする(UI#18)。
+// 外部アイコンライブラリは追加せず、ローカルの最小限のインラインSVGで完結させる。
+const ICONS = {
+  history:
+    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.5"/><path d="M10 6v4l3 2"/></svg>',
+  chart:
+    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16V9M10 16V4M16 16v-6"/></svg>',
+  person:
+    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3 2.5-5 6-5s6 2 6 5"/></svg>',
+  bulb:
+    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-3 9c.6.5 1 1.2 1 2h4c0-.8.4-1.5 1-2a5 5 0 0 0-3-9z"/><path d="M8 17h4"/></svg>',
+};
+
+function icon(name) {
+  const span = el('span', { class: 'icon' });
+  span.innerHTML = ICONS[name] ?? '';
+  return span;
+}
+
 function formatDate(sqliteDatetime) {
   // SQLiteのdatetime('now')はUTCの 'YYYY-MM-DD HH:MM:SS' 形式で返る
   const date = new Date(`${sqliteDatetime}Z`);
@@ -220,10 +239,14 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
   }
   card.appendChild(el('button', { class: 'btn btn-primary', text: '挑戦する', onclick: onStart }));
   wrap.appendChild(card);
-  wrap.appendChild(el('button', { class: 'btn-link btn-link-emphasis', text: '履歴を見る', onclick: onHistory }));
-  wrap.appendChild(el('button', { class: 'btn-link', text: 'お題の内訳を見る', onclick: onTopics }));
-  wrap.appendChild(el('button', { class: 'btn-link', text: 'あなたについての設定', onclick: onSettings }));
-  wrap.appendChild(el('button', { class: 'btn-link', text: 'お題を提案する', onclick: onSuggest }));
+  wrap.appendChild(
+    el('button', { class: 'btn-link btn-link-emphasis', onclick: onHistory }, [icon('history'), '履歴を見る'])
+  );
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onTopics }, [icon('chart'), 'お題の内訳を見る']));
+  wrap.appendChild(
+    el('button', { class: 'btn-link', onclick: onSettings }, [icon('person'), 'あなたについての設定'])
+  );
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onSuggest }, [icon('bulb'), 'お題を提案する']));
   return wrap;
 }
 
