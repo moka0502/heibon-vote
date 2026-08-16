@@ -42,6 +42,10 @@ function createSessionsRouter(db) {
   // サンプルが少なすぎる順位表示は誤解を招くため、一定数貯まるまでは出さない
   // (属性別内訳のBREAKDOWN_MIN_REAL_VOTESと同じ考え方)。
   const MIN_SESSIONS_FOR_PERCENTILE = 20;
+  // クライアント(www/js/app.js)のQUESTIONS_PER_SESSIONと同じ値。クライアント/サーバー間で
+  // 共有できる設定ファイルが今のところないため定数を重複させている(2026-08-16、大規模テストで
+  // 「voteIdsの件数を検証していない」不具合が見つかり追加)。
+  const QUESTIONS_PER_SESSION = 10;
 
   // /stats は /:id より先に登録する(そうしないと :id が "stats" にマッチしてしまう)
   router.get('/stats', (req, res) => {
@@ -76,17 +80,29 @@ function createSessionsRouter(db) {
       res.status(400).json({ error: 'voteIds is required' });
       return;
     }
+    if (voteIds.length !== QUESTIONS_PER_SESSION) {
+      res.status(400).json({ error: `voteIds must contain exactly ${QUESTIONS_PER_SESSION} entries` });
+      return;
+    }
 
     const placeholders = voteIds.map(() => '?').join(',');
     const votes = db
       .prepare(
-        `SELECT id, option_id AS optionId, majority_option_id_at_vote AS majorityOptionId
+        `SELECT id, option_id AS optionId, majority_option_id_at_vote AS majorityOptionId,
+                session_id AS sessionId
          FROM votes WHERE id IN (${placeholders})`
       )
       .all(...voteIds);
 
     if (votes.length !== voteIds.length) {
       res.status(400).json({ error: 'one or more voteIds not found' });
+      return;
+    }
+    // 既に別のセッションに使われたvoteIdを再送すると、session_idの無条件UPDATEで
+    // 元のセッションからvoteが奪われ、元のセッションの内訳が空になってしまう
+    // (2026-08-16、大規模テストの意地悪テストで発見)。
+    if (votes.some((v) => v.sessionId !== null)) {
+      res.status(400).json({ error: 'one or more voteIds already belong to another session' });
       return;
     }
 

@@ -14,7 +14,15 @@ function createTopicsRouter(db) {
   const attributeIdsStmt = db.prepare('SELECT id FROM attributes');
 
   router.get('/random', (req, res) => {
-    const count = Math.min(Math.max(Number(req.query.count) || 10, 1), 100);
+    // `Number(req.query.count) || 10` だと count=0 が(0が偽値のため)デフォルト10に
+    // フォールバックしてしまい、Math.max(...,1)の下限クランプに一度も到達しなかった
+    // (2026-08-16、大規模テストの閾値テストで発見)。未指定/NaNのみデフォルトへ、
+    // 0を含む有効な数値は[1,100]にクランプする。
+    const rawCount = Number(req.query.count);
+    const count =
+      req.query.count === undefined || Number.isNaN(rawCount)
+        ? 10
+        : Math.min(Math.max(rawCount, 1), 100);
     const category = typeof req.query.category === 'string' ? req.query.category : null;
     const topicRows = category
       ? db
