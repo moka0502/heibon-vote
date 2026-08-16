@@ -35,6 +35,21 @@ heibon-voteはNode.js/Express + better-sqlite3の**サーバーが必須**(投�
 ## 現時点の結論・次にやること
 
 - ユーザーは**有料オプションは今のところ検討しない**方針(2026-08-16時点)
-- 「毎回一時的に見られればいい」なら → 次回はTailscaleを試す(LAN IP直打ちより安定する見込み、localtunnelよりも安定・パスワード画面なしの見込み)
+- 「毎回一時的に見られればいい」なら → Tailscaleを試す予定だったが、この環境(Dockerコンテナ)には`/dev/net/tun`が無く`CAP_NET_ADMIN`も落とされているため、標準モードでは動かせないと判明。ユーザースペースモード(`tailscaled --tun=userspace-networking`、権限不要、インバウンド接続はlocalhostの同ポートへ転送される)なら動く見込みだが、公式インストールスクリプトの`sudo`実行が権限確認で止まっている(2026-08-16時点で未完了、ユーザーの明示許可待ち)
 - 「常時アクセス可能な固定URLがほしい」なら無料での現実的な選択肢は Oracle Cloud Always Free VPS のみ(Cloudflare Named Tunnelは独自ドメイン代が発生するため「無料」ではない)
+
+## 試行中: devcontainer.jsonの`portsAttributes`でPrivate可視性を明示(2026-08-16)
+
+PORTSパネルの右クリックメニューが出ない問題への別アプローチとして、`.devcontainer/devcontainer.json`に以下を追加(コミット`ac7fe38`)。
+
+```json
+"portsAttributes": {
+  "4322": {
+    "label": "heibon-vote",
+    "visibility": "private"
+  }
+}
+```
+
+これはGitHub Codespaces由来の設定項目で、ローカルDev Containersでも読まれるかは**未検証**。反映にはVS Codeの「ウィンドウのリロード」または「コンテナの再ビルド」が必要(どちらも現在のセッション・サーバー・トンネルが一旦切れる)。**次回この続きをやるときは、まずこの設定が効いたかどうか(PORTSパネルにPrivate表示が出るか、リモートから`http://<何らかのURL>`でアクセスできるか)を確認するところから始める。**
 - VS Code Dev Tunnelsの「Port Visibility」メニューが出ない問題は原因未診断のまま。解決すれば追加設定なしの無料選択肢が増えるので、余裕があれば診断する価値はある
