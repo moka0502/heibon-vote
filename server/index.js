@@ -13,6 +13,13 @@ const db = openDb();
 
 const app = express();
 app.use(express.json());
+// クリックジャッキング対策(2026-08-16、「よくあるバグ100項目」チェックで発見)。
+// X-Frame-Options未設定だと、悪意あるサイトがこのアプリをiframeで埋め込み、
+// 透明にして重ねた上で投票ボタン等をクリックさせる攻撃が可能になる。
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'DENY');
+  next();
+});
 app.use('/api/attributes', createAttributesRouter(db));
 app.use('/api/categories', createCategoriesRouter(db));
 app.use('/api/topics', createTopicsRouter(db));
