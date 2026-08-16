@@ -266,7 +266,7 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
       el('button', {
         class: 'btn btn-outline',
         text: `${category.label}(${category.count}問)`,
-        onclick: () => onSelectCategory(category.id),
+        onclick: () => onSelectCategory(category.id, category.label),
       })
     );
   }
@@ -517,6 +517,12 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   const wrap = el('div');
 
   const card = el('div', { class: 'card card-hero' });
+  // カテゴリを選んで挑戦した場合だけ、そのカテゴリ名を振り返りとして添える(CX#17)。
+  if (summary.categoryLabel) {
+    card.appendChild(
+      el('p', { class: 'progress', style: 'text-align:center', text: `「${summary.categoryLabel}」のお題に挑戦しました` })
+    );
+  }
   card.appendChild(
     el('div', { class: 'result-score', text: `${summary.matchCount} / ${summary.totalCount}` })
   );

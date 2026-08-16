@@ -193,7 +193,7 @@ async function showCategoryPicker() {
     mount(
       renderCategoryPicker(categories, {
         onSelectRandom: () => startQuiz(),
-        onSelectCategory: (categoryId) => startQuiz(categoryId),
+        onSelectCategory: (categoryId, categoryLabel) => startQuiz(categoryId, categoryLabel),
         onBack: showHome,
       }),
       showHome
@@ -203,12 +203,12 @@ async function showCategoryPicker() {
   }
 }
 
-async function startQuiz(category) {
+async function startQuiz(category, categoryLabel) {
   showLoading();
   try {
     const profile = getProfile();
     const { topics } = await api.getRandomTopics(QUESTIONS_PER_SESSION, category);
-    runQuiz({ topics, profile, index: 0, voteIds: [] });
+    runQuiz({ topics, profile, index: 0, voteIds: [], categoryLabel });
   } catch (err) {
     mountError(err.message, showHome, showHome);
   }
@@ -265,7 +265,7 @@ async function finishQuiz(state) {
       api.getSessionStats(),
     ]);
     mount(
-      renderResult(summary, votes, stats, {
+      renderResult({ ...summary, categoryLabel: state.categoryLabel }, votes, stats, {
         onHome: showHome,
         onHistory: showHistory,
         onRetry: () => startQuiz(),
