@@ -650,10 +650,12 @@ export function renderSuggestionForm(onSubmit, onCancel) {
   form.appendChild(textarea);
   const validationError = el('p', { class: 'error', style: 'display:none', text: '入力してから送ってください。' });
   form.appendChild(validationError);
-  form.appendChild(el('button', { class: 'btn btn-primary', type: 'submit', text: '送る' }));
+  const submitBtn = el('button', { class: 'btn btn-primary', type: 'submit', text: '送る' });
+  form.appendChild(submitBtn);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (submitBtn.disabled) return;
     const text = textarea.value.trim();
     if (!text) {
       validationError.style.display = 'block';
@@ -661,6 +663,9 @@ export function renderSuggestionForm(onSubmit, onCancel) {
       return;
     }
     validationError.style.display = 'none';
+    // onSubmitはAPI呼び出し完了(サンクス画面への遷移)まで非同期のため、連打・二重タップで
+    // 同じ提案が2回送信されてしまう(2026-08-16、「よくあるバグ100項目」チェックで発見)。
+    submitBtn.disabled = true;
     onSubmit(text);
   });
 
