@@ -1,5 +1,6 @@
 const express = require('express');
 const { getLatestRealVoteRows } = require('../votes-dedup');
+const { getVoteCounts, getMajorityOptionId, percentagesFor } = require('../majority');
 
 // 属性別の傾向は、実データ(is_dummy=0、同一voter_idは最新1票のみ)がこの件数に届くまで
 // 「まだ十分でない」として隠す(2026-08-15指示: サンプルが少なすぎる分析は見せない)。
@@ -115,8 +116,20 @@ function createTopicsRouter(db) {
     }
     const realVoteCount = realVotes.length;
 
+    // 選択肢ごとの全体%(初期データ+実データ、多数派判定と同じ母集団)は、実データが
+    // 100件に届いていなくても常に見せる(2026-08-17、マーケレビュー: 属性別クロス集計だけ
+    // 100件ゲートで隠せばよく、%まで丸ごと隠すとローンチ初期は「何も見せない機能」に
+    // 見えるという指摘)。属性別内訳(breakdown)のみ従来どおり100件で出し分ける。
+    const counts = getVoteCounts(db, topic.id);
+    const percentages = percentagesFor(counts);
+    const majorityOptionId = getMajorityOptionId(db, topic.id);
+    const totalVotes = counts.reduce((sum, c) => sum + c.count, 0);
+
     res.json({
       topic: { ...topic, options: optionStmt.all(topic.id) },
+      percentages,
+      majorityOptionId,
+      totalVotes,
       breakdown,
       realVoteCount,
       breakdownMinRealVotes: BREAKDOWN_MIN_REAL_VOTES,

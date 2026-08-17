@@ -64,8 +64,8 @@
 
 ## 属性別内訳(`server/routes/topics.js`)
 
-- `GET /api/topics/:id/breakdown`は、そのお題の実データ(`voter_id`最新1票のみ)が`BREAKDOWN_MIN_REAL_VOTES = 100`件に届いていなければ、`realVoteCount < breakdownMinRealVotes`をクライアントに返し、クライアント側は「属性別の傾向はまだ表示できません」に倒す
-- 100件に届いていれば、投票時の`profile_json`を属性ID×選択肢ごとに集計して返す
+- `GET /api/topics/:id/breakdown`は、**選択肢ごとの全体%(`percentages`/`majorityOptionId`/`totalVotes`、多数派判定と同じ母集団=初期データ+実データ)を常に返す**。クライアント(`renderTopicBreakdown`)はこの全体%を実データ件数によらず常に表示する(2026-08-17、マーケレビュー: %まで隠すとローンチ初期は「何も見せない機能」に見えるという指摘)
+- **属性別クロス集計(`breakdown`)のみ**、そのお題の実データ(`voter_id`最新1票のみ)が`BREAKDOWN_MIN_REAL_VOTES = 100`件に届いていなければ`realVoteCount < breakdownMinRealVotes`で出し分け、クライアントは「属性別の傾向はまだ表示できません」に倒す(サンプルが少ない属性別分析は誤読を招くため)。100件に届いていれば、投票時の`profile_json`を属性ID×選択肢ごとに集計して返す
 
 ## 平凡度ランク・通算称号(`server/tiers.js`)
 
@@ -98,7 +98,7 @@
 | `GET /api/categories` | `launched=1`かつactive問題が1問以上あるカテゴリのみ、`sort_order`順 |
 | `GET /api/topics/random?count=10&category=xxx&part=N` | ランダムにactive問題を出題。`category`省略で全カテゴリから。`category`とセットで`part=1`を指定すると、そのカテゴリの中で常に同じ固定10問(`topics`の`rowid`順)。`part=2`は固定10問を除いた残り全部からランダムに10問。`part`省略時はカテゴリ全体からランダム(従来通り) |
 | `GET /api/topics` | active問題の一覧(お題の内訳を見る画面用)。カテゴリの`sort_order`→お題の`question`昇順。各お題に`category`/`categoryLabel`を含み、クライアント側でカテゴリ見出しを挟んで表示する |
-| `GET /api/topics/:id/breakdown` | 属性別内訳(100件未満は非表示扱い) |
+| `GET /api/topics/:id/breakdown` | `{topic, percentages, majorityOptionId, totalVotes, breakdown, realVoteCount, breakdownMinRealVotes}`。全体%は常に、属性別`breakdown`は実データ100件未満だと非表示扱い |
 | `POST /api/votes` | `{topicId, optionId, profile, voterId}` → `{voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes}`。`totalVotes`はその時点の母集団総数(初期データ+実データ、または実データのみ、`server/majority.js`の閾値ロジックに従う) |
 | `POST /api/sessions` | `{voteIds, voterId}` → 10問分のvoteIdを1セッションに束ね、サーバー側で正誤を再計算・確定 → `{sessionId, matchCount, totalCount, tier, moreCommonCount, totalSessions}`。`voterId`は必須(空/未指定は400)。`moreCommonCount`はあなたより一致数が多かった(=あなたより平凡だった)セッション数で、過去のセッション数が`MIN_SESSIONS_FOR_PERCENTILE`(20件)未満の場合`null`。この`totalSessions`・`moreCommonCount`の母数は個人ではなく全員のセッション(「これまでの挑戦者」との比較のため) |
 | `GET /api/sessions?voterId=xxx` | 履歴一覧(新しい順)。`voterId`はその端末の`localStorage`の匿名ID(`voter_id`)で絞り込む個人別の履歴。未指定/空は空配列 |

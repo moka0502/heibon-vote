@@ -382,6 +382,13 @@ button {
   color: var(--text-muted);
 }
 
+.breakdown-attr-heading {
+  margin: 24px 0 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 1rem;
+}
+
 .topic-list-category {
   margin: 20px 0 4px;
   color: var(--text-muted);

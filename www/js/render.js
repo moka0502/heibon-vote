@@ -341,13 +341,39 @@ export function renderTopicBreakdown(
   topic,
   attributes,
   breakdown,
-  { realVoteCount, breakdownMinRealVotes },
+  { realVoteCount, breakdownMinRealVotes, percentages = {}, majorityOptionId = null, totalVotes = 0 },
   onBack
 ) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: topic.question }));
 
+  // 選択肢ごとの全体%は、実データが100件に届いていなくても常に見せる(2026-08-17、
+  // マーケレビュー: %まで隠すとローンチ初期は「何も見せない機能」に見える)。
+  if (typeof totalVotes === 'number' && totalVotes > 0) {
+    card.appendChild(el('p', { class: 'progress', text: `${totalVotes}件の回答から算出` }));
+    const overallBars = [];
+    for (const option of topic.options) {
+      const pct = percentages[option.id] ?? 0;
+      const isMajority = option.id === majorityOptionId;
+      const label = isMajority ? `${option.label}(多数派)` : option.label;
+      const bar = el('div', { class: isMajority ? 'bar' : 'bar bar-muted' });
+      const countEl = el('span', { class: 'bar-count', text: '0%' });
+      const line = el('div', { class: 'bar-line' });
+      line.appendChild(el('span', { class: 'bar-option-label', text: label }));
+      line.appendChild(el('div', { class: 'bar-track' }, [bar]));
+      line.appendChild(countEl);
+      card.appendChild(line);
+      overallBars.push([bar, countEl, pct]);
+    }
+    for (const [bar, countEl, pct] of overallBars) {
+      animateBarWidth(bar, pct);
+      animateCountUp(countEl, pct, { suffix: '%' });
+    }
+  }
+
+  // 属性別のクロス集計だけは、サンプルが少ないと誤読を招くため100件ゲートを維持する。
+  card.appendChild(el('h3', { class: 'breakdown-attr-heading', text: '属性別の傾向' }));
   if (realVoteCount < breakdownMinRealVotes) {
     card.appendChild(
       el('p', {

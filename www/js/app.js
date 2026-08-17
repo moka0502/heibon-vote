@@ -180,14 +180,16 @@ async function showTopics() {
 async function showTopicBreakdown(topicId) {
   showLoading();
   try {
-    const [{ attributes }, { topic, breakdown, realVoteCount, breakdownMinRealVotes }] =
-      await Promise.all([api.getAttributes(), api.getTopicBreakdown(topicId)]);
+    const [
+      { attributes },
+      { topic, breakdown, realVoteCount, breakdownMinRealVotes, percentages, majorityOptionId, totalVotes },
+    ] = await Promise.all([api.getAttributes(), api.getTopicBreakdown(topicId)]);
     mount(
       renderTopicBreakdown(
         topic,
         attributes,
         breakdown,
-        { realVoteCount, breakdownMinRealVotes },
+        { realVoteCount, breakdownMinRealVotes, percentages, majorityOptionId, totalVotes },
         showTopics
       ),
       showTopics
