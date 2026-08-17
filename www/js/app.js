@@ -263,7 +263,9 @@ async function answerQuestion(state, topic, optionId) {
       showHome
     );
   } catch (err) {
-    mountError(err.message, showHome, showHome);
+    // 送信失敗(レート制限等)でHomeへ飛ばすとclearQuizState()で進行状況が消えるため、
+    // 再読み込みは同じ問題への再挑戦にする(戻るボタンでの意図的な離脱時のみクリアされる)。
+    mountError(err.message, () => runQuiz(state), showHome);
   }
 }
 
