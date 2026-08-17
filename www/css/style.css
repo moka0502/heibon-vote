@@ -203,6 +203,21 @@ button {
   }
 }
 
+/* デスクトップ/審査ブラウザでは、カーソルを乗せても変化がなく押せる要素だと
+   伝わりにくいとUIレビューで指摘(2026-08-17)。タッチには影響しない軽い変化を足す。
+   hoverが効かないタッチデバイスに副作用を出さないよう(hover: hover)で限定する。 */
+@media (hover: hover) {
+  .btn:hover {
+    border-color: var(--accent);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.05);
+  }
+  .btn-outline:hover {
+    background: var(--accent-soft);
+  }
+}
+
 .btn:active {
   transform: scale(0.96);
 }
@@ -312,7 +327,8 @@ button {
   justify-content: space-between;
   margin-top: 6px;
   color: var(--text-muted);
-  font-size: 0.65rem;
+  /* 0.65rem(実測10.4px)は判読しづらいとa11yレビューで指摘、0.75remに引き上げ(2026-08-17) */
+  font-size: 0.75rem;
 }
 
 .badge {
@@ -376,17 +392,49 @@ button {
   margin-top: 0;
 }
 
+/* 一覧項目はネイティブbuttonにして、キーボード操作・スクリーンリーダーから
+   「押せる要素」として認識されるようにする(2026-08-17、a11y/UI/初回ユーザーの
+   3ペルソナが「divのままでタップ可能と気づかれない/操作不能」と指摘)。
+   button既定の見た目(中央寄せ・枠・背景)を打ち消し、行リンク風に整える。 */
 .session-list-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 4px;
+  border: none;
   border-bottom: 1px solid var(--border);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
+  transition: background 0.12s ease;
 }
 
 .session-list-item:last-child {
   border-bottom: none;
+}
+
+.session-list-item-main {
+  flex: 1;
+}
+
+/* タップ可能であることを示す矢印(初回ユーザーが「ただの一覧テキストに見える」と指摘) */
+.session-list-item-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.session-list-item:hover {
+  background: var(--accent-soft);
+}
+
+.session-list-item:active {
+  transform: scale(0.99);
 }
 
 .field {
@@ -450,8 +498,10 @@ select {
 
 .bar-line {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  row-gap: 4px;
   margin-bottom: 6px;
   font-size: 0.85rem;
   border-radius: 8px;
@@ -471,9 +521,12 @@ select {
   }
 }
 
+/* ラベルは固定幅で横に置くのをやめ、バーの上の独立した行にする(flex-basis:100%)。
+   6.5em固定だと「(あなた・多数派)」タグ付きの長いラベルが2行に折り返し、その行だけ
+   高くなってバーの縦位置がずれていた(2026-08-17、UIレビューで再発を指摘)。
+   独立行にすることで、ラベル長に関係なくバーの左端・高さが常に揃う。 */
 .bar-option-label {
-  width: 6.5em;
-  flex-shrink: 0;
+  flex: 1 1 100%;
   color: var(--text-muted);
 }
 

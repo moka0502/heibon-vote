@@ -323,8 +323,13 @@ export function renderTopicList(topics, { onSelect, onBack }) {
       currentCategory = topic.category;
       card.appendChild(el('h3', { class: 'topic-list-category', text: topic.categoryLabel }));
     }
-    const item = el('div', { class: 'session-list-item', onclick: () => onSelect(topic.id) });
-    item.appendChild(el('span', { text: topic.question }));
+    const item = el('button', {
+      type: 'button',
+      class: 'session-list-item',
+      onclick: () => onSelect(topic.id),
+    });
+    item.appendChild(el('span', { class: 'session-list-item-main', text: topic.question }));
+    item.appendChild(el('span', { class: 'session-list-item-chevron', 'aria-hidden': 'true', text: '›' }));
     card.appendChild(item);
   }
   wrap.appendChild(card);
@@ -727,11 +732,16 @@ export function renderHistoryList(sessions, { onSelect, onBack }) {
     );
   }
   for (const session of sessions) {
-    const item = el('div', { class: 'session-list-item', onclick: () => onSelect(session.id) });
-    item.appendChild(el('span', { text: formatDate(session.createdAt) }));
+    const item = el('button', {
+      type: 'button',
+      class: 'session-list-item',
+      onclick: () => onSelect(session.id),
+    });
+    item.appendChild(el('span', { class: 'session-list-item-main', text: formatDate(session.createdAt) }));
     item.appendChild(
       el('span', { text: `${session.matchCount}/${session.totalCount} (${session.sessionTier})` })
     );
+    item.appendChild(el('span', { class: 'session-list-item-chevron', 'aria-hidden': 'true', text: '›' }));
     card.appendChild(item);
   }
   wrap.appendChild(card);

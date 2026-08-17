@@ -6,6 +6,10 @@ export function playResultReveal(root, { matchCount, totalCount }) {
   const tierEl = root.querySelector('.result-tier');
   if (!scoreEl || !tierEl) return;
 
+  // アニメーションを控える設定のユーザーには最終値を即表示する(2026-08-17、a11yレビューで
+  // 指摘: CSS側やカウントアップは対応済みだが、最重要画面のこの演出だけ未対応だった)。
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+
   // 満点(真の平凡)だけ特別な瞬間として演出を強めにする(Tinder/Bumble深掘り分B3:
   // 演出強度が常に一定だった指摘への対応)。それ以外は従来どおりの控えめな演出のまま。
   const isPerfect = matchCount === totalCount;
