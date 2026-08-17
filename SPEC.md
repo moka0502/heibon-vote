@@ -109,20 +109,34 @@
 ## フロントエンド動作(`www/js/app.js`)
 
 - 画面遷移はSPA的に`appEl.replaceChildren(node)`で行い、`mount(node, backTo)`が`history.pushState`/`popstate`と連動する。各画面は「戻ったらどこに行くか」を`backTo`として渡す。`popstate`発火時は`currentBack`(なければ`showHome`)を呼ぶ
-- **プロフィール**: `localStorage`の`heibonVote.profile`に保存。未設定ならイントロ→属性設定を強制
+- **プロフィール**: `localStorage`の`heibonVote.profile`に保存。未設定ならイントロ→属性設定を強制。属性設定フォーム(`renderProfileForm`)は各属性を**初期状態「未選択」**で表示し、ユーザーが選ばなかった属性はプロフィールに含めない(送信可能・必須ではない)。以前は先頭の選択肢を常に選択済み扱いにしており、未入力のつもりのユーザーの属性まで事実と異なる値で保存され、`privacy.html`の「未入力の場合は取得しません」という記述と矛盾していた(2026-08-17修正)。サーバー側(`GET /api/topics/:id/breakdown`の集計)は元々欠損した属性キーを`if (!valueId) continue`で無視する設計のため、この変更に追随済み
 - **クイズ進行状態の永続化**: `localStorage`の`heibonVote.quizState`に1問答えるたびに保存。`init()`起動時、未完了のクイズがあれば`runQuiz()`で直接再開する。`showHome()`に到達する経路(戻るボタン含む)では毎回`clearQuizState()`を呼び、離脱=中断とみなして状態を破棄する(2026-08-15修正: 以前はここが抜けており、離脱後のリロードで中断したクイズに強制的に戻される不具合があった)
 - **voter_id**: `localStorage`の`heibonVote.voterId`に`crypto.randomUUID()`で生成、初回アクセス時に一度だけ払い出す
 
 ## レート制限・タイムアウト・バックアップ(2026-08-16実装)
 
-- **レート制限**(`server/index.js`、`express-rate-limit`): ログイン機能がないアプリのため「認証」は実装せず、連打・bot対策のレート制限のみ実装。`/api`全体に一般APIリミッター(1分100回/IP)、`/api/votes`・`/api/sessions`に書き込み系リミッター(1分30回/IP)、`/api/suggestions`に専用リミッター(1分5回/IP)を重ねて適用。超過時は429と`{error: "..."}`を返す
+- **レート制限**(`server/index.js`、`express-rate-limit`): ログイン機能がないアプリのため「認証」は実装せず、連打・bot対策のレート制限のみ実装。`/api`全体に一般APIリミッター(1分100回/IP)、`/api/votes`・`/api/sessions`に書き込み系リミッター(1分30回/IP)、`/api/suggestions`に専用リミッター(1分5回/IP)を重ねて適用。超過時は429と`{error: "..."}`を返す。**書き込み系リミッターはPOST等の書き込みメソッドのみに適用し、GET/HEAD(結果取得・統計取得)は対象外にする**(`writeMethodsOnly`ラッパー)。GETまで数えると、1クイズ(投票10回+セッション保存1回)だけでバケットを消費し、連続プレイの2周目で結果取得まで429になり進行中クイズが失われるため(2026-08-17修正)
 - **fetchタイムアウト**(`www/js/api.js`の`request()`): `AbortController`で15秒(`REQUEST_TIMEOUT_MS`)のタイムアウトを実装。タイムアウト時は既存の`mountError`にそのまま乗る
 - **DBバックアップ**(`server/backup.js`): サーバー起動時に1回+以後24時間ごとに`server/data/backups/`へタイムスタンプ付きでコピー、直近14世代のみ保持。手動実行は`npm run backup`。ホスト側と同じディスク上のため、ホスト障害には無力(誤操作・バグからの復旧用)。常時ホスティング移行後、本格的なバックアップ(別ストレージへの定期スナップショット等)への切り替えを想定
 
-## セキュリティ・堅牢性の既知のギャップ
+## セキュリティヘッダー(`server/index.js`、2026-08-16実装)
 
-- `express.json()`のボディサイズ上限はデフォルトのまま(明示的な制限なし)
+- **X-Frame-Options: DENY**: クリックジャッキング対策
+- **Content-Security-Policy**: `script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'` を全レスポンスに付与。`www/index.html`が外部scriptタグのみ(インラインscript/styleなし)、GSAPはCDNでなくローカル同梱のため`'self'`のみで機能を壊さず適用できている
+- **ペイロードサイズ上限**: `express.json({ limit: '1mb' })`。このアプリのAPIは短文フィールドのみ扱うため十分な余裕を持たせた値
+- **CORS**: 明示的な設定はなし。Capacitorの「リモートURL型」構成ではWebViewが本番URLを直接開くため実質同一オリジンになり、CORS制約が発生しない前提(ネイティブ埋め込み型に変える場合は要再検討)
+
+## プライバシーポリシー
+
+`www/privacy.html`(静的ページ、Homeフッターからリンク)。収集する情報(匿名`voterId`・回答内容・属性情報(任意)・お題提案文)を`schema.sql`の実データに即して記載。個人を特定できる情報(氏名・メール等)は取得しない。
+
+## iOS化(Capacitor)の準備状況(2026-08-16)
+
+- `capacitor.config.json`(リポジトリ直下)を作成済み。`server.url`は本番ドメイン未確定のためプレースホルダ。`@capacitor/core`・`@capacitor/cli`を`devDependencies`に追加済み
+- `npx cap add ios`はまだ実行していない(CocoaPods/Xcodeが必要でLinux devcontainer上では完結しないため)。macOS環境が用意でき次第、`cap add ios`→`@capacitor/assets generate`→Xcodeでビルドの順で進める
+- App Store掲載用マスターアイコン(`www/icons/icon-1024.png`、1024x1024)を用意済み。iOS各サイズ(@2x/@3x等)への展開は`ios/`プロジェクト作成後に`@capacitor/assets`で行う
 
 ## 未確定・保留事項
 
 - 広告・アフィリエイト実装は優先度低として保留中
+- 常時稼働の公開ホスティング(Oracle Cloud Always Free VPS想定)・Apple Developer Program登録・App Store Connect提出はユーザー本人のアカウント操作が必要なため未着手
