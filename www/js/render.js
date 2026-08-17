@@ -552,41 +552,94 @@ function shareText(summary) {
 
 // テキストのみのシェアだと拡散力が弱いという指摘を受け、結果を画像化する
 // (2026-08-16)。SNS(X等)はビジュアル付きの投稿の方が反応率が高いため。
+// 2026-08-17、マーケ/UIレビュー(白背景+文字だけで地味・空白が多い)を受けてブランド強化:
+// インディゴ地+アプリと同じ「平」ロゴ+平凡メーター(矢印)を足してTLで埋もれにくくする。
 function drawShareCard(summary) {
   const canvas = document.createElement('canvas');
   canvas.width = 1080;
   canvas.height = 1080;
   const ctx = canvas.getContext('2d');
+  ctx.textAlign = 'center';
 
-  ctx.fillStyle = '#faf9f7';
+  // 背景: ブランドカラーのインディゴgrad(白背景よりTLで目を引く)
+  const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
+  bg.addColorStop(0, '#5b5bd6');
+  bg.addColorStop(1, '#4646b8');
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 1080, 1080);
 
+  // 白カード(インディゴ地の上に浮かせて情報を締める)
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
-  ctx.roundRect(60, 60, 960, 960, 40);
+  ctx.roundRect(70, 70, 940, 940, 48);
   ctx.fill();
 
-  ctx.textAlign = 'center';
+  // ロゴ: アプリアイコンと同じ「平」のインディゴ角丸バッジ
+  ctx.fillStyle = '#5b5bd6';
+  ctx.beginPath();
+  ctx.roundRect(475, 150, 130, 130, 32);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 84px system-ui, sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('平', 540, 219);
+  ctx.textBaseline = 'alphabetic';
+
   ctx.fillStyle = '#6b6b76';
-  ctx.font = '600 40px system-ui, sans-serif';
-  ctx.fillText('平凡投票アプリ', 540, 190);
+  ctx.font = '600 38px system-ui, sans-serif';
+  ctx.fillText('平凡投票アプリ', 540, 340);
 
   if (summary.categoryLabel) {
     ctx.font = '400 34px system-ui, sans-serif';
-    ctx.fillText(`「${summary.categoryLabel}」に挑戦`, 540, 250);
+    ctx.fillText(`「${summary.categoryLabel}」に挑戦`, 540, 400);
   }
 
+  // スコア
   ctx.fillStyle = '#1f1f24';
-  ctx.font = '700 170px system-ui, sans-serif';
-  ctx.fillText(`${summary.matchCount} / ${summary.totalCount}`, 540, 470);
+  ctx.font = '700 160px system-ui, sans-serif';
+  ctx.fillText(`${summary.matchCount} / ${summary.totalCount}`, 540, 590);
 
+  // 段階ラベル
   ctx.fillStyle = '#5b5bd6';
-  ctx.font = '600 76px system-ui, sans-serif';
-  ctx.fillText(summary.tier, 540, 600);
+  ctx.font = '600 72px system-ui, sans-serif';
+  ctx.fillText(summary.tier, 540, 690);
+
+  // 平凡メーター(横帯+スコア位置の矢印)。空白が目立つという指摘への情報密度up。
+  const trackX = 160;
+  const trackW = 760;
+  const trackY = 780;
+  const trackH = 24;
+  ctx.fillStyle = '#eceaf7';
+  ctx.beginPath();
+  ctx.roundRect(trackX, trackY, trackW, trackH, 12);
+  ctx.fill();
+  const ratio = summary.totalCount > 0 ? summary.matchCount / summary.totalCount : 0;
+  const fillW = Math.max(trackH, trackW * ratio);
+  ctx.fillStyle = '#5b5bd6';
+  ctx.beginPath();
+  ctx.roundRect(trackX, trackY, fillW, trackH, 12);
+  ctx.fill();
+  // 矢印マーカー
+  const arrowX = trackX + trackW * ratio;
+  ctx.fillStyle = '#1f1f24';
+  ctx.beginPath();
+  ctx.moveTo(arrowX, trackY - 6);
+  ctx.lineTo(arrowX - 16, trackY - 30);
+  ctx.lineTo(arrowX + 16, trackY - 30);
+  ctx.closePath();
+  ctx.fill();
+  // メーター両端ラベル
+  ctx.fillStyle = '#9a9aa5';
+  ctx.font = '400 28px system-ui, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('唯一無二', trackX, trackY + 66);
+  ctx.textAlign = 'right';
+  ctx.fillText('真の平凡', trackX + trackW, trackY + 66);
+  ctx.textAlign = 'center';
 
   ctx.fillStyle = '#6b6b76';
-  ctx.font = '400 36px system-ui, sans-serif';
-  ctx.fillText('あなたは世間の多数派と何問一致できる?', 540, 880);
+  ctx.font = '400 34px system-ui, sans-serif';
+  ctx.fillText('あなたは世間の多数派と何問一致できる?', 540, 940);
 
   return canvas;
 }
