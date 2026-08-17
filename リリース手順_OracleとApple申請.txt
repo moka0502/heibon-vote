@@ -1,0 +1,262 @@
+============================================================
+ 平凡投票 (heibon-vote) リリース手順書
+ ―― Oracle Cloud ホスティング + Apple App Store 申請 ――
+ 作成: 2026-08-17 / 対象: あなた本人の作業（アカウント・支払い・Mac が必要な部分）
+============================================================
+
+このファイルは「早く Oracle と Apple の申請を進める」ための実践ガイドです。
+コマンドはコピペ用に「$ 」で始めています（$ は打たない）。
+不明点は Claude に聞けば、その場で補足・トラブル対応します。
+
+
+────────────────────────────────────────────
+0. 全体像と、進める順番
+────────────────────────────────────────────
+アプリ本体はほぼ初回リリースの完成度。次の律速は「あなたにしかできない申請・契約」。
+申請系（特に Apple）は承認に時間がかかるので、A と D を"今日"並行で着手するのが最短。
+
+  A. Oracle Cloud で VPS を借りて、平凡投票サーバーを常時稼働させる（ドメイン+HTTPS）
+  B. capacitor.config.json の server.url を本番ドメインに差し替える
+  C. Apple Developer Program に登録（$99/年、承認に時間がかかる＝早めに）
+  D. Mac で iOS プロジェクト作成 → Xcode ビルド
+  E. App Store Connect でアプリ登録・素材アップ・App Privacy 申告・審査提出
+
+  推奨タイムライン:
+   Day 1: A(VPS契約・構築)を進める / 並行で C(Apple登録)を申し込む
+   Day 2-: Apple承認待ちの間に A を仕上げ、B を反映、審査官が触れる状態にする
+   承認後: D → E
+
+
+============================================================
+ PART A. Oracle Cloud Always Free で常時ホスティング
+============================================================
+
+■ A-1. アカウント作成
+  - https://www.oracle.com/cloud/free/ で「Always Free」アカウント作成
+  - クレジットカードと電話番号の確認が要る（Always Free枠は無料。有料化しない限り課金されない）
+  - リージョンは「東京(ap-tokyo-1)」か「大阪」を選ぶと日本から速い
+    ※ Always Free の Ampere(ARM) 枠は人気で「Out of capacity」になりがち。
+      その場合は時間帯・リージョンを変えて再試行するか、AMD Micro 枠で妥協する。
+
+■ A-2. VM(コンピュート・インスタンス)を作成
+  - メニュー: Compute → Instances → Create Instance
+  - Shape(重要):
+      第一候補) VM.Standard.A1.Flex（Ampere ARM, Always Free枠: 4 OCPU / 24GB まで無料）
+                → 平凡投票には 1 OCPU / 6GB で十分すぎる
+      代替)     VM.Standard.E2.1.Micro（AMD, Always Free。非力だがこのアプリなら動く）
+  - OS(Image): Canonical Ubuntu 22.04（推奨。以降の手順は Ubuntu 前提）
+  - SSH鍵: 「Generate a key pair」で秘密鍵をDLして保管（後で SSH ログインに使う）
+  - Networking: パブリックIPを割り当てる（デフォルトでOK）
+  - 作成後、割り当てられた「Public IP アドレス」を控える
+
+■ A-3. ファイアウォールを2箇所開ける（← 一番ハマる所）
+  Oracle は「クラウド側」と「OS側」の2重ファイアウォールがある。両方 80/443 を開ける。
+  (1) クラウド側: VCN → Security Lists（またはNSG）に Ingress ルール追加
+        - 0.0.0.0/0 / TCP / 80
+        - 0.0.0.0/0 / TCP / 443
+  (2) OS側: SSHログイン後に実行
+        $ sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
+        $ sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT
+        $ sudo netfilter-persistent save
+      （Ubuntu の Oracle イメージは iptables で絞っている。上記で 80/443 を通す）
+
+■ A-4. サーバーに必要なものを入れる（SSHログイン後）
+  $ sudo apt update && sudo apt -y upgrade
+  # Node.js 20（このアプリは Node 20 系で動作確認済み。v20.19.2）
+  $ curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+  $ sudo apt -y install nodejs
+  # better-sqlite3 はネイティブモジュール。ビルドツールを入れておく（prebuild が無い時の保険）
+  $ sudo apt -y install build-essential python3 git nginx
+  # プロセス常駐マネージャ pm2
+  $ sudo npm install -g pm2
+
+■ A-5. 平凡投票を配置して起動
+  $ git clone https://github.com/moka0502/heibon-vote.git
+  $ cd heibon-vote
+  $ npm ci          # package-lock 通りに依存を入れる（better-sqlite3 がビルドされる）
+  # 初回起動テスト（Ctrl+C で止める）
+  $ node server/index.js
+      → 「heibon-vote server listening on http://localhost:4322」が出れば成功
+
+  # pm2 で常駐 + サーバー再起動やOS再起動でも自動で立ち上がるようにする
+  $ pm2 start server/index.js --name heibon-vote
+  $ pm2 save
+  $ pm2 startup       # 表示されたコマンドを1回コピペ実行（OS起動時の自動起動を登録）
+
+  ★ デプロイ（コード更新）時の手順（重要・CLAUDE.md にも記録済み）:
+     $ cd ~/heibon-vote && git pull && npm ci && pm2 restart heibon-vote
+     ※ push しただけ / git pull しただけでは反映されない。pm2 restart まで必須。
+     ※ サーバー再起動で questions-seed.json の変更も DB に反映される（起動時 seed）。
+
+■ A-6. trust proxy を設定（nginx の背後に置くので必須）
+  nginx をリバースプロキシにする前に、server/index.js に1行足す。
+  （レート制限が「全ユーザー同一IP扱い」になって審査官まで 429 で弾く事故を防ぐ。
+    コード内の該当コメント「本番デプロイ時の必須設定」参照）
+  server/index.js の「app.use('/api', generalApiLimiter);」の直前に:
+        app.set('trust proxy', 1);
+  を追加してコミット→push→VPSで git pull → pm2 restart。
+
+
+============================================================
+ PART B. ドメイン + HTTPS（Capacitor は https 必須）
+============================================================
+capacitor.config.json は cleartext:false = https 必須。生IPでは Let's Encrypt 証明書が
+取れないので「ドメイン名」が要る。
+
+■ B-1. ドメインを用意（どれか）
+  - お名前.com / Cloudflare Registrar 等で安いドメインを取得（年 1,000〜2,000円程度）
+  - 無料で済ませるなら DuckDNS（例: heibonvote.duckdns.org）も可
+  取得したら DNS の A レコードを「VPSのPublic IP」に向ける。
+
+■ B-2. nginx をリバースプロキシに設定
+  $ sudo nano /etc/nginx/sites-available/heibonvote
+  --- 以下を貼る（server_name は自分のドメインに置換）---
+  server {
+      listen 80;
+      server_name YOUR-DOMAIN;        # 例: heibonvote.example.com
+      location / {
+          proxy_pass http://127.0.0.1:4322;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+      }
+  }
+  ---
+  $ sudo ln -s /etc/nginx/sites-available/heibonvote /etc/nginx/sites-enabled/
+  $ sudo nginx -t && sudo systemctl reload nginx
+
+■ B-3. HTTPS 化（Let's Encrypt / certbot、無料・自動更新）
+  $ sudo apt -y install certbot python3-certbot-nginx
+  $ sudo certbot --nginx -d YOUR-DOMAIN
+      → メール入力・規約同意。証明書取得と nginx への https 設定を自動でやってくれる
+      → 「https://YOUR-DOMAIN/」でアプリが開けば成功
+  自動更新は certbot が cron/timer で入るので放置でOK（$ sudo certbot renew --dry-run で確認）
+
+■ B-4. 疎通確認（審査官もここを触る）
+  - スマホ/PC のブラウザで https://YOUR-DOMAIN/ を開き、クイズが最後まで動くか
+  - https://YOUR-DOMAIN/privacy.html が開くか（プライバシーポリシーURLに使う）
+
+
+============================================================
+ PART C. capacitor.config.json を本番ドメインに差し替え
+============================================================
+  capacitor.config.json を編集:
+    "appName": "平凡投票",                       ← heibon-vote から変更（表示名を統一）
+    "server": { "url": "https://YOUR-DOMAIN", "cleartext": false }
+  さらに（任意だが推奨）シェア文/画像にURLを入れるならこのタイミングで。
+  変更したら commit → push。（アプリ側は次回リロードで反映、SW更新なら sw.js の
+  CACHE_NAME を上げる）
+
+
+============================================================
+ PART D. Apple Developer Program 登録（早めに）
+============================================================
+  - https://developer.apple.com/programs/ から登録（$99/年）
+  - 個人(Individual)なら D-U-N-S 番号は不要でシンプル。法人だと D-U-N-S が要り時間がかかる
+  - Apple ID に二要素認証を有効化しておく
+  - 支払い後、承認まで数時間〜数日かかることがある（＝先に申し込むほど良い）
+
+
+============================================================
+ PART E. Mac で iOS プロジェクト作成 → Xcode ビルド
+============================================================
+（この PART は macOS + Xcode が必須。Linux/devcontainer では完結しない）
+
+■ E-0. 事前準備（★重要な注意）
+  現状 package.json は @capacitor/core が 8系・@capacitor/cli が 7系でメジャーがズレている。
+  cap add ios の前に「同じメジャー」に揃える（推奨: 両方7に統一＝実績が多い / または両方8）。
+    $ npm install @capacitor/core@7 @capacitor/cli@7
+    （@capacitor/ios も同じメジャーで入れる: 下記 E-1 で @7 指定）
+
+■ E-1. iOS プロジェクトを作る
+  $ npm install @capacitor/ios@7
+  $ npx cap add ios
+  $ npx cap sync ios
+      ※ cap add ios は CocoaPods が要る（$ sudo gem install cocoapods）
+
+■ E-2. アイコン・スプラッシュを各サイズ展開
+  マスターアイコンは既に www/icons/icon-1024.png がある。
+  $ npm install -D @capacitor/assets
+  $ npx @capacitor/assets generate --ios
+      → iOS 用の全サイズ・スプラッシュが ios/ プロジェクトに生成される
+
+■ E-3. Xcode でビルド
+  $ npx cap open ios     # Xcode が開く
+  - Signing & Capabilities: 自分の Apple Developer チームを選択（Bundle ID = com.moka0502.heibonvote）
+  - 実機 or シミュレータで起動し、WebView が https://YOUR-DOMAIN を開いて動くか確認
+  - リモートURL型なので、サーバーが落ちていると真っ白 → 提出前は VPS 稼働を必ず確認
+
+
+============================================================
+ PART F. App Store Connect 登録・提出
+============================================================
+
+■ F-1. アプリ登録
+  - https://appstoreconnect.apple.com/ → マイApp → 新規App
+    名称: 平凡投票 / Bundle ID: com.moka0502.heibonvote / 言語: 日本語 / SKU: 任意
+
+■ F-2. 掲載素材
+  - アプリアイコン(1024x1024): www/icons/icon-1024.png を使用
+  - スクリーンショット（必須サイズ、iPhone）:
+      6.9"/6.7"(1290x2796) は必須。5.5"(1242x2208) も用意すると無難
+      → クイズ画面・結果画面(平凡メーター)・シェアカード あたりが"映える"
+  - 説明文/キーワード/プロモーションテキスト: 「『平凡』は、実はすごい」を主役に
+  - プライバシーポリシーURL: https://YOUR-DOMAIN/privacy.html
+
+■ F-3. App Privacy 申告（実態と一致させる。ここが要注意）
+  平凡投票が集める情報（www/privacy.html と実装に一致）:
+    - 年代・性別・血液型・利き手（任意。未選択なら取得しない）
+    - 匿名 voterId（localStorage の UUID。端末識別子に相当）
+    - クイズの回答内容
+    - お題提案フォームの投稿文
+    - 氏名・メール等の個人特定情報は取得しない
+  申告のポイント:
+    - 「Identifiers（匿名ID）」「User Content（回答・提案）」等に該当をチェック
+    - 用途は「App Functionality（アプリ機能）」。トラッキング/広告目的では使っていない
+    - 第三者共有なし、ユーザー追跡なし（＝ATT プロンプト不要。広告は初回提出に入れない方針）
+
+■ F-4. 審査で落ちないための要点（Guideline 対策・CLAUDE.md 準拠）
+  1. 【最重要】提出時に VPS が確実に稼働（審査官が実際に操作する。落ちてると即 Reject）
+     → pm2 で常駐、証明書有効、https で最後まで遊べることを直前に確認
+  2. App Privacy 申告と www/privacy.html の内容を一致させる
+  3. Guideline 4.2(Minimum Functionality): 独自アイコン・スタンドアロン表示・GSAP演出で
+     「ただのWebサイトのラップ」に見せない（実装済み）
+  4. Guideline 2.1(App Completeness): クラッシュ/壊れリンク/無反応ボタンを潰す
+     （堅牢性テスト・意地悪テストは実施済み。x-powered-by無効化・400/413化・
+       セッション横取り対策済み）
+  5. レート制限が審査官を誤ブロックしないよう trust proxy を設定（PART A-6）
+  6. 広告(AdMob)は初回提出に入れない。承認実績を作ってからアップデートで追加
+
+
+============================================================
+ 付録1. 「今できてる／できてない」チェックリスト
+============================================================
+ [済] アプリ本体（クイズ・結果・シェア画像・PWA・アプリ名「平凡投票」統一）
+ [済] プライバシーポリシー www/privacy.html（Homeフッターからリンク）
+ [済] capacitor.config.json 作成（server.url はプレースホルダのまま＝B で差し替え）
+ [済] App Store 用マスターアイコン www/icons/icon-1024.png
+ [済] サーバー堅牢性/セキュリティ（横取り対策・400/413・CSP・レート制限）
+ [未・あなた] Oracle Cloud VPS 契約・構築（PART A）
+ [未・あなた] ドメイン取得 + HTTPS（PART B）
+ [未] capacitor server.url 差し替え + appName「平凡投票」（PART C）
+ [未・あなた] Apple Developer Program 登録（PART D）
+ [未・Mac] cap add ios / assets / Xcode ビルド（PART E、※capacitorのcore/cliメジャー統一先に）
+ [未・あなた] App Store Connect 提出（PART F）
+
+
+============================================================
+ 付録2. よくあるハマり所
+============================================================
+ - Oracle: Ampere(ARM)枠が「Out of capacity」→ 時間/リージョンを変えて再試行 or AMD Micro
+ - Oracle: 80/443 が開かない → クラウド側 Security List と OS側 iptables の"両方"を確認
+ - certbot: 生IPでは証明書が取れない → 先にドメインの A レコードを VPS IP に向ける
+ - push したのに反映されない → VPS で git pull 後に pm2 restart（＋SW更新は sw.js のCACHE_NAME）
+ - レート制限で審査官まで 429 → trust proxy 未設定が原因（PART A-6）
+ - cap add ios がこける → @capacitor/core と cli のメジャーがズレ（先に統一）/ CocoaPods 未導入
+ - DB は VPS のディスク上の server/data/heibon-vote.db（gitignore）。定期バックアップ推奨
+   （server/backup.js が起動時＋24hごとに server/data/backups/ へ。別ストレージ退避も検討）
+
+
+困ったら Claude に「この手順のここで詰まった」と言えば、その場で解決策を出します。
+============================================================
