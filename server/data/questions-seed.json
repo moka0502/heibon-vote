@@ -1785,6 +1785,132 @@
     "status": "active"
   },
   {
+    "id": "shusse-shitai",
+    "question": "出世したい派? したくない派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "shitai",
+        "label": "出世したい"
+      },
+      {
+        "id": "shitakunai",
+        "label": "出世したくない"
+      }
+    ],
+    "dummyVotes": {
+      "shitai": 42,
+      "shitakunai": 58
+    },
+    "source": "doda調査(出世したくない58.5%)。https://doda.jp/guide/ranking/108.html",
+    "status": "active"
+  },
+  {
+    "id": "shigoto-kyuryo-yarigai",
+    "question": "仕事選びは給料重視派? やりがい重視派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "kyuryo",
+        "label": "給料重視"
+      },
+      {
+        "id": "yarigai",
+        "label": "やりがい重視"
+      }
+    ],
+    "dummyVotes": {
+      "kyuryo": 59,
+      "yarigai": 41
+    },
+    "source": "複数調査(2023時点で収入重視約59%/やりがい重視約41%)を2択に正規化。https://workin.jp/work/job-important-condition-3",
+    "status": "active"
+  },
+  {
+    "id": "blind-touch",
+    "question": "ブラインドタッチができる派? できない派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "dekiru",
+        "label": "できる"
+      },
+      {
+        "id": "dekinai",
+        "label": "できない"
+      }
+    ],
+    "dummyVotes": {
+      "dekiru": 37,
+      "dekinai": 63
+    },
+    "source": "マイナビ調査(2017、ブラインドタッチができる37%)。https://pcacademy.jp/typing-proportion",
+    "status": "active"
+  },
+  {
+    "id": "teinen-hataraku",
+    "question": "定年後も働きたい派? 働きたくない派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "hatarakitai",
+        "label": "働きたい"
+      },
+      {
+        "id": "hatarakitakunai",
+        "label": "働きたくない"
+      }
+    ],
+    "dummyVotes": {
+      "hatarakitai": 75,
+      "hatarakitakunai": 25
+    },
+    "source": "ガネット調査(定年退職間近の7割以上が定年後も働きたい70.5%)を2択に正規化。https://prtimes.jp/main/html/rd/p/000000038.000019575.html",
+    "status": "active"
+  },
+  {
+    "id": "tsukin-jikan",
+    "question": "通勤時間は片道30分未満派? 30分以上派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "miman",
+        "label": "30分未満"
+      },
+      {
+        "id": "ijou",
+        "label": "30分以上"
+      }
+    ],
+    "dummyVotes": {
+      "miman": 57,
+      "ijou": 43
+    },
+    "source": "総務省統計局 住宅・土地統計調査(通勤30分未満57.0%)。https://www.stat.go.jp/data/jyutaku/2008/nihon/4_3.html",
+    "status": "active"
+  },
+  {
+    "id": "douryo-kyujitsu",
+    "question": "職場の同僚と休日に会う派? 会わない派?",
+    "category": "work-style",
+    "options": [
+      {
+        "id": "au",
+        "label": "会う"
+      },
+      {
+        "id": "awanai",
+        "label": "会わない"
+      }
+    ],
+    "dummyVotes": {
+      "au": 24,
+      "awanai": 76
+    },
+    "source": "シティリビングWeb調査(会社の同僚と休日に遊ばない76%)。https://city.living.jp/common/ecology/1467171/",
+    "status": "active"
+  },
+  {
     "id": "music-subsc-cd",
     "question": "音楽はサブスク(定額配信)派? CD・購入派?",
     "category": "digital-habits",
@@ -1887,6 +2013,111 @@
       "on": 24
     },
     "source": "アイリッジ調査(2024年12月発表、15〜69歳対象、通知設定をオンからオフに変更した経験がある人76%)を基に按分。2026-08-15調査(https://manamina.valuesccg.com/articles/3904)",
+    "status": "active"
+  },
+  {
+    "id": "doga-sub",
+    "question": "動画配信サブスクを利用している派? していない派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "riyou",
+        "label": "利用している"
+      },
+      {
+        "id": "nashi",
+        "label": "利用していない"
+      }
+    ],
+    "dummyVotes": {
+      "riyou": 70,
+      "nashi": 30
+    },
+    "source": "VOD STREAM/ICT総研(動画配信サービス利用経験約70%)を2択に正規化。https://prtimes.jp/main/html/rd/p/000000559.000055900.html",
+    "status": "active"
+  },
+  {
+    "id": "neru-mae-smaho",
+    "question": "寝る前に布団でスマホを見る派? 見ない派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "miru",
+        "label": "見る"
+      },
+      {
+        "id": "minai",
+        "label": "見ない"
+      }
+    ],
+    "dummyVotes": {
+      "miru": 63,
+      "minai": 37
+    },
+    "source": "NTTドコモ モバイル社会研究所(就寝前に布団でスマホ利用が6割超)を2択に正規化。https://www.moba-ken.jp/project/lifestyle/20230720.html",
+    "status": "active"
+  },
+  {
+    "id": "sns-jitsumei",
+    "question": "SNS(X等)は実名派? 匿名(ハンドルネーム)派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "jitsumei",
+        "label": "実名"
+      },
+      {
+        "id": "tokumei",
+        "label": "匿名"
+      }
+    ],
+    "dummyVotes": {
+      "jitsumei": 25,
+      "tokumei": 75
+    },
+    "source": "MMD研究所×マカフィー調査ほか(Twitter/Xの実名利用は20〜30代で14〜28%)を2択に正規化。https://seniorguide.jp/article/1043112.html",
+    "status": "active"
+  },
+  {
+    "id": "smaho-kaikae",
+    "question": "スマホは最新機種にこだわる派? 長く使う派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "saishin",
+        "label": "最新機種にこだわる"
+      },
+      {
+        "id": "nagaku",
+        "label": "長く使う"
+      }
+    ],
+    "dummyVotes": {
+      "saishin": 29,
+      "nagaku": 71
+    },
+    "source": "ITmedia Mobile読者アンケート(できるだけ長く使いたい37.4%+型落ち志向33.6%)を2択に正規化。https://www.itmedia.co.jp/mobile/articles/2503/30/news099.html",
+    "status": "active"
+  },
+  {
+    "id": "shashin-smaho-camera",
+    "question": "写真はスマホで撮る派? カメラで撮る派?",
+    "category": "digital-habits",
+    "options": [
+      {
+        "id": "smaho",
+        "label": "スマホ"
+      },
+      {
+        "id": "camera",
+        "label": "カメラ"
+      }
+    ],
+    "dummyVotes": {
+      "smaho": 88,
+      "camera": 12
+    },
+    "source": "MMD研究所調査(写真撮影に最もよく使うのはスマホ87.7%)。https://www.bcnretail.com/market/detail/20180830_83443.html",
     "status": "active"
   },
   {
@@ -2013,6 +2244,153 @@
       "mizu": 42
     },
     "source": "花王 洗顔実態調査(朝の洗顔で洗顔料や石鹸を使わず水・お湯だけで洗う人が4割以上)を基に按分。2026-08-15調査(https://prtimes.jp/main/html/rd/p/000000020.000122153.html)",
+    "status": "active"
+  },
+  {
+    "id": "bathtowel-arau",
+    "question": "バスタオルは毎日洗う派? 数日使う派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "mainichi",
+        "label": "毎日洗う"
+      },
+      {
+        "id": "suujitsu",
+        "label": "数日使う"
+      }
+    ],
+    "dummyVotes": {
+      "mainichi": 67,
+      "suujitsu": 33
+    },
+    "source": "ESSE online「バスタオルは毎日洗う派が67%」(2択に正規化)。https://esse-online.jp/articles/-/32922",
+    "status": "active"
+  },
+  {
+    "id": "kami-kawakashi",
+    "question": "髪はドライヤーで乾かす派? 自然乾燥派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "dryer",
+        "label": "ドライヤー"
+      },
+      {
+        "id": "shizen",
+        "label": "自然乾燥"
+      }
+    ],
+    "dummyVotes": {
+      "dryer": 57,
+      "shizen": 43
+    },
+    "source": "株式会社ノーマリズム調査(ドライヤー57%/自然乾燥43%)。https://www.dreamnews.jp/press/0000266407/",
+    "status": "active"
+  },
+  {
+    "id": "ofuro-mainichi",
+    "question": "お風呂は毎日入る派? 毎日は入らない派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "mainichi",
+        "label": "毎日入る"
+      },
+      {
+        "id": "hoka",
+        "label": "毎日は入らない"
+      }
+    ],
+    "dummyVotes": {
+      "mainichi": 77,
+      "hoka": 23
+    },
+    "source": "mitoriz「お風呂に関する調査」ほか、毎日入浴が約77%(中央調査社)。2択に正規化。https://service.mitoriz.co.jp/blog/62",
+    "status": "active"
+  },
+  {
+    "id": "toilet-futa-shimeru",
+    "question": "トイレのフタは閉めてから流す派? 開けたまま流す派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "shimeru",
+        "label": "閉めてから流す"
+      },
+      {
+        "id": "akeru",
+        "label": "開けたまま流す"
+      }
+    ],
+    "dummyVotes": {
+      "shimeru": 56,
+      "akeru": 44
+    },
+    "source": "ライオン調査(閉めてから流す56.2%/開けたまま43.8%)。https://news.mynavi.jp/article/20231216-2841413/",
+    "status": "active"
+  },
+  {
+    "id": "toiletpaper-double-single",
+    "question": "トイレットペーパーはダブル派? シングル派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "double",
+        "label": "ダブル"
+      },
+      {
+        "id": "single",
+        "label": "シングル"
+      }
+    ],
+    "dummyVotes": {
+      "double": 57,
+      "single": 43
+    },
+    "source": "kufura調査(ダブル約57%/シングル約43%)。https://kufura.jp/life/zakka/668763",
+    "status": "active"
+  },
+  {
+    "id": "neru-kutsushita",
+    "question": "寝るとき靴下を履く派? 履かない派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "haku",
+        "label": "履く"
+      },
+      {
+        "id": "hakanai",
+        "label": "履かない"
+      }
+    ],
+    "dummyVotes": {
+      "haku": 30,
+      "hakanai": 70
+    },
+    "source": "セシール調査(寝るとき靴下を履く人は約30%)を2択に正規化。https://www.cecile.co.jp/genre/g3-1-IN-SC-3A/article119/",
+    "status": "active"
+  },
+  {
+    "id": "sentaku-hindo",
+    "question": "洗濯は毎日する派? まとめてする派?",
+    "category": "home-routine",
+    "options": [
+      {
+        "id": "mainichi",
+        "label": "毎日する"
+      },
+      {
+        "id": "matome",
+        "label": "まとめてする"
+      }
+    ],
+    "dummyVotes": {
+      "mainichi": 55,
+      "matome": 45
+    },
+    "source": "東京ガス都市生活研究所(半数以上が毎日洗濯)を2択に正規化。https://uchi.tokyo-gas.co.jp/topics/5946",
     "status": "active"
   },
   {
@@ -2181,6 +2559,132 @@
       "ittenai": 87
     },
     "source": "楽天インサイト調査(2021年、直近1年以内にキャンプに行っていない人が87.3%)を基に按分。2026-08-15調査(https://insight.rakuten.co.jp/report/20210630/)",
+    "status": "active"
+  },
+  {
+    "id": "umi-yama",
+    "question": "遊びに行くなら海派? 山派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "umi",
+        "label": "海"
+      },
+      {
+        "id": "yama",
+        "label": "山"
+      }
+    ],
+    "dummyVotes": {
+      "umi": 63,
+      "yama": 37
+    },
+    "source": "LINEリサーチ(2020、海派41%/山派24%)を2択に正規化。https://prtimes.jp/main/html/rd/p/000002394.000001594.html",
+    "status": "active"
+  },
+  {
+    "id": "ryokou-kokunai-kaigai",
+    "question": "旅行は国内派? 海外派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "kokunai",
+        "label": "国内"
+      },
+      {
+        "id": "kaigai",
+        "label": "海外"
+      }
+    ],
+    "dummyVotes": {
+      "kokunai": 83,
+      "kaigai": 17
+    },
+    "source": "阪急交通社(国内旅行派62%/海外旅行派13%)を2択に正規化。https://blog.hankyu-travel.com/newsrelease/2023/02/traveling.php",
+    "status": "active"
+  },
+  {
+    "id": "manga-yomu",
+    "question": "漫画を読む派? 読まない派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "yomu",
+        "label": "読む"
+      },
+      {
+        "id": "yomanai",
+        "label": "読まない"
+      }
+    ],
+    "dummyVotes": {
+      "yomu": 55,
+      "yomanai": 45
+    },
+    "source": "クロス・マーケティング(普段漫画を読む50.2%)を2択に正規化。https://www.cross-m.co.jp/report/trend-eye/20220525comic",
+    "status": "active"
+  },
+  {
+    "id": "themepark-1nen",
+    "question": "直近1年で遊園地・テーマパークに行った派? 行っていない派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "itta",
+        "label": "行った"
+      },
+      {
+        "id": "ikanai",
+        "label": "行っていない"
+      }
+    ],
+    "dummyVotes": {
+      "itta": 23,
+      "ikanai": 77
+    },
+    "source": "クロス・マーケティング(2026、1年に1回以上行く22.8%)を2択に正規化。https://www.cross-m.co.jp/report/trend-eye/20260422themepark",
+    "status": "active"
+  },
+  {
+    "id": "fes-keiken",
+    "question": "音楽フェスに行ったことがある派? ない派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "aru",
+        "label": "行ったことがある"
+      },
+      {
+        "id": "nai",
+        "label": "行ったことがない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 30,
+      "nai": 70
+    },
+    "source": "LINEリサーチ(音楽フェスに行ったことがある3割)。https://note.com/linesurveys_jp/n/n8839012d94d2",
+    "status": "active"
+  },
+  {
+    "id": "kyujitsu-okiru",
+    "question": "休日は早起きする派? ゆっくり寝る派?",
+    "category": "leisure",
+    "options": [
+      {
+        "id": "hayaoki",
+        "label": "早起きする"
+      },
+      {
+        "id": "yukkuri",
+        "label": "ゆっくり寝る"
+      }
+    ],
+    "dummyVotes": {
+      "hayaoki": 41,
+      "yukkuri": 59
+    },
+    "source": "マイボイスコム/くらし調査(休日は平日より遅く起きる59.1%)を2択に正規化。https://www.myvoice.co.jp/biz/surveys/24212/index.html",
     "status": "active"
   },
   {
