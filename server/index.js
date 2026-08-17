@@ -50,7 +50,10 @@ const generalApiLimiter = rateLimit({
 });
 const writeLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 30,
+  // 1周のクイズで書き込みは投票10回+セッション保存1回=11回。30だと約2.7周で頭打ちになり、
+  // 連続プレイの熱心なユーザーが詰まる(2026-08-17、CXレビュー)。60にして4〜5周の余裕を
+  // 持たせつつ、1IPあたり60書き込み/分は通常プレイでは出ない水準なのでbot対策は維持できる。
+  max: 60,
   standardHeaders: true,
   legacyHeaders: false,
   handler: rateLimitHandler,
