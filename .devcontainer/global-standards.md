@@ -119,9 +119,13 @@
   1. **重い依存を遅延require化**して起動経路から外す（`cheerio`/`xlsx`など、スクレイピングや
      Excel取込みでしか使わないものは、トップレベルではなく実際に使うハンドラ内で`require`する）。
      起動時の`require.cache`に重い依存が載らないことを確認する
-  2. **開発サーバーは`node --watch-path=./server`で自動再起動**にする（コードをpush/編集しても
-     プロセスを再起動しないと反映されない事故を防ぐ。`--watch`全体監視だと`npm install`で
-     node_modulesが変わるたび巻き添え再起動するため、監視をアプリのソースディレクトリに限定する）
+  2. **開発サーバーはポーリング方式で自動再起動**にする（コードをpush/編集してもプロセスを
+     再起動しないと反映されない事故を防ぐ）。**重要: WSL2のWindows側バインドマウントでは
+     inotifyイベントがコンテナに伝わらず、`node --watch`や`nodemon`の既定(inotify)は全く発火しない
+     （2026-08-17、sub-income-logで実測。`--watch-path`でもtouchに無反応）**。そのため
+     mtimeを定期statするポーリング方式にする（依存を増やさないなら小さな自作ランナー
+     `scripts/dev.js`で`server/`配下の`.js`のmtimeを1〜2秒ごとに見て子プロセス再起動、
+     nodemonを使うなら`-L`/`--legacy-watch`のポーリングモード必須）
   3. **根本策=`node_modules`をコンテナ内の名前付きvolumeにマウント**すればFSが速くなり抜本解決する
      （`devcontainer.json`の`mounts`に`source=<proj>-node-modules,target=.../node_modules,type=volume`）。
      ただし空volume初期化時のowner不整合で`npm install`がEACCESで失敗しうるため、postCreateで
@@ -130,4 +134,4 @@
 - **ローカル常駐サーバーは「pushしただけでは新コードが反映されない」ことを常に意識する**
   （2026-08-17、sub-income-logで顕在化）。起動しっぱなしのサーバープロセスは再起動しない限り
   古いコードのまま動き、フロント（ネットワークファーストで新JSが届く）との間で新旧不整合を起こし
-  undefinedエラー等になる。上記の`--watch-path`自動再起動を入れるか、変更後に手動再起動する運用を徹底する
+  undefinedエラー等になる。上記のポーリング式自動再起動を入れるか、変更後に手動再起動する運用を徹底する
