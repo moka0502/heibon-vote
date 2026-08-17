@@ -243,10 +243,13 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
       el('p', {}, [el('span', { class: lifetimeTitleBadgeClass(stats.lifetimeTitle), text: stats.lifetimeTitle })])
     );
   }
-  card.appendChild(el('p', { class: 'progress', text: `通算満点: ${stats.perfectCount}回` }));
+  // 「満点」「称号」が何を指すか初見では伝わらないため、一言添える(初回ユーザーレビュー)。
+  card.appendChild(
+    el('p', { class: 'progress', text: `通算満点(10問すべて多数派と一致): ${stats.perfectCount}回` })
+  );
   const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
   if (nextTitleHint) {
-    card.appendChild(el('p', { class: 'progress', text: nextTitleHint }));
+    card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえます)` }));
   }
   card.appendChild(el('button', { class: 'btn btn-primary', text: '挑戦する', onclick: onStart }));
   wrap.appendChild(card);
@@ -272,6 +275,15 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
       text: '気になるジャンルで挑戦してもいいし、まずはランダムに10問答えてみてもOK。',
     })
   );
+  // 「Part1/Part2」が何かは画面上で説明がないと初見では分からない(初回ユーザーレビュー)。
+  if (categories.some((c) => Math.floor(c.count / 10) >= 2)) {
+    card.appendChild(
+      el('p', {
+        class: 'progress',
+        text: '「Part1」「Part2」は同じカテゴリ内の別々の10問です(問題は重複しません)。',
+      })
+    );
+  }
   card.appendChild(
     el('button', {
       class: 'btn btn-primary',
@@ -777,10 +789,12 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
       ])
     );
   }
-  card.appendChild(el('p', { class: 'progress', text: `通算満点: ${stats.perfectCount}回` }));
+  card.appendChild(
+    el('p', { class: 'progress', text: `通算満点(10問すべて多数派と一致): ${stats.perfectCount}回` })
+  );
   const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
   if (nextTitleHint) {
-    card.appendChild(el('p', { class: 'progress', text: nextTitleHint }));
+    card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえます)` }));
   }
   card.appendChild(el('button', { class: 'btn btn-primary', text: 'もう一度挑戦する', onclick: onRetry }));
   card.appendChild(renderShareButton(summary));
