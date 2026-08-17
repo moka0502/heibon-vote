@@ -2898,6 +2898,90 @@
     "status": "active"
   },
   {
+    "id": "origami-kasa",
+    "question": "折りたたみ傘を常に持ち歩く派? 必要な時だけ派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "tsuneni",
+        "label": "常に持ち歩く"
+      },
+      {
+        "id": "hitsuyou",
+        "label": "必要な時だけ"
+      }
+    ],
+    "dummyVotes": {
+      "tsuneni": 20,
+      "hitsuyou": 80
+    },
+    "source": "プラネット/ウェザーニュース調査(常に傘を持ち歩くのは男性18.3%/女性9%、雨予報の時だけが最多46%)を2択に正規化。https://www.planet-van.co.jp/shiru/from_planet/vol86.html",
+    "status": "active"
+  },
+  {
+    "id": "osatsu-muki",
+    "question": "財布のお札の向きを揃える派? 気にしない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "soroeru",
+        "label": "揃える"
+      },
+      {
+        "id": "kinishinai",
+        "label": "気にしない"
+      }
+    ],
+    "dummyVotes": {
+      "soroeru": 72,
+      "kinishinai": 28
+    },
+    "source": "ラジオ関西の聴取者調査(お札の向きを揃える72%/揃えない28%)。https://jocr.jp/raditopi/2022/05/16/428090/",
+    "status": "active"
+  },
+  {
+    "id": "pocket-tissue",
+    "question": "ポケットティッシュを持ち歩く派? 持ち歩かない派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "motsu",
+        "label": "持ち歩く"
+      },
+      {
+        "id": "motanai",
+        "label": "持ち歩かない"
+      }
+    ],
+    "dummyVotes": {
+      "motsu": 80,
+      "motanai": 20
+    },
+    "source": "フェリシモ調査(いつも持ち歩く74%+ときどき16%)を2択に正規化。https://www.felissimo.co.jp/monokotolabo/enq/051747.php",
+    "status": "active"
+  },
+  {
+    "id": "saifu-genkin",
+    "question": "財布に入れる現金は1万円未満派? 1万円以上派?",
+    "category": "personal",
+    "options": [
+      {
+        "id": "miman",
+        "label": "1万円未満"
+      },
+      {
+        "id": "ijou",
+        "label": "1万円以上"
+      }
+    ],
+    "dummyVotes": {
+      "miman": 58,
+      "ijou": 42
+    },
+    "source": "CanCam/トウシル調査(財布の平均約1万3569円、1万円未満が過半)を2択に正規化。https://cancam.jp/archives/1064540",
+    "status": "active"
+  },
+  {
     "id": "uranai-shinjiru-shinjinai",
     "question": "占いは信じる派? 信じない派?",
     "category": "jinx",
@@ -3105,6 +3189,132 @@
       "kininai": 30
     },
     "source": "名付けポン調査(赤ちゃんの名前を付けるとき画数を気にして付けた先輩ママ・パパは7割)を基に按分。2026-08-15調査(https://pon-navi.net/nazuke/seimeihandan/nazuke-kakusuu-kinisuru)",
+    "status": "active"
+  },
+  {
+    "id": "omamori-motsu",
+    "question": "お守りを持ち歩いている派? 持ち歩いていない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "motsu",
+        "label": "持ち歩いている"
+      },
+      {
+        "id": "motanai",
+        "label": "持ち歩いていない"
+      }
+    ],
+    "dummyVotes": {
+      "motsu": 36,
+      "motanai": 64
+    },
+    "source": "sirabee調査(お守りを身につけ/持ち歩く36.0%)。https://sirabee.com/2018/02/19/20161452771/",
+    "status": "active"
+  },
+  {
+    "id": "yakudoshi",
+    "question": "厄年を気にする派? 気にしない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "kinisuru",
+        "label": "気にする"
+      },
+      {
+        "id": "kinishinai",
+        "label": "気にしない"
+      }
+    ],
+    "dummyVotes": {
+      "kinisuru": 58,
+      "kinishinai": 42
+    },
+    "source": "エバーライフ/sirabee意識調査(厄年が気になる計約58%)を2択に正規化。https://sirabee.com/2023/01/05/20163003518/",
+    "status": "active"
+  },
+  {
+    "id": "genkatsugi",
+    "question": "ゲン担ぎ(願掛け)をする派? しない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "suru",
+        "label": "する"
+      },
+      {
+        "id": "shinai",
+        "label": "しない"
+      }
+    ],
+    "dummyVotes": {
+      "suru": 60,
+      "shinai": 40
+    },
+    "source": "リビング調査(ゲン担ぎがある約6割)を2択に正規化。https://mrs.living.jp/k_life/article/4293351",
+    "status": "active"
+  },
+  {
+    "id": "yurei-shinjiru",
+    "question": "幽霊・霊の存在を信じる派? 信じない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "shinjiru",
+        "label": "信じる"
+      },
+      {
+        "id": "shinjinai",
+        "label": "信じない"
+      }
+    ],
+    "dummyVotes": {
+      "shinjiru": 47,
+      "shinjinai": 53
+    },
+    "source": "リサーチパネル調査(2014、幽霊を信じる47.1%/信じない46.9%)を2択に正規化。https://research-panel.jp/rpdr/view.php?eid=315986",
+    "status": "active"
+  },
+  {
+    "id": "omikuji-musubu",
+    "question": "おみくじは木に結ぶ派? 持ち帰る派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "musubu",
+        "label": "木に結ぶ"
+      },
+      {
+        "id": "mochikaeru",
+        "label": "持ち帰る"
+      }
+    ],
+    "dummyVotes": {
+      "musubu": 68,
+      "mochikaeru": 32
+    },
+    "source": "ウェザーニュース調査(木に結ぶ43%/持ち帰る約2割)を2択に正規化。https://weathernews.jp/s/topics/201912/130105/",
+    "status": "active"
+  },
+  {
+    "id": "umarekawari",
+    "question": "生まれ変わり(輪廻転生)を信じる派? 信じない派?",
+    "category": "jinx",
+    "options": [
+      {
+        "id": "shinjiru",
+        "label": "信じる"
+      },
+      {
+        "id": "shinjinai",
+        "label": "信じない"
+      }
+    ],
+    "dummyVotes": {
+      "shinjiru": 43,
+      "shinjinai": 57
+    },
+    "source": "ISSP国際社会調査(2008、日本で生まれ変わりを信じる42.6%)を2択に正規化。https://gendai.media/articles/-/45721",
     "status": "active"
   },
   {
