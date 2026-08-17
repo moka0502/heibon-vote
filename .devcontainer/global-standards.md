@@ -109,3 +109,25 @@
   例: english-quiz-botには`gh`・`ffmpeg`・`fonts-liberation`が追加インストールされていた
   （2026-07-26、versant-practiceへ移植）。逆に、確認して実体が見当たらないもの
   （設定はあるが未インストール等の環境ドリフト）はそのまま移植せず、気づいた時点で報告する
+- **バインドマウント上の`node_modules`はサーバー起動・依存読み込みが遅い（全Node.js
+  プロジェクト共通の落とし穴、2026-08-17、sub-income-logで特定）**。ホストフォルダを
+  バインドマウントする既定構成では`node_modules`もWindows側(9p/drvfs)に載るため、
+  `express`・`cheerio`・`playwright`等の**大量の小ファイルのrequireが数秒〜数十秒**かかる
+  （FS競合時は変動大。実測: `require('cheerio')`ツリーで10秒超、サーバー起動が33〜80秒）。
+  一度起動した後のAPIアクセス自体は速く、遅いのは**起動・再起動・`npm install`の瞬間**に集中する。
+  対処は次の3段構え:
+  1. **重い依存を遅延require化**して起動経路から外す（`cheerio`/`xlsx`など、スクレイピングや
+     Excel取込みでしか使わないものは、トップレベルではなく実際に使うハンドラ内で`require`する）。
+     起動時の`require.cache`に重い依存が載らないことを確認する
+  2. **開発サーバーは`node --watch-path=./server`で自動再起動**にする（コードをpush/編集しても
+     プロセスを再起動しないと反映されない事故を防ぐ。`--watch`全体監視だと`npm install`で
+     node_modulesが変わるたび巻き添え再起動するため、監視をアプリのソースディレクトリに限定する）
+  3. **根本策=`node_modules`をコンテナ内の名前付きvolumeにマウント**すればFSが速くなり抜本解決する
+     （`devcontainer.json`の`mounts`に`source=<proj>-node-modules,target=.../node_modules,type=volume`）。
+     ただし空volume初期化時のowner不整合で`npm install`がEACCESで失敗しうるため、postCreateで
+     `sudo chown -R node:node node_modules`を入れる等の対処が要る。**rebuildを伴い、失敗すると
+     環境が壊れる**ので、ユーザーが立ち会える時に適用する（無人・留守中の自動適用はしない）
+- **ローカル常駐サーバーは「pushしただけでは新コードが反映されない」ことを常に意識する**
+  （2026-08-17、sub-income-logで顕在化）。起動しっぱなしのサーバープロセスは再起動しない限り
+  古いコードのまま動き、フロント（ネットワークファーストで新JSが届く）との間で新旧不整合を起こし
+  undefinedエラー等になる。上記の`--watch-path`自動再起動を入れるか、変更後に手動再起動する運用を徹底する
