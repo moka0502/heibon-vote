@@ -108,7 +108,7 @@ function createSessionsRouter(db) {
     const votes = db
       .prepare(
         `SELECT id, option_id AS optionId, majority_option_id_at_vote AS majorityOptionId,
-                session_id AS sessionId
+                session_id AS sessionId, voter_id AS voterId
          FROM votes WHERE id IN (${placeholders})`
       )
       .all(...voteIds);
@@ -124,6 +124,15 @@ function createSessionsRouter(db) {
     // 元のセッションからvoteが奪われ、元のセッションの内訳が空になってしまう
     // (2026-08-16、大規模テストの意地悪テストで発見)。
     if (votes.some((v) => v.sessionId !== null)) {
+      res.status(400).json({ error: 'one or more voteIds are invalid' });
+      return;
+    }
+    // 送られたvoteが全て申告どおりのvoterId本人のものかを検証する(2026-08-17、開発運用者
+    // ペルソナの意地悪テストで発見)。votes.idは連番で推測可能なため、これがないと他人の
+    // 未確定投票(session_id=null)の連番を推測して別voterIdでPOSTすると、他人の票を自分の
+    // セッションに取り込めてしまう(履歴・パーセンタイル母集団の汚染、及び正規ユーザーの
+    // 確定を妨げるグリーフィング)。列挙を防ぐため文言は上と同じにする。
+    if (votes.some((v) => v.voterId !== voterId)) {
       res.status(400).json({ error: 'one or more voteIds are invalid' });
       return;
     }

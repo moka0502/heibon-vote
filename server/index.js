@@ -16,6 +16,9 @@ backupNow();
 startAutoBackup();
 
 const app = express();
+// 技術スタックを開示するX-Powered-Byヘッダーを消す(2026-08-17、開発運用者ペルソナの
+// 指摘。攻撃対象の絞り込みに使われる軽微な情報開示)。
+app.disable('x-powered-by');
 // ペイロードサイズ上限(2026-08-16、App Store提出前チェックリストで発見)。
 // 上限なしだとexpress.jsonが巨大なJSONも素通しし、413ではなくメモリ圧迫や
 // 500につながりうる。このアプリのAPIは短文フィールドのみ扱うため1mbで十分。
@@ -73,6 +76,12 @@ const writeMethodsOnly = (limiter) => (req, res, next) => {
   if (req.method === 'GET' || req.method === 'HEAD') return next();
   return limiter(req, res, next);
 };
+// 【本番デプロイ時の必須設定】リバースプロキシ(Oracle Cloud等のLB/nginx、Tailscale serve)
+// の背後で動かす場合、`app.set('trust proxy', <信頼するホップ数>)` を入れないと req.ip が
+// プロキシIPになり、全ユーザーが1つのレート制限バケットを共有してしまう(審査官のアクセスまで
+// 429で巻き込まれ得る。2026-08-17、開発運用者ペルソナ指摘)。ここで無条件に有効化しないのは、
+// プロキシが無い直アクセス構成だとクライアントがX-Forwarded-Forを偽装してレート制限を回避
+// できてしまうため。デプロイ構成が確定した時点で、そのホップ数に合わせて設定すること。
 app.use('/api', generalApiLimiter);
 app.use('/api/votes', writeMethodsOnly(writeLimiter));
 app.use('/api/sessions', writeMethodsOnly(writeLimiter));
@@ -92,6 +101,17 @@ app.use(express.static(path.join(__dirname, '..', 'www')));
 // そのままHTMLでクライアントに返ってしまう。ここで捕捉し、詳細はサーバー側の
 // ログにのみ残し、クライアントには汎用的なエラーだけを返す。
 app.use((err, req, res, next) => {
+  // クライアント起因のリクエストエラー(壊れたJSON・上限超過ペイロード)は本来400/413で
+  // 返すべきものが、express.jsonの投げる例外としてここに落ちて500化していた(2026-08-17、
+  // 開発運用者ペルソナの意地悪テストで発見)。type別に正しいステータスへ振り分ける。
+  if (err.type === 'entity.parse.failed') {
+    res.status(400).json({ error: 'invalid JSON' });
+    return;
+  }
+  if (err.type === 'entity.too.large') {
+    res.status(413).json({ error: 'payload too large' });
+    return;
+  }
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'internal server error' });
 });

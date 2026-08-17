@@ -120,6 +120,16 @@
 - Apple Developer Program登録($99/年)
 - App Store Connectでのアプリ登録・提出(スクリーンショット等の掲載素材、App Privacy申告も含む)
 
+### デプロイ時の反映(pushしただけでは本番に反映されない)(2026-08-17追記)
+
+**push=git履歴の更新であって本番反映ではない**。heibon-voteは2つの経路で別々に反映される:
+- **サーバー側(API・`server/*.js`・seed)**: Nodeプロセスは起動時のコードをメモリに保持し続けるため、**再起動しないと新しいAPIコードが反映されない**(古いコードのままレスポンスを返し、新フィールドが`undefined`になる等)。加えてこのアプリは`openDb()`が起動時にseedを流すので、`questions-seed.json`の変更もサーバー再起動で初めてDBに反映される(better-sqlite3の稼働中コネクションは他プロセスの変更を取りこぼすことがあり、ローカルでもコード/seed変更後は再起動が必要)。
+- **フロント側(`www/`)**: Service Workerが静的シェルを**cache-first**でキャッシュしているため、HTML/CSS/JSを変えたら`www/sw.js`の`CACHE_NAME`(現在`heibon-vote-shell-vN`)を上げないと、クライアントは古いシェルを使い続ける(`skipWaiting`+`clients.claim`済みなので、バージョンを上げれば次のリロードで反映)。`/api/*`は素通しなのでデータは常に最新。
+
+**恒久対策**: VPS構築時に、デプロイ(`git pull`)後に自動でサーバーを再起動する仕組み(pm2の`--watch`かデプロイフック、またはsystemd + `ExecReload`)を必ず入れる。手動運用の間は「push → VPSで`git pull` → サーバー再起動 → 反映確認」までをデプロイ作業の1セットとする(共通標準§5「デプロイ後、最初の本番実行結果を確認するまでを変更作業の完了とする」に対応)。
+
+**`trust proxy`設定(本番の必須項目)**: リバースプロキシ(Oracle CloudのLB/nginx、`tailscale serve`)の背後で動かすと、`req.ip`がプロキシIPになり全ユーザーが1つのレート制限バケットを共有する(審査官のアクセスまで429で巻き込まれ得る。2026-08-17、開発運用者ペルソナ指摘)。デプロイ構成が確定したら`server/index.js`で`app.set('trust proxy', <信頼するホップ数>)`を設定する。プロキシが無い直アクセス構成で無条件に有効化すると、クライアントが`X-Forwarded-For`を偽装してレート制限を回避できるため、**プロキシ構成が確定するまでは設定しない**(コードにコメントで明記済み)。
+
 ## 技術方針
 
 - **DB必須**: ローカルNode.js + better-sqlite3。DBファイルは`server/data/heibon-vote.db`(gitignore対象)。スキーマは`server/db/schema.sql`が一つの事実源
