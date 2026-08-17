@@ -133,6 +133,7 @@
 ## 技術方針
 
 - **DB必須**: ローカルNode.js + better-sqlite3。DBファイルは`server/data/heibon-vote.db`(gitignore対象)。スキーマは`server/db/schema.sql`が一つの事実源
+- **`openDb()`はWALモード+起動時seedを行う。稼働中サーバーがある状態で別プロセスの`openDb()`(`node -e`スクリプト等)を走らせると、WAL競合(orphaned WAL: 稼働プロセスがWALを握ったままdisk上で`(deleted)`化)を起こし、①別コネクションから稼働中の最新書き込みが見えない②サーバー再起動時に起動後の書き込みが失われる、が発生しうる**(2026-08-17、CX担当ペルソナが`/proc/<pid>/fd`で発見。このセッション中「DBを直接編集したのにサーバーに反映されない/削除が戻る」現象を何度も引き起こした根本原因)。**直接DB操作(テストデータ投入・掃除、seed外の削除・ラベル更新)は、サーバーを停止してから単一接続で行い、`db.pragma('wal_checkpoint(TRUNCATE)')`でWALをflushしてから再起動する**のが安全。seedファイル(`questions-seed.json`)の編集はfsのみでDBに触れないので、この問題を避けられる(反映はサーバー再起動時のauto-seedで行われる)
 - サーバー: `server/index.js`(Express)が静的配信(`www/`)とAPI(`/api/*`)の両方を担う。`npm run dev` → `node server/index.js`、ポート4322(他プロジェクトkusutto-games:4321等との衝突回避のため据え置き)
 - フロントは引き続きビルドツールなしVanilla HTML/CSS/JS(ESモジュール)。配色・質感トークン(`www/css/style.css`)は`kusutto-games`/`versant-practice`に合わせた近白背景`#faf9f7`+インディゴ`#5b5bd6`、フラット、`scale(0.96)`押下フィードバック
 - 多数派判定の同数タイブレークは`options.sort_order`が小さい方を採用(決定的、乱数不要)
