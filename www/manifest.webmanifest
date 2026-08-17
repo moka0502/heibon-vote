@@ -1,6 +1,6 @@
 {
-  "name": "heibon-vote",
-  "short_name": "heibon-vote",
+  "name": "平凡投票",
+  "short_name": "平凡投票",
   "description": "10問中、何問「みんなの多数派」と一致できるか競う平凡度クイズ",
   "start_url": ".",
   "scope": ".",
