@@ -1,0 +1,75 @@
+# Codemagic ビルド設定（平凡投票 / Capacitor iOS）
+# ------------------------------------------------------------------
+# 目的: Macを持たずに、クラウド(macOS)上で iOS アプリをビルド→署名→
+#       App Store Connect / TestFlight へアップロードする。
+#
+# ★これは"雛形"です。以下の【TODO】は Apple Developer が有効化され、
+#   App Store Connect でアプリを作成した"後"に埋めます（今は未確定のため空欄）。
+#
+# 使う前提（Apple有効化後に Codemagic の管理画面でやること）:
+#   1. Codemagic に GitHub でサインアップ → このリポジトリを接続
+#   2. App Store Connect で「App Store Connect API キー」を発行
+#      （Users and Access → Integrations → App Store Connect API）
+#   3. Codemagic の Team settings → Integrations → App Store Connect に
+#      その API キーを登録し、名前をつける（下の <APP_STORE_CONNECT_KEY> に使う）
+#   4. Codemagic の環境変数に APP_STORE_APPLE_ID（アプリ作成後に決まる数値ID）を設定
+# ------------------------------------------------------------------
+
+workflows:
+  ios-release:
+    name: 平凡投票 iOS Release
+    instance_type: mac_mini_m2      # CodemagicのmacOSマシン（無料枠対象）
+    max_build_duration: 60
+
+    integrations:
+      # 【TODO】Codemagicに登録したApp Store Connect APIキーの"名前"に置き換える
+      app_store_connect: <APP_STORE_CONNECT_KEY>
+
+    environment:
+      ios_signing:
+        distribution_type: app_store          # App Store配布用の署名
+        bundle_identifier: com.moka0502.heibonvote
+      vars:
+        BUNDLE_ID: "com.moka0502.heibonvote"
+        # 【TODO】App Store Connectでアプリを新規作成した後に付く"数値のApple ID"を入れる
+        APP_STORE_APPLE_ID: "0000000000"
+      node: 20
+      xcode: latest
+      cocoapods: default
+
+    scripts:
+      - name: Install JS dependencies
+        script: npm ci
+
+      - name: Generate & sync iOS project
+        # ios/ フォルダはリポジトリに含めず、ビルド時にCapacitorで生成する
+        # （cap add ios はCocoaPods/macOSが要るためCI(mac)で実行）。
+        script: |
+          npx cap add ios || true
+          npx cap sync ios
+
+      - name: Set up code signing
+        script: xcode-project use-profiles
+
+      - name: Set build number
+        # TestFlightの最新ビルド番号+1を採番（重複を防ぐ）
+        script: |
+          cd ios/App
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" || echo 0)
+          agvtool new-version -all $(($LATEST + 1))
+
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace "ios/App/App.xcworkspace" \
+            --scheme "App"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true      # まずTestFlightへ（審査提出は慣れてから手動でもOK）
+        # submit_to_app_store: false     # App Store審査に自動提出したくなったらtrueに

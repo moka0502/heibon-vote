@@ -8,12 +8,13 @@
     "backup": "node -e \"console.log(require('./server/backup').backupNow())\""
   },
   "dependencies": {
+    "@capacitor/ios": "^8.5.0",
     "better-sqlite3": "^11",
     "express": "^4",
     "express-rate-limit": "^8.6.2"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.6.8",
+    "@capacitor/cli": "^8.5.0",
     "@capacitor/core": "^8.5.0",
     "gsap": "^3.15.0"
   }
