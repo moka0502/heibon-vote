@@ -441,27 +441,6 @@
     "status": "active"
   },
   {
-    "id": "shan-asa-yoru",
-    "question": "シャンプーは朝派? 夜派?",
-    "category": "home-routine",
-    "options": [
-      {
-        "id": "morning",
-        "label": "朝シャン"
-      },
-      {
-        "id": "night",
-        "label": "夜シャン"
-      }
-    ],
-    "dummyVotes": {
-      "morning": 39,
-      "night": 61
-    },
-    "source": "アンケート調査(朝シャンを取り入れている人は約39%)を基に按分。2026-08-15調査(https://www.dreamnews.jp/press/0000349445)",
-    "status": "active"
-  },
-  {
     "id": "furusato-nouzei-yaru",
     "question": "ふるさと納税、やっている派? やっていない派?",
     "category": "money",
@@ -1008,27 +987,6 @@
     "status": "active"
   },
   {
-    "id": "date-warikan",
-    "question": "デート代は割り勘派? 男性が多く払う派?",
-    "category": "romance",
-    "options": [
-      {
-        "id": "warikan",
-        "label": "割り勘"
-      },
-      {
-        "id": "otoko",
-        "label": "男性が多く払う"
-      }
-    ],
-    "dummyVotes": {
-      "warikan": 59,
-      "otoko": 41
-    },
-    "source": "ONE FOR ONE調査(女性回答、割り勘52%/男性が多く払う36%の比率に正規化)を基に按分。2026-08-15調査(https://webtan.impress.co.jp/n/2024/05/31/47083)",
-    "status": "active"
-  },
-  {
     "id": "enkyori-renai",
     "question": "遠距離恋愛は「できる」派? 「できない」派?",
     "category": "romance",
@@ -1135,12 +1093,12 @@
   },
   {
     "id": "propose-otokokara",
-    "question": "プロポーズは男性からしてほしい派? どちらでもいい派?",
+    "question": "プロポーズは男性からするべき派? どちらでもいい派?",
     "category": "romance",
     "options": [
       {
         "id": "otokokara",
-        "label": "男性からしてほしい"
+        "label": "男性からするべき"
       },
       {
         "id": "dochirademo",
@@ -1845,27 +1803,6 @@
       "cd": 56
     },
     "source": "日本の音楽市場データ(2022年、オーディオレコード(CD等)56%/音楽配信(サブスク等)44%)を基に按分。2026-08-15調査(https://www.saishintech.com/2023/03/japanese-music-market-cd-vs-streaming-mar-2023/)",
-    "status": "active"
-  },
-  {
-    "id": "sumaho-lock-yubi-kao",
-    "question": "スマホの画面ロックは指紋認証派? 顔認証派?",
-    "category": "digital-habits",
-    "options": [
-      {
-        "id": "yubi",
-        "label": "指紋認証"
-      },
-      {
-        "id": "kao",
-        "label": "顔認証"
-      }
-    ],
-    "dummyVotes": {
-      "yubi": 73,
-      "kao": 27
-    },
-    "source": "MMD研究所調査(2020年12月、15〜69歳428人対象、指紋認証42.7%/顔認証16.0%)の比率に正規化して按分。2026-08-15調査(https://mmdlabo.jp/investigation/detail_1928.html)",
     "status": "active"
   },
   {
@@ -2920,7 +2857,7 @@
   },
   {
     "id": "qr-kessai-denshi-money",
-    "question": "普段の支払いはQRコード決済派? 電子マネー派?",
+    "question": "キャッシュレス決済は、QRコード決済派? 電子マネー派?",
     "category": "money",
     "options": [
       {
@@ -3231,6 +3168,27 @@
       "kinishinai": 15
     },
     "source": "ホットペッパーグルメ外食総研調査(20-60代男女1,035人対象、飲食店でのデート中「極力スマホをいじらない」がマナーだと思う割合が平均約85%)を基に按分。2024年調査(https://news.mynavi.jp/article/20240926-3031593/)",
+    "status": "active"
+  },
+  {
+    "id": "koibito-erabi-naimen-gaiken",
+    "question": "恋人選びは内面(性格)重視派? 外見重視派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "naimen",
+        "label": "内面(性格)重視"
+      },
+      {
+        "id": "gaiken",
+        "label": "外見重視"
+      }
+    ],
+    "dummyVotes": {
+      "naimen": 65,
+      "gaiken": 35
+    },
+    "source": "マシェラボ「未婚者の恋人選び」調査(性格・人柄を最重視51.4%)ほか複数調査で内面重視が多数の傾向を、内面/外見の2択に正規化して按分。2026-08-17調査(https://machetalk.jp/media/love-choice-generations-gender-difference/)",
     "status": "active"
   },
   {
@@ -3571,23 +3529,23 @@
   },
   {
     "id": "aircon-nezuki-tsukeppanashi",
-    "question": "夏の就寝時、エアコンは一晩中つけたまま派? 使わない派?",
+    "question": "夏の就寝時、エアコンは一晩中つけたまま派? タイマーや使わない派?",
     "category": "health",
     "options": [
       {
         "id": "tsukeppanashi",
-        "label": "一晩中つけたまま派"
+        "label": "一晩中つけたまま"
       },
       {
         "id": "tsukawanai",
-        "label": "エアコンは使わない派"
+        "label": "タイマーや使わない"
       }
     ],
     "dummyVotes": {
-      "tsukeppanashi": 75,
-      "tsukawanai": 25
+      "tsukeppanashi": 56,
+      "tsukawanai": 44
     },
-    "source": "株式会社クロス・マーケティング「夏のエアコン使用に関する調査」(2025年)。就寝時「一晩中つけたまま」56.4%、「エアコンは使わない」19.2%(2値で按分正規化)。https://adv.tokyo-np.co.jp/prtimes/article49724/",
+    "source": "株式会社クロス・マーケティング「夏のエアコン使用に関する調査」(2025年)。就寝時「一晩中つけたまま」56.4%、それ以外(タイマー・使わない等)を「タイマーや使わない」に合算し2値で正規化。https://adv.tokyo-np.co.jp/prtimes/article49724/",
     "status": "active"
   }
 ]
