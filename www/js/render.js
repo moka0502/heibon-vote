@@ -186,11 +186,14 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
   }
 
   // ネイティブselect依存から、Duolingo風の大きくタップできる選択肢ボタンへ(D3)。
-  const selectedValues = {};
+  // 未選択のまま送信すると、その属性はプロフィールに含めない(2026-08-17、
+  // App Store審査官/CX担当ペルソナレビューで発覚: 先頭選択肢が常に選択済み扱いになり、
+  // 実際は未入力のユーザーの属性まで事実と異なる値で保存されていた。
+  // www/privacy.htmlの「未入力の場合は取得しません」という記述と実装を一致させる)。
+  const selectedValues = { ...currentValues };
   for (const attribute of attributes) {
     const field = el('div', { class: 'field' });
     field.appendChild(el('span', { class: 'field-label', text: attribute.label }));
-    selectedValues[attribute.id] = currentValues?.[attribute.id] ?? attribute.values[0].id;
 
     const optionButtons = [];
     const optionsWrap = el('div', { class: 'attribute-options' });
@@ -255,6 +258,7 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
     el('button', { class: 'btn-link', onclick: onSettings }, [icon('person'), 'あなたについての設定'])
   );
   wrap.appendChild(el('button', { class: 'btn-link', onclick: onSuggest }, [icon('bulb'), 'お題を提案する']));
+  wrap.appendChild(el('a', { class: 'btn-link', href: 'privacy.html', text: 'プライバシーポリシー' }));
   return wrap;
 }
 
@@ -583,21 +587,44 @@ function renderShareButton(summary) {
       }
       return;
     }
-    // Web Share API非対応のブラウザ向けフォールバック: 画像をダウンロードしてもらう
+    // Web Share API非対応のブラウザ向けフォールバック: 画像をダウンロードしてもらう。
+    // ダウンロード・コピーそれぞれ独立にtry/catchする(2026-08-17、App Store審査官
+    // ペルソナレビューで発覚: a.click()が例外を投げる環境だと後続のクリップボード
+    // コピーごと止まり、ボタンの見た目も無反応のまま何も起きていないように見えていた)。
+    let downloadOk = false;
     if (file) {
-      const url = URL.createObjectURL(file);
-      const a = el('a', { href: url, download: file.name });
-      a.click();
-      URL.revokeObjectURL(url);
+      try {
+        const url = URL.createObjectURL(file);
+        const a = el('a', { href: url, download: file.name });
+        a.click();
+        URL.revokeObjectURL(url);
+        downloadOk = true;
+      } catch (err) {
+        console.error('share image download failed:', err);
+      }
     }
+    let copyOk = false;
     if (navigator.clipboard) {
-      await navigator.clipboard.writeText(text);
-      const original = btn.textContent;
-      btn.textContent = '画像を保存・テキストをコピーしました!';
-      setTimeout(() => {
-        btn.textContent = original;
-      }, 2000);
+      try {
+        await navigator.clipboard.writeText(text);
+        copyOk = true;
+      } catch (err) {
+        console.error('share text copy failed:', err);
+      }
     }
+    const original = btn.textContent;
+    if (downloadOk && copyOk) {
+      btn.textContent = '画像を保存・テキストをコピーしました!';
+    } else if (downloadOk) {
+      btn.textContent = '画像を保存しました!';
+    } else if (copyOk) {
+      btn.textContent = 'テキストをコピーしました!';
+    } else {
+      btn.textContent = 'シェアに失敗しました。もう一度お試しください。';
+    }
+    setTimeout(() => {
+      btn.textContent = original;
+    }, 2000);
   });
   return btn;
 }
