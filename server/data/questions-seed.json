@@ -501,7 +501,7 @@
       "eatout": 25
     },
     "source": "マイナビ調査(全国20〜40代会社員対象、自炊派75.3%)を基に按分。20〜40代会社員限定の調査である点に注意。2026-08-15調査(https://cm-marketinglab.mynavi.jp/column/research_selfcooking-Z/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "kyujitsu-indoor-outdoor",
@@ -1194,7 +1194,7 @@
       "nokosu": 55
     },
     "source": "社会人500人アンケート(元恋人の連絡先を消去する45.4%)を基に按分。調査により29.6%〜45.4%と幅があり、代表値として採用。2026-08-15調査(https://gakumado.mynavi.jp/freshers/articles/12159)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "ehomaki-taberu",
@@ -1257,7 +1257,7 @@
       "kakanai": 9
     },
     "source": "ニフティキッズ調査(小中学生対象、七夕にやることは「短冊に願い事」が90.7%)を基に按分。小中学生対象の調査である点に注意。2026-08-15調査(https://kids.nifty.com/parent/research/tanabata_20250701/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "toshikoshi-soba",
@@ -1299,7 +1299,7 @@
       "ikanai": 79
     },
     "source": "JTB調査(2025年、ゴールデンウィークに旅行に行かない人79.1%)を基に按分。2026-08-15調査(https://www.jtbcorp.jp/jp/newsroom/2025/04/03_jtb-2025gw.html)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "oosouji-nenmatsu",
@@ -1467,7 +1467,7 @@
       "nai": 43
     },
     "source": "Timely Researchアンケート(現在ダイエット中22.1%+過去に経験34.6%=56.7%)を基に按分。2026-08-15調査(https://www.dims.ne.jp/timelyresearch/2017/170315/)",
-    "status": "stock"
+    "status": "active"
   },
   {
     "id": "zangyou-suru-shinai",
@@ -2664,6 +2664,930 @@
       "kininai": 30
     },
     "source": "名付けポン調査(赤ちゃんの名前を付けるとき画数を気にして付けた先輩ママ・パパは7割)を基に按分。2026-08-15調査(https://pon-navi.net/nazuke/seimeihandan/nazuke-kakusuu-kinisuru)",
+    "status": "active"
+  },
+  {
+    "id": "tkg-choumiryo",
+    "question": "卵かけご飯は、だし醤油派? めんつゆ派?",
+    "category": "food",
+    "options": [
+      {
+        "id": "dashi-shoyu",
+        "label": "だし醤油派"
+      },
+      {
+        "id": "mentsuyu",
+        "label": "めんつゆ派"
+      }
+    ],
+    "dummyVotes": {
+      "dashi-shoyu": 58,
+      "mentsuyu": 42
+    },
+    "source": "株式会社リクルート「たまごかけごはんの日」アンケート調査(2023年)。卵かけご飯にかける調味料はだし醤油36.5%・めんつゆ26.4%(上位2項目を正規化)。https://prtimes.jp/main/html/rd/p/000002801.000011414.html",
+    "status": "active"
+  },
+  {
+    "id": "curry-karasa",
+    "question": "カレーは中辛派? 辛口派?",
+    "category": "food",
+    "options": [
+      {
+        "id": "chukara",
+        "label": "中辛派"
+      },
+      {
+        "id": "karakuchi",
+        "label": "辛口派"
+      }
+    ],
+    "dummyVotes": {
+      "chukara": 53,
+      "karakuchi": 47
+    },
+    "source": "ガジェット通信「カレーの辛さは辛口と甘口どっちが好き?」1000人アンケート(2013年)。中辛39%・辛口35%(上位2項目を正規化)。https://getnews.jp/archives/114359",
+    "status": "active"
+  },
+  {
+    "id": "ichigo-rennyu",
+    "question": "いちごは、練乳なしで食べる派? 練乳をかける派?",
+    "category": "food",
+    "options": [
+      {
+        "id": "nashi",
+        "label": "練乳なし派"
+      },
+      {
+        "id": "kakeru",
+        "label": "練乳をかける派"
+      }
+    ],
+    "dummyVotes": {
+      "nashi": 76,
+      "kakeru": 24
+    },
+    "source": "macaroni読者アンケート、いちご好き155名対象(2021年公開)。かけない派65%・かける派21%(上位2項目を正規化)。https://macaro-ni.jp/98250",
+    "status": "active"
+  },
+  {
+    "id": "hiyashichuka-mayo",
+    "question": "冷やし中華は、マヨネーズなし派? マヨネーズをかける派?",
+    "category": "food",
+    "options": [
+      {
+        "id": "nashi",
+        "label": "マヨネーズなし派"
+      },
+      {
+        "id": "kakeru",
+        "label": "マヨネーズをかける派"
+      }
+    ],
+    "dummyVotes": {
+      "nashi": 75,
+      "kakeru": 25
+    },
+    "source": "ウェザーニュース全国アンケート調査。冷やし中華にマヨネーズをかける派は全国平均25%、かけない派75%。https://weathernews.jp/s/topics/202106/110175/",
+    "status": "active"
+  },
+  {
+    "id": "butajiru-yomikata",
+    "question": "豚汁は「とんじる」派? 「ぶたじる」派?",
+    "category": "food",
+    "options": [
+      {
+        "id": "tonjiru",
+        "label": "とんじる派"
+      },
+      {
+        "id": "butajiru",
+        "label": "ぶたじる派"
+      }
+    ],
+    "dummyVotes": {
+      "tonjiru": 84,
+      "butajiru": 16
+    },
+    "source": "楽天インサイト(ファミリーマート委託)「全国『豚汁』調査」2025年11月実施、全国20〜69歳男女700名対象。とんじる派84.3%・ぶたじる派15.7%。https://prtimes.jp/main/html/rd/p/000002048.000046210.html",
+    "status": "active"
+  },
+  {
+    "id": "oden-karashi",
+    "question": "おでんは、からしをつける派? つけない派?",
+    "category": "food",
+    "options": [
+      {
+        "id": "tsukeru",
+        "label": "からしをつける派"
+      },
+      {
+        "id": "tsukenai",
+        "label": "からしをつけない派"
+      }
+    ],
+    "dummyVotes": {
+      "tsukeru": 61,
+      "tsukenai": 39
+    },
+    "source": "紀文食品公式Xアンケート、2024年11月20日実施、回答15,244人。つける派60.7%・つけない派39.3%。https://www.buzzfeed.com/jp/keitoarai/oden-karashi",
+    "status": "active"
+  },
+  {
+    "id": "sashimi-wasabi",
+    "question": "刺身のわさびは、身にのせる派? 醤油に溶かす派?",
+    "category": "food",
+    "options": [
+      {
+        "id": "noseru",
+        "label": "身にのせる派"
+      },
+      {
+        "id": "tokasu",
+        "label": "醤油に溶かす派"
+      }
+    ],
+    "dummyVotes": {
+      "noseru": 59,
+      "tokasu": 41
+    },
+    "source": "Jタウン研究所 都道府県別アンケート調査、2016年実施、総投票数1,883票。のせて食べる派56.5%・醤油に溶かす派40%(上位2項目を正規化)。https://j-town.net/2016/11/18235281.html?p=all",
+    "status": "active"
+  },
+  {
+    "id": "mikan-shiroi-suji",
+    "question": "みかんの白い筋は、取らない派? 取る派?",
+    "category": "food",
+    "options": [
+      {
+        "id": "toranai",
+        "label": "取らない派"
+      },
+      {
+        "id": "toru",
+        "label": "取る派"
+      }
+    ],
+    "dummyVotes": {
+      "toranai": 71,
+      "toru": 29
+    },
+    "source": "マイナビ学生の窓口 大学生対象アンケート(回答178人、取らない127人・取る51人)。取らない派71.3%・取る派28.7%。https://gakumado.mynavi.jp/gmd/articles/46651",
+    "status": "active"
+  },
+  {
+    "id": "saifu-koin-tameru-tsukaikiru",
+    "question": "財布の小銭は貯める派? 使い切る派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "tameru",
+        "label": "貯める(小銭入れに溜まりがち)"
+      },
+      {
+        "id": "tsukaikiru",
+        "label": "使い切る(細かく使う)"
+      }
+    ],
+    "dummyVotes": {
+      "tameru": 59,
+      "tsukaikiru": 41
+    },
+    "source": "コインスター株式会社「現金・小銭の保有に関する意識調査」約6割(58.8%)が「小銭を貯めた/溜めてしまった経験がある」と回答。2026年調査(https://prtimes.jp/main/html/rd/p/000000002.000036224.html)",
+    "status": "active"
+  },
+  {
+    "id": "credit-card-maisuu",
+    "question": "クレジットカードは1枚だけ派? 複数枚持つ派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "ichimai",
+        "label": "1枚だけ"
+      },
+      {
+        "id": "fukusuu",
+        "label": "複数枚持つ"
+      }
+    ],
+    "dummyVotes": {
+      "ichimai": 25,
+      "fukusuu": 75
+    },
+    "source": "クロス・マーケティング調査(20〜69歳男女1,100人)、保有枚数「1枚」25.4%が最多回答、平均保有枚数2.84枚。2026年調査(https://prtimes.jp/main/html/rd/p/000000737.000004729.html)",
+    "status": "active"
+  },
+  {
+    "id": "chintai-mochiie",
+    "question": "住まいは賃貸派? 持ち家派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "mochiie",
+        "label": "持ち家派"
+      },
+      {
+        "id": "chintai",
+        "label": "賃貸派"
+      }
+    ],
+    "dummyVotes": {
+      "mochiie": 82,
+      "chintai": 18
+    },
+    "source": "全国宅地建物取引業協会連合会(全宅連)2023年調査(20〜65歳男女5,151人)、持ち家派67.5%・賃貸派15.2%(2択分を正規化)。https://www.zentaku.or.jp/news/9556/",
+    "status": "active"
+  },
+  {
+    "id": "shougakukin-karita",
+    "question": "奨学金は借りた派? 借りていない派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "karita",
+        "label": "借りた"
+      },
+      {
+        "id": "karite_inai",
+        "label": "借りていない"
+      }
+    ],
+    "dummyVotes": {
+      "karita": 51,
+      "karite_inai": 49
+    },
+    "source": "日本学生支援機構(JASSO)「令和6年度学生生活調査」、大学(昼間部)の奨学金受給率51.1%。https://www.jili.or.jp/lifeplan/lifeevent/761.html",
+    "status": "active"
+  },
+  {
+    "id": "qr-kessai-denshi-money",
+    "question": "普段の支払いはQRコード決済派? 電子マネー派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "qr",
+        "label": "QRコード決済"
+      },
+      {
+        "id": "denshi_money",
+        "label": "電子マネー"
+      }
+    ],
+    "dummyVotes": {
+      "qr": 55,
+      "denshi_money": 45
+    },
+    "source": "直近1か月の利用率調査、QRコード決済46.6%・電子マネー(Suica等非接触型)38.9%(2択分を正規化)。https://catalog.monex.co.jp/article/?p=1054",
+    "status": "active"
+  },
+  {
+    "id": "bonus-chokin-wariai",
+    "question": "ボーナスは半分以上貯金する派? 半分未満しか貯金しない派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "half_or_more",
+        "label": "半分以上貯金する"
+      },
+      {
+        "id": "less_than_half",
+        "label": "半分未満しか貯金しない"
+      }
+    ],
+    "dummyVotes": {
+      "half_or_more": 55,
+      "less_than_half": 45
+    },
+    "source": "株式会社ロイヤリティマーケティング「Ponta消費意識調査」、ボーナスの半分以上を貯金・預金したい人54.8%。https://www.loyalty.co.jp/news/20250626",
+    "status": "active"
+  },
+  {
+    "id": "receipt-suteru-hokan",
+    "question": "レシートは確認後すぐ捨てる派? 保管して記録する派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "suteru",
+        "label": "確認後すぐ捨てる"
+      },
+      {
+        "id": "hokan",
+        "label": "保管して記録する"
+      }
+    ],
+    "dummyVotes": {
+      "suteru": 57,
+      "hokan": 43
+    },
+    "source": "LINEリサーチ調査、受け取ったレシートを「内容を確認したら捨てる」38.7%・「支出の記録のためとっておく」29.3%(2択分を正規化)。https://prtimes.jp/main/html/rd/p/000004350.000001594.html",
+    "status": "active"
+  },
+  {
+    "id": "nisa-riyou-shiteinai",
+    "question": "新NISAは利用している派? 利用していない派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "riyou",
+        "label": "利用している"
+      },
+      {
+        "id": "hiriyou",
+        "label": "利用していない"
+      }
+    ],
+    "dummyVotes": {
+      "riyou": 29,
+      "hiriyou": 71
+    },
+    "source": "株式会社ロイヤリティマーケティング「新NISAの利用状況に関する調査」、新NISAを「すでに利用している」28.6%(2024年12月調査)。https://biz.loyalty.co.jp/report/151/",
+    "status": "active"
+  },
+  {
+    "id": "credit-ikkatsu-ribo",
+    "question": "クレジットカードは一括払い派? 分割・リボ払い派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "ikkatsu",
+        "label": "一括払い"
+      },
+      {
+        "id": "bunkatsu_ribo",
+        "label": "分割・リボ払い"
+      }
+    ],
+    "dummyVotes": {
+      "ikkatsu": 98,
+      "bunkatsu_ribo": 2
+    },
+    "source": "マイナビニュース調査(2023年4月)、一括払いを選ぶ人は98.4%、分割払い・リボ払いはそれぞれ0.8%。https://news.mynavi.jp/article/20230419-2657259/",
+    "status": "active"
+  },
+  {
+    "id": "ideco-riyou-shiteinai",
+    "question": "iDeCoは利用している派? 利用していない派?",
+    "category": "money",
+    "options": [
+      {
+        "id": "riyou",
+        "label": "利用している"
+      },
+      {
+        "id": "hiriyou",
+        "label": "利用していない"
+      }
+    ],
+    "dummyVotes": {
+      "riyou": 6,
+      "hiriyou": 94
+    },
+    "source": "ベター・プレイス社調査(20〜79歳男女350人超対象)、iDeCoを利用している人は5.6%。https://otonanswer.jp/post/164140/",
+    "status": "active"
+  },
+  {
+    "id": "matching-app-keiken",
+    "question": "マッチングアプリは使ったことがある派? ない派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "aru",
+        "label": "使ったことがある"
+      },
+      {
+        "id": "nai",
+        "label": "使ったことがない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 40,
+      "nai": 60
+    },
+    "source": "MMD研究所「2025年マッチングサービス・アプリの利用実態調査」(20-69歳男女30,000人対象、サービス認知者のうち利用経験39.5%)を基に按分。https://mmdlabo.jp/investigation/detail_2489.html",
+    "status": "active"
+  },
+  {
+    "id": "shanai-renai-keiken",
+    "question": "社内恋愛は経験したことがある派? ない派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "aru",
+        "label": "経験したことがある"
+      },
+      {
+        "id": "nai",
+        "label": "経験したことがない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 30,
+      "nai": 70
+    },
+    "source": "ナイル株式会社「出会いコンパス」調査(10-40代の社会人2,063人対象、社内恋愛経験あり30.4%)を基に按分。2024年調査(https://prtimes.jp/main/html/rd/p/000000517.000055900.html)",
+    "status": "active"
+  },
+  {
+    "id": "tomodachi-kara-koibito",
+    "question": "友達から恋人になったことがある派? ない派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "aru",
+        "label": "なったことがある"
+      },
+      {
+        "id": "nai",
+        "label": "なったことがない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 44,
+      "nai": 56
+    },
+    "source": "意識調査(20-39歳女性対象、「友達から恋人になったカップルはいますか」に「はい」44.2%/「いいえ」55.8%)を基に按分。https://www.lisalisa50.com/research20160330_16.html",
+    "status": "active"
+  },
+  {
+    "id": "koibito-isei-yujin-yuruse",
+    "question": "恋人の異性の友人と二人きりで会うのは許せる派? 許せない派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "yuruseru",
+        "label": "許せる"
+      },
+      {
+        "id": "yurusenai",
+        "label": "許せない"
+      }
+    ],
+    "dummyVotes": {
+      "yuruseru": 40,
+      "yurusenai": 60
+    },
+    "source": "めちゃコミック調査レポート(会員2,063人対象、パートナーが異性の友人と二人で会うことを「許せない」と回答した割合が約6割)を基に按分。2019年調査(https://www.atpress.ne.jp/news/182976)",
+    "status": "active"
+  },
+  {
+    "id": "koibito-ichi-kyoyu",
+    "question": "恋人と位置情報を共有する派? しない派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "kyoyu",
+        "label": "共有する"
+      },
+      {
+        "id": "shinai",
+        "label": "共有しない"
+      }
+    ],
+    "dummyVotes": {
+      "kyoyu": 29,
+      "shinai": 71
+    },
+    "source": "株式会社SheepDog調査(10-20代男女400人対象、位置情報共有アプリで「共有している」計28.75%/「共有していない」71.25%)を基に按分。2022年調査(https://prtimes.jp/main/html/rd/p/000000113.000077217.html)",
+    "status": "active"
+  },
+  {
+    "id": "kidoku-suru-mondai-nai",
+    "question": "恋人からの既読スルーは愛情があれば問題ない派? 気になる派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "mondainai",
+        "label": "問題ない"
+      },
+      {
+        "id": "kininaru",
+        "label": "気になる"
+      }
+    ],
+    "dummyVotes": {
+      "mondainai": 62,
+      "kininaru": 38
+    },
+    "source": "株式会社ネクストレベル調査(20-39歳独身男女256人対象、「愛情はあるので既読スルーしても問題ない」との回答が男女とも6割超)を基に按分。https://prtimes.jp/main/html/rd/p/000000108.000032757.html",
+    "status": "active"
+  },
+  {
+    "id": "fukuen-keiken",
+    "question": "元恋人と復縁したことがある派? ない派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "aru",
+        "label": "復縁したことがある"
+      },
+      {
+        "id": "nai",
+        "label": "復縁したことがない"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 14,
+      "nai": 86
+    },
+    "source": "意識調査(20-39歳女性100人対象、「元恋人と復縁したことがある」13.9%/「ない」86.1%)を基に按分。https://oggi.jp/7161839",
+    "status": "active"
+  },
+  {
+    "id": "tanjoubi-kiitehoshii",
+    "question": "誕生日プレゼントは欲しいものを事前に聞いてほしい派? サプライズで選んでほしい派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "kiitehoshii",
+        "label": "事前に聞いてほしい"
+      },
+      {
+        "id": "surprise",
+        "label": "サプライズで選んでほしい"
+      }
+    ],
+    "dummyVotes": {
+      "kiitehoshii": 53,
+      "surprise": 47
+    },
+    "source": "意識調査(誕生日プレゼントで「自分の欲しいものを聞いてくれる」40.8%/「相手が選んだものを贈ってくれる」36.2%の比率に正規化)を基に按分。https://www.lisalisa50.com/research20151105_7.html",
+    "status": "active"
+  },
+  {
+    "id": "date-chu-smaho",
+    "question": "デート中はスマホを極力見ないのがマナー派? 気にしない派?",
+    "category": "romance",
+    "options": [
+      {
+        "id": "manaa",
+        "label": "見ないのがマナー"
+      },
+      {
+        "id": "kinishinai",
+        "label": "気にしない"
+      }
+    ],
+    "dummyVotes": {
+      "manaa": 85,
+      "kinishinai": 15
+    },
+    "source": "ホットペッパーグルメ外食総研調査(20-60代男女1,035人対象、飲食店でのデート中「極力スマホをいじらない」がマナーだと思う割合が平均約85%)を基に按分。2024年調査(https://news.mynavi.jp/article/20240926-3031593/)",
+    "status": "active"
+  },
+  {
+    "id": "hahanohi-present",
+    "question": "母の日はプレゼントを贈る派? 贈らない派?",
+    "category": "seasonal",
+    "options": [
+      {
+        "id": "okuru",
+        "label": "贈る"
+      },
+      {
+        "id": "okuranai",
+        "label": "贈らない"
+      }
+    ],
+    "dummyVotes": {
+      "okuru": 46,
+      "okuranai": 54
+    },
+    "source": "おとなの週末お取り寄せ倶楽部「母の日に関する調査結果」(2026年)。30〜69歳女性1,000人対象、プレゼントを贈る予定37.9%・贈らない予定45.0%(2択按分)。https://www.commercepick.com/archives/92219",
+    "status": "active"
+  },
+  {
+    "id": "ochugen-okuru",
+    "question": "お中元は贈る派? 贈らない派?",
+    "category": "seasonal",
+    "options": [
+      {
+        "id": "okuru",
+        "label": "贈る"
+      },
+      {
+        "id": "okuranai",
+        "label": "贈らない"
+      }
+    ],
+    "dummyVotes": {
+      "okuru": 31,
+      "okuranai": 69
+    },
+    "source": "暮らしニスタ「主婦100人!アンケート隊」お中元・お歳暮アンケート(2020年)。贈る30.7%・贈らない69.3%。https://kurashinista.jp/column/detail/6790",
+    "status": "active"
+  },
+  {
+    "id": "doyounoushi-unagi",
+    "question": "土用の丑の日はうなぎを食べる派? 食べない派?",
+    "category": "seasonal",
+    "options": [
+      {
+        "id": "taberu",
+        "label": "食べる"
+      },
+      {
+        "id": "tabenai",
+        "label": "食べない"
+      }
+    ],
+    "dummyVotes": {
+      "taberu": 53,
+      "tabenai": 47
+    },
+    "source": "データコム株式会社「土用の丑の日におけるうなぎの喫食に関する調査」(2024年)。20〜30代450人対象、食べる52.7%。https://prtimes.jp/main/html/rd/p/000000057.000126910.html",
+    "status": "active"
+  },
+  {
+    "id": "tsukimi-dango",
+    "question": "十五夜は月見団子を用意する派? しない派?",
+    "category": "seasonal",
+    "options": [
+      {
+        "id": "yoi",
+        "label": "用意する"
+      },
+      {
+        "id": "shinai",
+        "label": "用意しない"
+      }
+    ],
+    "dummyVotes": {
+      "yoi": 33,
+      "shinai": 67
+    },
+    "source": "ウェザーニュース「月見団子に関するアンケート」(2022年)。十五夜に月見団子を用意する予定33%。https://weathernews.jp/s/topics/202209/060245/",
+    "status": "active"
+  },
+  {
+    "id": "hatsuhinode-miru",
+    "question": "初日の出は見に行く派? 行かない派?",
+    "category": "seasonal",
+    "options": [
+      {
+        "id": "iku",
+        "label": "見に行く"
+      },
+      {
+        "id": "ikanai",
+        "label": "行かない"
+      }
+    ],
+    "dummyVotes": {
+      "iku": 69,
+      "ikanai": 31
+    },
+    "source": "株式会社アイベック「ハッピーメール」初日の出に関するアンケート(2025年)。成人男女200人対象、初日の出を拝んだ経験がある68.5%。https://prtimes.jp/main/html/rd/p/000000177.000042380.html",
+    "status": "active"
+  },
+  {
+    "id": "valentine-choco",
+    "question": "バレンタインはチョコを贈る派? 贈らない派?",
+    "category": "seasonal",
+    "options": [
+      {
+        "id": "okuru",
+        "label": "贈る"
+      },
+      {
+        "id": "okuranai",
+        "label": "贈らない"
+      }
+    ],
+    "dummyVotes": {
+      "okuru": 57,
+      "okuranai": 43
+    },
+    "source": "株式会社インテージ「バレンタインデーに関する調査」(2026年)。15〜79歳女性対象、渡す予定なし42.8%(残りが渡す予定あり)。https://prtimes.jp/main/html/rd/p/000000273.000036691.html",
+    "status": "active"
+  },
+  {
+    "id": "obon-hakamairi",
+    "question": "お盆はお墓参りに行く派? 行かない派?",
+    "category": "seasonal",
+    "options": [
+      {
+        "id": "iku",
+        "label": "行く"
+      },
+      {
+        "id": "ikanai",
+        "label": "行かない"
+      }
+    ],
+    "dummyVotes": {
+      "iku": 58,
+      "ikanai": 42
+    },
+    "source": "全国石製品協同組合 お墓参りに関する調査(2026年)。24〜79歳500人対象、お墓参りをしている57.8%。https://gentosha-go.com/articles/-/80827",
+    "status": "active"
+  },
+  {
+    "id": "koromogae-suru",
+    "question": "衣替えは季節の変わり目にする派? しない派?",
+    "category": "seasonal",
+    "options": [
+      {
+        "id": "suru",
+        "label": "する"
+      },
+      {
+        "id": "shinai",
+        "label": "しない"
+      }
+    ],
+    "dummyVotes": {
+      "suru": 64,
+      "shinai": 36
+    },
+    "source": "エステー株式会社「衣替えに関するアンケート調査」(2023年)。20〜69歳1,212人対象、何らかの形で衣替えする64%、入れ替えはしない35.9%。https://www.st-c.co.jp/news/newsrelease/2023/20230331_001907.html",
+    "status": "active"
+  },
+  {
+    "id": "furo-yubune-shower",
+    "question": "お風呂は湯船に浸かる派? シャワーだけで済ませる派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "yubune",
+        "label": "湯船に浸かる派"
+      },
+      {
+        "id": "shower",
+        "label": "シャワーだけで済ませる派"
+      }
+    ],
+    "dummyVotes": {
+      "yubune": 84,
+      "shower": 16
+    },
+    "source": "株式会社mitoriz「お風呂に関するアンケート調査」(2024年)。「湯船に浸かる習慣がある」84.3%。https://www.mitoriz.co.jp/pressrelease/20241119-5129/",
+    "status": "active"
+  },
+  {
+    "id": "hiesho-aru-nai",
+    "question": "冷え性である派? ない派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "aru",
+        "label": "冷え性である派"
+      },
+      {
+        "id": "nai",
+        "label": "冷え性でない派"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 68,
+      "nai": 32
+    },
+    "source": "株式会社ナビット「辛い冷え性についての大調査【1000人アンケート】」(2024年11月)。回答者1,000人中678人が冷え性に悩まされていると回答。https://prtimes.jp/main/html/rd/p/000001741.000080271.html",
+    "status": "active"
+  },
+  {
+    "id": "taiju-mainichi-hakaru",
+    "question": "体重は毎日測る派? 測らない派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "hakaru",
+        "label": "毎日測る派"
+      },
+      {
+        "id": "hakaranai",
+        "label": "測らない派"
+      }
+    ],
+    "dummyVotes": {
+      "hakaru": 33,
+      "hakaranai": 67
+    },
+    "source": "MEDI PALETTE SURVEY(株式会社ロッテ)「毎日体重を測っていない人は7割近く」調査(2023年11月、347人対象)。「毎日測る」32.6%、「測らない」67.4%。https://medipalette.com/survey/archives/",
+    "status": "active"
+  },
+  {
+    "id": "undo-shukan-aru-nai",
+    "question": "運動習慣がある派? ない派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "aru",
+        "label": "運動習慣がある派"
+      },
+      {
+        "id": "nai",
+        "label": "運動習慣がない派"
+      }
+    ],
+    "dummyVotes": {
+      "aru": 35,
+      "nai": 65
+    },
+    "source": "厚生労働省「令和6年国民健康・栄養調査」。運動習慣のある人の割合は男性38.5%・女性31.5%(平均約35%で正規化)。https://www.mhlw.go.jp/content/10900000/001603146.pdf",
+    "status": "active"
+  },
+  {
+    "id": "choshoku-mainichi-taberu",
+    "question": "朝食は毎日食べる派? 食べない派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "taberu",
+        "label": "毎日食べる派"
+      },
+      {
+        "id": "tabenai",
+        "label": "食べない派"
+      }
+    ],
+    "dummyVotes": {
+      "taberu": 89,
+      "tabenai": 11
+    },
+    "source": "農林水産省「食育に関する意識調査」(令和5年度)。「ほとんど毎日食べる」79.0%、「ほとんど食べない」10.1%(2値で按分正規化)。https://www.maff.go.jp/j/syokuiku/ishiki/r05/3-2.html",
+    "status": "active"
+  },
+  {
+    "id": "mask-tsukeru-tsukenai",
+    "question": "マスクは着ける日が多い派? ほとんど着けない派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "tsukeru",
+        "label": "着ける日が多い派"
+      },
+      {
+        "id": "tsukenai",
+        "label": "ほとんど着けない派"
+      }
+    ],
+    "dummyVotes": {
+      "tsukeru": 69,
+      "tsukenai": 31
+    },
+    "source": "株式会社クロス・マーケティング「マスクに関する調査」(2025年3月)。「着ける日が多い」56.8%、「ほとんど着けない」25.9%(2値で按分正規化)。https://www.cross-m.co.jp/report/trend-eye/20250313mask",
+    "status": "active"
+  },
+  {
+    "id": "asagata-yorugata",
+    "question": "朝型派? 夜型派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "asagata",
+        "label": "朝型派"
+      },
+      {
+        "id": "yorugata",
+        "label": "夜型派"
+      }
+    ],
+    "dummyVotes": {
+      "asagata": 51,
+      "yorugata": 49
+    },
+    "source": "リビングWeb「あなたは朝型？夜型？」アンケート(2023年、698件)。朝型系47.1%、夜型系45.3%(2値で按分正規化)。https://mrs.living.jp/k_life/article/5069366/result",
+    "status": "active"
+  },
+  {
+    "id": "hamigaki-nikai-ijou",
+    "question": "歯磨きは1日2回以上派? 1日1回以下派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "nikai_ijou",
+        "label": "1日2回以上派"
+      },
+      {
+        "id": "ikkai_ika",
+        "label": "1日1回以下派"
+      }
+    ],
+    "dummyVotes": {
+      "nikai_ijou": 78,
+      "ikkai_ika": 22
+    },
+    "source": "ライオン株式会社「オーラルケアに関する生活者調査」(2022年)。1日2回以上歯をみがく人の割合77.8%。https://doc.lion.co.jp/uploads/tmg_block_page_image/file/8141/20220603.pdf",
+    "status": "active"
+  },
+  {
+    "id": "aircon-nezuki-tsukeppanashi",
+    "question": "夏の就寝時、エアコンは一晩中つけたまま派? 使わない派?",
+    "category": "health",
+    "options": [
+      {
+        "id": "tsukeppanashi",
+        "label": "一晩中つけたまま派"
+      },
+      {
+        "id": "tsukawanai",
+        "label": "エアコンは使わない派"
+      }
+    ],
+    "dummyVotes": {
+      "tsukeppanashi": 75,
+      "tsukawanai": 25
+    },
+    "source": "株式会社クロス・マーケティング「夏のエアコン使用に関する調査」(2025年)。就寝時「一晩中つけたまま」56.4%、「エアコンは使わない」19.2%(2値で按分正規化)。https://adv.tokyo-np.co.jp/prtimes/article49724/",
     "status": "active"
   }
 ]
