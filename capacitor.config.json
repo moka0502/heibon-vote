@@ -1,0 +1,19 @@
+{
+  "appId": "com.moka0502.heibonvote",
+  "appName": "heibon-vote",
+  "webDir": "www",
+  "backgroundColor": "#faf9f7",
+  "server": {
+    "url": "https://TODO-set-production-domain.example.com",
+    "cleartext": false
+  },
+  "ios": {
+    "backgroundColor": "#faf9f7"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "backgroundColor": "#5b5bd6",
+      "showSpinner": false
+    }
+  }
+}
