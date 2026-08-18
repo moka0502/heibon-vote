@@ -22,8 +22,8 @@ workflows:
     max_build_duration: 60
 
     integrations:
-      # 【TODO】Codemagicに登録したApp Store Connect APIキーの"名前"に置き換える
-      app_store_connect: <APP_STORE_CONNECT_KEY>
+      # CodemagicのDeveloper Portal連携に登録したApp Store Connect APIキーの名前(2026-08-18設定)
+      app_store_connect: heibon-vote-asc
 
     environment:
       ios_signing:
@@ -31,8 +31,8 @@ workflows:
         bundle_identifier: com.moka0502.heibonvote
       vars:
         BUNDLE_ID: "com.moka0502.heibonvote"
-        # 【TODO】App Store Connectでアプリを新規作成した後に付く"数値のApple ID"を入れる
-        APP_STORE_APPLE_ID: "0000000000"
+        # App Store Connectでアプリ「平凡投票」を作成して付いた数値のApple ID(2026-08-18設定)
+        APP_STORE_APPLE_ID: "6802689228"
       node: 20
       xcode: latest
       cocoapods: default
