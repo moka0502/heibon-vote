@@ -10,7 +10,7 @@ function sessionTierFor(matchCount, totalCount) {
   if (matchCount === totalCount) return '真の平凡';
   const ratio = matchCount / totalCount;
   if (ratio >= 0.8) return '平凡寄り';
-  if (ratio >= 0.5) return '個性あり';
+  if (ratio >= 0.5) return 'バランス派';
   if (ratio >= 0.3) return '個性派';
   return '唯一無二';
 }

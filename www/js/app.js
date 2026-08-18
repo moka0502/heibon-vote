@@ -6,6 +6,8 @@ import {
   saveQuizState,
   getQuizState,
   clearQuizState,
+  getPlayedParts,
+  markPlayed,
 } from './storage.js';
 import { playResultReveal } from './effects.js';
 import {
@@ -120,6 +122,7 @@ async function showHome() {
         onTopics: showTopics,
         onSettings: showSettings,
         onSuggest: showSuggestionForm,
+        profileEmpty: Object.keys(getProfile() ?? {}).length === 0,
       })
     );
   } catch (err) {
@@ -208,6 +211,7 @@ async function showCategoryPicker() {
         onSelectRandom: () => startQuiz(),
         onSelectCategory: (categoryId, categoryLabel, part) => startQuiz(categoryId, categoryLabel, part),
         onBack: showHome,
+        playedParts: getPlayedParts(),
       }),
       showHome
     );
@@ -221,6 +225,7 @@ async function startQuiz(category, categoryLabel, part) {
   try {
     const profile = getProfile();
     const { topics } = await api.getRandomTopics(QUESTIONS_PER_SESSION, category, part);
+    markPlayed(category, part);
     const fullCategoryLabel = categoryLabel && part ? `${categoryLabel} Part${part}` : categoryLabel;
     runQuiz({ topics, profile, index: 0, voteIds: [], categoryLabel: fullCategoryLabel });
   } catch (err) {
@@ -278,7 +283,7 @@ async function finishQuiz(state) {
     const summary = await api.postSession(state.voteIds, voterId);
     clearQuizState();
     const [{ votes }, stats] = await Promise.all([
-      api.getSession(summary.sessionId),
+      api.getSession(summary.sessionId, voterId),
       api.getSessionStats(voterId),
     ]);
     mount(
@@ -308,7 +313,7 @@ async function showHistory() {
 async function showHistoryDetail(sessionId) {
   showLoading();
   try {
-    const { session, votes } = await api.getSession(sessionId);
+    const { session, votes } = await api.getSession(sessionId, getVoterId());
     mount(renderHistoryDetail(session, votes, showHistory), showHistory);
   } catch (err) {
     mountError(err.message, showHistory, showHistory);
@@ -333,7 +338,15 @@ async function showProfileSetup() {
 async function init() {
   const profile = getProfile();
   if (!profile) {
-    mount(renderIntro(showProfileSetup));
+    // 初手で属性フォームを強制せず、まず遊べるようにする(2026-08-18、マーケ/CX指摘の離脱対策)。
+    // イントロ後は空プロフィールを保存してホームへ。属性は任意で、Home→設定や結果画面の誘導から
+    // いつでも入力できる。空でも真値になるので次回起動でイントロが再表示されない。
+    mount(
+      renderIntro(() => {
+        saveProfile({});
+        showHome();
+      })
+    );
     return;
   }
 

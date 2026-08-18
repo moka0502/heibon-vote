@@ -48,3 +48,23 @@ export function getQuizState() {
 export function clearQuizState() {
   localStorage.removeItem(QUIZ_STATE_KEY);
 }
+
+// 挑戦済みのカテゴリ+Partを覚えておき、カテゴリ選択画面で「挑戦済み」を出す(継続利用の手がかり)。
+const PLAYED_PARTS_KEY = 'heibonVote.playedParts';
+
+export function getPlayedParts() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(PLAYED_PARTS_KEY) || '[]');
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
+export function markPlayed(category, part) {
+  if (!category || !part) return; // ランダム(カテゴリ無し)は記録しない
+  const key = `${category}:${part}`;
+  const set = new Set(getPlayedParts());
+  set.add(key);
+  localStorage.setItem(PLAYED_PARTS_KEY, JSON.stringify([...set]));
+}

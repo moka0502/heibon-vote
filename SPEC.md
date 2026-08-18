@@ -75,7 +75,7 @@
 |---|---|
 | `matchCount === totalCount` | 真の平凡 |
 | `ratio >= 0.8` | 平凡寄り |
-| `ratio >= 0.5` | 個性あり |
+| `ratio >= 0.5` | バランス派 |
 | `ratio >= 0.3` | 個性派 |
 | それ以外 | 唯一無二 |
 
@@ -104,7 +104,7 @@
 | `POST /api/votes` | `{topicId, optionId, profile, voterId}` → `{voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes}`。`totalVotes`はその時点の母集団総数(初期データ+実データ、または実データのみ、`server/majority.js`の閾値ロジックに従う)。`topicId`/`optionId`/`voterId`は文字列でなければ400(`voterId`はnull/未指定は可)。`profile`はオブジェクトのうち既知の属性キー(`age`/`gender`/`blood_type`/`handedness`)かつ文字列値のみ採用し、それ以外(配列・巨大JSON・未知キー)は無視して空扱い(2026-08-18、開発運用者ペルソナの意地悪テストで、voterId非文字列が500・profile無検証で1MB級JSON保存できた点への対応) |
 | `POST /api/sessions` | `{voteIds, voterId}` → 10問分のvoteIdを1セッションに束ね、サーバー側で正誤を再計算・確定 → `{sessionId, matchCount, totalCount, tier, moreCommonCount, totalSessions}`。`voterId`は必須(空/未指定は400)。`moreCommonCount`はあなたより一致数が多かった(=あなたより平凡だった)セッション数で、過去のセッション数が`MIN_SESSIONS_FOR_PERCENTILE`(20件)未満の場合`null`。この`totalSessions`・`moreCommonCount`の母数は個人ではなく全員のセッション(「これまでの挑戦者」との比較のため) |
 | `GET /api/sessions?voterId=xxx` | 履歴一覧(新しい順)。`voterId`はその端末の`localStorage`の匿名ID(`voter_id`)で絞り込む個人別の履歴。未指定/空は空配列 |
-| `GET /api/sessions/:id` | セッション詳細+各問の内訳(%バー用) |
+| `GET /api/sessions/:id` | セッション詳細+各問の内訳(%バー用)。`?voterId=`を渡すと、そのセッションの`voter_id`と不一致なら404(履歴の個人化と一貫。未指定なら従来通り返す・非破壊。2026-08-18) |
 | `GET /api/sessions/stats?voterId=xxx` | `{perfectCount, lifetimeTitle}`。`voterId`で絞り込んだ個人の通算満点(`/:id`より先に登録、ルーティング順の都合)。未指定/空は`{perfectCount: 0, lifetimeTitle: null}` |
 | `POST /api/suggestions` | `{text}`(最大500文字) → お題投稿を保存、審査は手動 |
 

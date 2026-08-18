@@ -19,7 +19,7 @@ function createSessionsRouter(db) {
   );
   const getSessionStmt = db.prepare(
     `SELECT id, match_count AS matchCount, total_count AS totalCount,
-            session_tier AS sessionTier, created_at AS createdAt
+            session_tier AS sessionTier, created_at AS createdAt, voter_id AS voterId
      FROM quiz_sessions WHERE id = ?`
   );
   const getSessionVotesStmt = db.prepare(
@@ -71,6 +71,14 @@ function createSessionsRouter(db) {
   router.get('/:id', (req, res) => {
     const session = getSessionStmt.get(req.params.id);
     if (!session) {
+      res.status(404).json({ error: 'not found' });
+      return;
+    }
+    // 履歴の個人化と一貫させ、voterIdを渡した場合は本人のセッションのみ返す(2026-08-18、
+    // 開発運用/CX指摘)。UUIDは推測困難で実害は小さいが、voter_idが付いた行に別人のvoterIdで
+    // アクセスされたら404。voterId未指定なら従来通り返す(非破壊)。
+    const reqVoterId = req.query.voterId;
+    if (typeof reqVoterId === 'string' && reqVoterId !== '' && session.voterId && session.voterId !== reqVoterId) {
       res.status(404).json({ error: 'not found' });
       return;
     }

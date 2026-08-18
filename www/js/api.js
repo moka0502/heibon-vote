@@ -46,7 +46,8 @@ export const api = {
       body: JSON.stringify({ voteIds, voterId }),
     }),
   getSessions: (voterId) => request(`/api/sessions?voterId=${encodeURIComponent(voterId)}`),
-  getSession: (id) => request(`/api/sessions/${id}`),
+  getSession: (id, voterId) =>
+    request(`/api/sessions/${id}${voterId ? `?voterId=${encodeURIComponent(voterId)}` : ''}`),
   getSessionStats: (voterId) => request(`/api/sessions/stats?voterId=${encodeURIComponent(voterId)}`),
   postSuggestion: (text) =>
     request('/api/suggestions', {

@@ -176,6 +176,13 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
 
   const form = el('form', { class: 'card' });
   form.appendChild(el('h2', { text: title }));
+  // 任意であることを明示(2026-08-18、CX/UI指摘: 全部埋めないと進めないと誤解して離脱する人がいる)。
+  form.appendChild(
+    el('p', {
+      class: 'progress',
+      text: '答えたくない項目は空のままでOK。あとでいつでも変更できます。',
+    })
+  );
   if (currentValues) {
     form.appendChild(
       el('p', {
@@ -231,27 +238,39 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
   return wrap;
 }
 
-export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, onSuggest }) {
+export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, onSuggest, profileEmpty }) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: '挑戦しよう' }));
   card.appendChild(
     el('p', { text: '色々なカテゴリの10問に答えて、世間の多数派とどれだけ一致できるか試そう。' })
   );
-  if (stats.lifetimeTitle) {
+  // 未プレイ(通算満点0回)のときは、成績・称号チェイスを出さず「挑戦する」に集中させる
+  // (2026-08-18、CX指摘: 遊ぶ前から「0」と採点されている印象を避ける)。
+  if (stats.perfectCount > 0) {
+    if (stats.lifetimeTitle) {
+      card.appendChild(
+        el('p', {}, [el('span', { class: lifetimeTitleBadgeClass(stats.lifetimeTitle), text: stats.lifetimeTitle })])
+      );
+    }
     card.appendChild(
-      el('p', {}, [el('span', { class: lifetimeTitleBadgeClass(stats.lifetimeTitle), text: stats.lifetimeTitle })])
+      el('p', { class: 'progress', text: `通算満点(10問すべて多数派と一致): ${stats.perfectCount}回` })
     );
-  }
-  // 「満点」「称号」が何を指すか初見では伝わらないため、一言添える(初回ユーザーレビュー)。
-  card.appendChild(
-    el('p', { class: 'progress', text: `通算満点(10問すべて多数派と一致): ${stats.perfectCount}回` })
-  );
-  const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
-  if (nextTitleHint) {
-    card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえます)` }));
+    const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
+    if (nextTitleHint) {
+      card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえます)` }));
+    }
   }
   card.appendChild(el('button', { class: 'btn btn-primary', text: '挑戦する', onclick: onStart }));
+  // 属性は任意。未設定の人には「設定すると内訳が見られる」ことだけ控えめに伝える(A1誘導)。
+  if (profileEmpty) {
+    card.appendChild(
+      el('p', {
+        class: 'progress',
+        text: '年代・血液型などを設定すると、属性別の傾向も見られます(任意・下の「あなたについての設定」から)。',
+      })
+    );
+  }
   wrap.appendChild(card);
   wrap.appendChild(
     el('button', { class: 'btn-link btn-link-emphasis', onclick: onHistory }, [icon('history'), '履歴を見る'])
@@ -265,7 +284,18 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
   return wrap;
 }
 
-export function renderCategoryPicker(categories, { onSelectRandom, onSelectCategory, onBack }) {
+export function renderCategoryPicker(categories, { onSelectRandom, onSelectCategory, onBack, playedParts = [] }) {
+  const played = new Set(playedParts);
+  const partButton = (category, part) => {
+    const done = played.has(`${category.id}:${part}`);
+    const btn = el('button', {
+      class: `btn btn-outline category-option${done ? ' is-played' : ''}`,
+      onclick: () => onSelectCategory(category.id, category.label, part),
+    });
+    btn.appendChild(el('span', { text: `${category.label} Part${part}` }));
+    if (done) btn.appendChild(el('span', { class: 'played-badge', text: '挑戦済み' }));
+    return btn;
+  };
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: 'お題を選ぶ' }));
@@ -295,24 +325,8 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
     // 「食事(11問)」のような半端な数を見せず、常に10問ぴったりの「Part」単位で選ばせる。
     // Part1は固定10問、Part2は残りが10問貯まったカテゴリだけに出す(2026-08-16)。
     const parts = Math.floor(category.count / 10);
-    if (parts >= 1) {
-      card.appendChild(
-        el('button', {
-          class: 'btn btn-outline category-option',
-          text: `${category.label} Part1`,
-          onclick: () => onSelectCategory(category.id, category.label, 1),
-        })
-      );
-    }
-    if (parts >= 2) {
-      card.appendChild(
-        el('button', {
-          class: 'btn btn-outline category-option',
-          text: `${category.label} Part2`,
-          onclick: () => onSelectCategory(category.id, category.label, 2),
-        })
-      );
-    }
+    if (parts >= 1) card.appendChild(partButton(category, 1));
+    if (parts >= 2) card.appendChild(partButton(category, 2));
   }
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onBack }));
@@ -329,20 +343,26 @@ export function renderTopicList(topics, { onSelect, onBack }) {
       text: '気になるお題を選ぶと、選択肢ごとの割合や年代・血液型などの属性別の傾向が見られます。',
     })
   );
-  let currentCategory = null;
+  // カテゴリごとに折りたたむ(2026-08-18、UI指摘: 全100問フラットで7000px超のスクロールを解消)。
+  const byCat = new Map();
   for (const topic of topics) {
-    if (topic.category !== currentCategory) {
-      currentCategory = topic.category;
-      card.appendChild(el('h3', { class: 'topic-list-category', text: topic.categoryLabel }));
+    if (!byCat.has(topic.category)) byCat.set(topic.category, { label: topic.categoryLabel, items: [] });
+    byCat.get(topic.category).items.push(topic);
+  }
+  for (const { label, items } of byCat.values()) {
+    const details = el('details', { class: 'topic-list-cat' });
+    details.appendChild(el('summary', {}, [`${label}(${items.length})`]));
+    for (const topic of items) {
+      const item = el('button', {
+        type: 'button',
+        class: 'session-list-item',
+        onclick: () => onSelect(topic.id),
+      });
+      item.appendChild(el('span', { class: 'session-list-item-main', text: topic.question }));
+      item.appendChild(el('span', { class: 'session-list-item-chevron', 'aria-hidden': 'true', text: '›' }));
+      details.appendChild(item);
     }
-    const item = el('button', {
-      type: 'button',
-      class: 'session-list-item',
-      onclick: () => onSelect(topic.id),
-    });
-    item.appendChild(el('span', { class: 'session-list-item-main', text: topic.question }));
-    item.appendChild(el('span', { class: 'session-list-item-chevron', 'aria-hidden': 'true', text: '›' }));
-    card.appendChild(item);
+    card.appendChild(details);
   }
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onBack }));
@@ -387,16 +407,14 @@ export function renderTopicBreakdown(
   // 属性別のクロス集計だけは、サンプルが少ないと誤読を招くため100件ゲートを維持する。
   card.appendChild(el('h3', { class: 'breakdown-attr-heading', text: '属性別の傾向' }));
   if (realVoteCount < breakdownMinRealVotes) {
+    // 「N/100件」のテキストだけで十分。ラベルの無い空の進捗バーは宙に浮いて誤読を招くので出さない
+    // (2026-08-18、UI指摘)。
     card.appendChild(
       el('p', {
         class: 'progress',
         text: `属性別の傾向はまだ表示できません(実際の回答 ${realVoteCount} / ${breakdownMinRealVotes}件)。もっとみんなが挑戦すると見られるようになります。`,
       })
     );
-    const pct = Math.min(100, Math.round((realVoteCount / breakdownMinRealVotes) * 100));
-    const bar = el('div', { class: 'bar' });
-    card.appendChild(el('div', { class: 'bar-track' }, [bar]));
-    animateBarWidth(bar, pct);
     wrap.appendChild(card);
     wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onBack }));
     return wrap;
@@ -514,13 +532,19 @@ export function renderQuestionFeedback(
   totalVotes,
   onNext
 ) {
+  // 僅差の一致は「割れる中で多数派を引いた」と特別に褒める(2026-08-18、CX指摘+ユーザー要望:
+  // "さすが平凡!わかってらっしゃる"的に、僅差だからこそ称える)。自分の選択肢%が55%未満なら僅差扱い。
+  const chosenPct = percentages[chosenOptionId] ?? 0;
+  const isCloseCall = isMajorityMatch && chosenPct < 55;
+  let bannerText;
+  if (!isMajorityMatch) bannerText = '平凡じゃない! 多数派とは不一致でした';
+  else if (isCloseCall) bannerText = 'さすが平凡! 割れる中で多数派を引きました';
+  else bannerText = '平凡! 多数派と一致でした';
   const wrap = el('div', { class: 'card' });
   wrap.appendChild(
     el('div', { class: `feedback-banner ${isMajorityMatch ? 'is-match' : 'is-mismatch'}` }, [
       el('span', { class: 'feedback-icon', text: isMajorityMatch ? '○' : '✕' }),
-      el('span', {
-        text: isMajorityMatch ? '平凡! 多数派と一致でした' : '平凡じゃない! 多数派とは不一致でした',
-      }),
+      el('span', { text: bannerText }),
     ])
   );
   wrap.appendChild(el('h2', { class: 'question-heading', text: topic.question }));
@@ -559,7 +583,19 @@ export function renderQuestionFeedback(
 
 function shareText(summary) {
   const categoryPart = summary.categoryLabel ? `「${summary.categoryLabel}」で` : '';
-  return `平凡投票アプリで${categoryPart}${summary.matchCount}/${summary.totalCount}問「${summary.tier}」でした。あなたは世間の多数派と何問一致できる?`;
+  return `平凡投票アプリで${categoryPart}${summary.matchCount}/${summary.totalCount}問「${summary.tier}」でした。あなたは世間の多数派と何問一致できる? #平凡投票`;
+}
+
+// シェアカード用の"短い"tierコピー(resultFlavorTextは長いのでカードには不向き)。
+function shareCardTierCopy(tier) {
+  const map = {
+    真の平凡: '"普通"の天才',
+    平凡寄り: '共感力の塊',
+    バランス派: 'ちょうどいいバランス',
+    個性派: 'ちょい逆張り派',
+    唯一無二: '唯一無二の感性',
+  };
+  return map[tier] ?? '';
 }
 
 // テキストのみのシェアだと拡散力が弱いという指摘を受け、結果を画像化する
@@ -649,9 +685,24 @@ function drawShareCard(summary) {
   ctx.fillText('真の平凡', trackX + trackW, trackY + 66);
   ctx.textAlign = 'center';
 
+  // tier別の短いコピー(そのスコアが"どういう人"かを一言で)
+  const tierCopy = shareCardTierCopy(summary.tier);
+  if (tierCopy) {
+    ctx.fillStyle = '#5b5bd6';
+    ctx.font = '600 40px system-ui, sans-serif';
+    ctx.fillText(`＝ ${tierCopy}`, 540, 895);
+  }
+
+  // 何のアプリか伝わるよう、回答したお題を1問だけ載せる(2026-08-18、マーケ指摘)。
   ctx.fillStyle = '#6b6b76';
-  ctx.font = '400 34px system-ui, sans-serif';
-  ctx.fillText('あなたは世間の多数派と何問一致できる?', 540, 940);
+  ctx.font = '400 30px system-ui, sans-serif';
+  if (summary.sampleQuestion) {
+    let q = summary.sampleQuestion;
+    if (q.length > 22) q = q.slice(0, 21) + '…';
+    ctx.fillText(`例:「${q}」`, 540, 950);
+  } else {
+    ctx.fillText('あなたは世間の多数派と何問一致できる?', 540, 950);
+  }
 
   return canvas;
 }
@@ -660,8 +711,8 @@ function canvasToBlob(canvas) {
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
-function renderShareButton(summary) {
-  const btn = el('button', { class: 'btn btn-outline', text: '結果をシェアする' });
+function renderShareButton(summary, { primary = false } = {}) {
+  const btn = el('button', { class: `btn ${primary ? 'btn-primary' : 'btn-outline'}`, text: '結果をシェアする' });
   btn.addEventListener('click', async () => {
     const text = shareText(summary);
     const blob = await canvasToBlob(drawShareCard(summary));
@@ -727,8 +778,13 @@ function renderShareButton(summary) {
 
 // 満点・最下位ランクだけ、淡々とした事実提示に少し意外性のある一言を添える
 // (Spotify Wrapped深掘り分SW2)。中間ランクは狙いすぎると嘘っぽくなるため据え置き。
+// 全段階に一言コピーを添えて、ボリューム層(平凡寄り/バランス派)が素っ気なく終わらないようにする
+// (2026-08-18、マーケ指摘。「平凡=すごい」のコンセプトに沿って、どの段階も肯定的に)。
 function resultFlavorText(tier) {
   if (tier === '真の平凡') return '実はあなたは、"普通"を体現する才能の持ち主かもしれません。';
+  if (tier === '平凡寄り') return 'みんなと同じを引ける共感力の持ち主。"だいたい多数派"が強みです。';
+  if (tier === 'バランス派') return '王道もわかりつつ自分の色も混ざる、ちょうどいいバランス感覚。';
+  if (tier === '個性派') return 'ちょっと逆張り、が多め。人と違う視点を持っています。';
   if (tier === '唯一無二') return '実はあなたは、かなり個性的な選択をする人でした。';
   return null;
 }
@@ -740,7 +796,7 @@ function renderTierMeter(matchCount, totalCount) {
   const labels = el('div', { class: 'tier-meter-labels' }, [
     el('span', { text: '唯一無二' }),
     el('span', { text: '個性派' }),
-    el('span', { text: '個性あり' }),
+    el('span', { text: 'バランス派' }),
     el('span', { text: '平凡寄り' }),
     el('span', { text: '真の平凡' }),
   ]);
@@ -774,41 +830,61 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   if (flavorText) {
     card.appendChild(el('p', { style: 'text-align:center', text: flavorText }));
   }
-  if (typeof summary.moreCommonCount === 'number') {
+  // 相対感を常時出す(2026-08-18、マーケ指摘: 母集団が薄い初期でも「何人が挑戦したか」は出す)。
+  if (typeof summary.totalSessions === 'number' && summary.totalSessions > 0) {
+    if (typeof summary.moreCommonCount === 'number') {
+      card.appendChild(
+        el('p', {
+          class: 'progress',
+          style: 'text-align:center',
+          text: `これまでの挑戦者${summary.totalSessions}人中、あなたより「共感性が高く、定番を理解し、万人受けする王道」だった人は${summary.moreCommonCount}人でした`,
+        })
+      );
+    } else {
+      card.appendChild(
+        el('p', {
+          class: 'progress',
+          style: 'text-align:center',
+          text: `これまで${summary.totalSessions}人が挑戦しています(もう少し集まると、あなたの"平凡順位"も出ます)`,
+        })
+      );
+    }
+  }
+  // 未プレイ相当(通算満点0回)のときは称号チェイスを出さない(A3、CX指摘)。
+  if (stats.perfectCount > 0) {
+    if (stats.lifetimeTitle) {
+      card.appendChild(
+        el('p', { style: 'text-align:center' }, [
+          el('span', {
+            class: lifetimeTitleBadgeClass(stats.lifetimeTitle),
+            text: `通算称号: ${stats.lifetimeTitle}`,
+          }),
+        ])
+      );
+    }
     card.appendChild(
-      el('p', {
-        class: 'progress',
-        style: 'text-align:center',
-        text: `これまでの挑戦者${summary.totalSessions}人中、あなたより「共感性が高く、定番を理解し、万人受けする王道」だった人は${summary.moreCommonCount}人でした`,
-      })
+      el('p', { class: 'progress', text: `通算満点(10問すべて多数派と一致): ${stats.perfectCount}回` })
     );
+    const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
+    if (nextTitleHint) {
+      card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえます)` }));
+    }
   }
-  if (stats.lifetimeTitle) {
-    card.appendChild(
-      el('p', { style: 'text-align:center' }, [
-        el('span', {
-          class: lifetimeTitleBadgeClass(stats.lifetimeTitle),
-          text: `通算称号: ${stats.lifetimeTitle}`,
-        }),
-      ])
-    );
-  }
-  card.appendChild(
-    el('p', { class: 'progress', text: `通算満点(10問すべて多数派と一致): ${stats.perfectCount}回` })
-  );
-  const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
-  if (nextTitleHint) {
-    card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえます)` }));
-  }
-  card.appendChild(el('button', { class: 'btn btn-primary', text: 'もう一度挑戦する', onclick: onRetry }));
-  card.appendChild(renderShareButton(summary));
+  // シェアを主役に(2026-08-18、マーケ指摘: 拡散が生命線)。もう一度挑戦はアウトライン化。
+  // シェアカードに"何のアプリか"を伝える例題を1問渡す(回答したお題の先頭)。
+  const shareSummary = { ...summary, sampleQuestion: detailVotes?.[0]?.topic?.question ?? null };
+  card.appendChild(renderShareButton(shareSummary, { primary: true }));
+  card.appendChild(el('button', { class: 'btn btn-outline', text: 'もう一度挑戦する', onclick: onRetry }));
   wrap.appendChild(card);
 
+  // 内訳は初期折りたたみ(2026-08-18、UI指摘: スコア/メーター/シェアCTAが縦長に埋もれるのを解消)。
   const detailCard = el('div', { class: 'card' });
-  detailCard.appendChild(el('h3', { text: 'くわしい内訳' }));
+  const details = el('details', { class: 'breakdown-accordion' });
+  details.appendChild(el('summary', { text: 'くわしい内訳を見る' }));
   for (const vote of detailVotes) {
-    detailCard.appendChild(renderVoteBreakdownRow(vote));
+    details.appendChild(renderVoteBreakdownRow(vote));
   }
+  detailCard.appendChild(details);
   wrap.appendChild(detailCard);
 
   wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onHome }));
@@ -854,14 +930,19 @@ export function renderHistoryDetail(session, votes, onBack) {
     el('div', { class: 'result-score', text: `${session.matchCount} / ${session.totalCount}` })
   );
   card.appendChild(el('div', { class: 'result-tier', text: session.sessionTier }));
+  // 結果画面と同じ平凡メーターを出して一貫させる(2026-08-18、UI指摘)。
+  card.appendChild(renderTierMeter(session.matchCount, session.totalCount));
   card.appendChild(el('p', { class: 'progress', text: formatDate(session.createdAt) }));
   wrap.appendChild(card);
 
+  // 内訳は結果画面と同様に初期折りたたみ(縦長解消)。
   const detailCard = el('div', { class: 'card' });
-  detailCard.appendChild(el('h3', { text: 'くわしい内訳' }));
+  const details = el('details', { class: 'breakdown-accordion' });
+  details.appendChild(el('summary', { text: 'くわしい内訳を見る' }));
   for (const vote of votes) {
-    detailCard.appendChild(renderVoteBreakdownRow(vote));
+    details.appendChild(renderVoteBreakdownRow(vote));
   }
+  detailCard.appendChild(details);
   wrap.appendChild(detailCard);
 
   wrap.appendChild(el('button', { class: 'btn-link', text: '履歴一覧に戻る', onclick: onBack }));

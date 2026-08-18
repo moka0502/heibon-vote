@@ -256,6 +256,26 @@ button {
   text-align: left;
 }
 
+/* カテゴリボタンの「挑戦済み」バッジ(2026-08-18、CX指摘の継続利用シグナル) */
+.category-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.category-option.is-played {
+  opacity: 0.72;
+}
+.played-badge {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
 .btn-link {
   display: flex;
   align-items: center;
@@ -327,8 +347,18 @@ button {
   justify-content: space-between;
   margin-top: 6px;
   color: var(--text-muted);
-  /* 0.65rem(実測10.4px)は判読しづらいとa11yレビューで指摘、0.75remに引き上げ(2026-08-17) */
-  font-size: 0.75rem;
+  /* 0.65rem(実測10.4px)は判読しづらいとa11yレビューで指摘、0.75remに引き上げ(2026-08-17)。
+     ただし320px幅で5ラベルが詰まるため0.7remに微調整し、両端は内側に寄せて端の余白を確保
+     (2026-08-18、UI指摘)。 */
+  font-size: 0.7rem;
+}
+
+.tier-meter-labels span:first-child {
+  text-align: left;
+}
+
+.tier-meter-labels span:last-child {
+  text-align: right;
 }
 
 .badge {
@@ -393,6 +423,37 @@ button {
   margin: 20px 0 4px;
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+/* カテゴリ/内訳の折りたたみ(details/summary)。summaryをタップ可能な見出し行に(2026-08-18) */
+.topic-list-cat,
+.breakdown-accordion {
+  border-top: 1px solid var(--border);
+}
+.topic-list-cat > summary,
+.breakdown-accordion > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 4px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topic-list-cat > summary::-webkit-details-marker,
+.breakdown-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+.topic-list-cat > summary::before,
+.breakdown-accordion > summary::before {
+  content: '▸';
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+.topic-list-cat[open] > summary::before,
+.breakdown-accordion[open] > summary::before {
+  transform: rotate(90deg);
 }
 
 .topic-list-category:first-child {
@@ -606,7 +667,9 @@ input[type='text'] {
 
 .feedback-banner {
   display: flex;
-  align-items: center;
+  /* 文言が2行に折り返す小型端末でも、アイコンが縦中央に浮かず先頭行に揃うようにする
+     (2026-08-18、UI指摘)。 */
+  align-items: flex-start;
   gap: 10px;
   padding: 14px 16px;
   border-radius: var(--radius);
