@@ -7,7 +7,7 @@
 // アプリの根っこの主張(イントロ画面の「『平凡』は、実はすごい」)に一貫させる形で言い換えた
 // (かなり平凡→平凡寄り、平凡→個性あり)。閾値の数字自体は変更していない。
 function sessionTierFor(matchCount, totalCount) {
-  if (matchCount === totalCount) return '真の平凡(今回)';
+  if (matchCount === totalCount) return '真の平凡';
   const ratio = matchCount / totalCount;
   if (ratio >= 0.8) return '平凡寄り';
   if (ratio >= 0.5) return '個性あり';

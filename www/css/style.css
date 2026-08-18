@@ -484,6 +484,23 @@ select {
   background: var(--surface);
 }
 
+/* textarea/input はブラウザ既定だと13.3px・monospaceになり、iOS Safariは
+   font-size<16pxのフォーカスで画面を強制ズームインする(2026-08-18、UI担当ペルソナ指摘)。
+   16px以上＋フォント継承で、iOSの自動ズームと他画面からの浮きを防ぐ。 */
+textarea,
+input,
+input[type='text'] {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
 .error {
   color: #c0392b;
   font-size: 0.9rem;

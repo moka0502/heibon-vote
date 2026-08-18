@@ -12,8 +12,9 @@ const { createSuggestionsRouter } = require('./routes/suggestions');
 
 const PORT = 4322;
 const db = openDb();
-backupNow();
-startAutoBackup();
+// dbハンドルを渡してWALをflushしてからバックアップする(単純コピーだとWAL内の最新票が欠落)。
+backupNow(db);
+startAutoBackup(db);
 
 const app = express();
 // 技術スタックを開示するX-Powered-Byヘッダーを消す(2026-08-17、開発運用者ペルソナの

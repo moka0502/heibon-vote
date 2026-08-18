@@ -728,7 +728,7 @@ function renderShareButton(summary) {
 // 満点・最下位ランクだけ、淡々とした事実提示に少し意外性のある一言を添える
 // (Spotify Wrapped深掘り分SW2)。中間ランクは狙いすぎると嘘っぽくなるため据え置き。
 function resultFlavorText(tier) {
-  if (tier === '真の平凡(今回)') return '実はあなたは、"普通"を体現する才能の持ち主かもしれません。';
+  if (tier === '真の平凡') return '実はあなたは、"普通"を体現する才能の持ち主かもしれません。';
   if (tier === '唯一無二') return '実はあなたは、かなり個性的な選択をする人でした。';
   return null;
 }
@@ -764,7 +764,11 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   card.appendChild(
     el('div', { class: 'result-score', text: `${summary.matchCount} / ${summary.totalCount}` })
   );
-  card.appendChild(el('div', { class: 'result-tier', text: summary.tier }));
+  // 段階ラベルは素の「真の平凡」で保存・履歴表示する(履歴で"(今回)"が残るのを解消。
+  // 2026-08-18、CX担当ペルソナ指摘)。結果画面だけは、同画面に出る通算称号「真の平凡」との
+  // 混同を避けるため、満点の段階ラベルに"(今回)"を添えて表示する。
+  const tierDisplay = summary.tier === '真の平凡' ? '真の平凡(今回)' : summary.tier;
+  card.appendChild(el('div', { class: 'result-tier', text: tierDisplay }));
   card.appendChild(renderTierMeter(summary.matchCount, summary.totalCount));
   const flavorText = resultFlavorText(summary.tier);
   if (flavorText) {

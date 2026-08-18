@@ -73,11 +73,13 @@
 
 | 条件 | ランク |
 |---|---|
-| `matchCount === totalCount` | 真の平凡(今回) |
+| `matchCount === totalCount` | 真の平凡 |
 | `ratio >= 0.8` | 平凡寄り |
 | `ratio >= 0.5` | 個性あり |
 | `ratio >= 0.3` | 個性派 |
 | それ以外 | 唯一無二 |
+
+満点の段階ラベルは**素の「真の平凡」を保存・履歴表示する**(2026-08-18、CX担当ペルソナ指摘: 以前は`真の平凡(今回)`をそのまま`quiz_sessions.session_tier`に保存しており、履歴一覧で「真の平凡(今回)」と過去分にも`(今回)`が残っていた)。結果画面(`renderResult`)だけは、同画面に出る**通算称号**「真の平凡」(下記)との混同を避けるため、表示時に`(今回)`を添える。
 
 閾値は2026-08-15、`questions-seed.json`の初期データの比率を使ったモンテカルロシミュレーション(2万セッション試算)で検証済み。元は個性派境界0.2だったが「唯一無二」到達率が0.02%(実質到達不能)だったため0.3に引き上げ、約0.4%まで緩和した。ラベル文言は2026-08-16、「平凡=つまらない」ではなく「平凡=共感力があって王道」というアプリの主張に一貫させる形で言い換えた(閾値の数字自体は変更なし)。結果画面には`server/tiers.js`と同じ閾値で5段階に区切ったゲージ(`.tier-meter`)も表示し、段階ラベルだけでは伝わらない連続的なスコア位置を補う。
 
@@ -99,7 +101,7 @@
 | `GET /api/topics/random?count=10&category=xxx&part=N` | ランダムにactive問題を出題。`category`省略で全カテゴリから。`category`とセットで`part=1`を指定すると、そのカテゴリの中で常に同じ固定10問(`topics`の`rowid`順)。`part=2`は固定10問を除いた残り全部からランダムに10問。`part`省略時はカテゴリ全体からランダム(従来通り) |
 | `GET /api/topics` | active問題の一覧(お題の内訳を見る画面用)。カテゴリの`sort_order`→お題の`question`昇順。各お題に`category`/`categoryLabel`を含み、クライアント側でカテゴリ見出しを挟んで表示する |
 | `GET /api/topics/:id/breakdown` | `{topic, percentages, majorityOptionId, totalVotes, breakdown, realVoteCount, breakdownMinRealVotes}`。全体%は常に、属性別`breakdown`は実データ100件未満だと非表示扱い |
-| `POST /api/votes` | `{topicId, optionId, profile, voterId}` → `{voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes}`。`totalVotes`はその時点の母集団総数(初期データ+実データ、または実データのみ、`server/majority.js`の閾値ロジックに従う) |
+| `POST /api/votes` | `{topicId, optionId, profile, voterId}` → `{voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes}`。`totalVotes`はその時点の母集団総数(初期データ+実データ、または実データのみ、`server/majority.js`の閾値ロジックに従う)。`topicId`/`optionId`/`voterId`は文字列でなければ400(`voterId`はnull/未指定は可)。`profile`はオブジェクトのうち既知の属性キー(`age`/`gender`/`blood_type`/`handedness`)かつ文字列値のみ採用し、それ以外(配列・巨大JSON・未知キー)は無視して空扱い(2026-08-18、開発運用者ペルソナの意地悪テストで、voterId非文字列が500・profile無検証で1MB級JSON保存できた点への対応) |
 | `POST /api/sessions` | `{voteIds, voterId}` → 10問分のvoteIdを1セッションに束ね、サーバー側で正誤を再計算・確定 → `{sessionId, matchCount, totalCount, tier, moreCommonCount, totalSessions}`。`voterId`は必須(空/未指定は400)。`moreCommonCount`はあなたより一致数が多かった(=あなたより平凡だった)セッション数で、過去のセッション数が`MIN_SESSIONS_FOR_PERCENTILE`(20件)未満の場合`null`。この`totalSessions`・`moreCommonCount`の母数は個人ではなく全員のセッション(「これまでの挑戦者」との比較のため) |
 | `GET /api/sessions?voterId=xxx` | 履歴一覧(新しい順)。`voterId`はその端末の`localStorage`の匿名ID(`voter_id`)で絞り込む個人別の履歴。未指定/空は空配列 |
 | `GET /api/sessions/:id` | セッション詳細+各問の内訳(%バー用) |
@@ -117,7 +119,7 @@
 
 - **レート制限**(`server/index.js`、`express-rate-limit`): ログイン機能がないアプリのため「認証」は実装せず、連打・bot対策のレート制限のみ実装。`/api`全体に一般APIリミッター(1分100回/IP)、`/api/votes`・`/api/sessions`に書き込み系リミッター(1分60回/IP。1周=書き込み11回のため4〜5周の余裕。以前は30回で約2.7周で頭打ちだった)、`/api/suggestions`に専用リミッター(1分5回/IP)を重ねて適用。超過時は429と`{error: "..."}`を返す。**書き込み系リミッターはPOST等の書き込みメソッドのみに適用し、GET/HEAD(結果取得・統計取得)は対象外にする**(`writeMethodsOnly`ラッパー)。GETまで数えると、1クイズ(投票10回+セッション保存1回)だけでバケットを消費し、連続プレイの2周目で結果取得まで429になり進行中クイズが失われるため(2026-08-17修正)
 - **fetchタイムアウト**(`www/js/api.js`の`request()`): `AbortController`で15秒(`REQUEST_TIMEOUT_MS`)のタイムアウトを実装。タイムアウト時は既存の`mountError`にそのまま乗る
-- **DBバックアップ**(`server/backup.js`): サーバー起動時に1回+以後24時間ごとに`server/data/backups/`へタイムスタンプ付きでコピー、直近14世代のみ保持。手動実行は`npm run backup`。ホスト側と同じディスク上のため、ホスト障害には無力(誤操作・バグからの復旧用)。常時ホスティング移行後、本格的なバックアップ(別ストレージへの定期スナップショット等)への切り替えを想定
+- **DBバックアップ**(`server/backup.js`): サーバー起動時に1回+以後24時間ごとに`server/data/backups/`へタイムスタンプ付きでコピー、直近14世代のみ保持。手動実行は`npm run backup`。**コピー前に、稼働中の`db`ハンドルで`wal_checkpoint(TRUNCATE)`を実行してWALを主`.db`へflushする**(2026-08-18、CX担当ペルソナ指摘: このアプリは`journal_mode=WAL`のため、単純な`fs.copyFileSync`(主`.db`のみ)だとチェックポイント前の投票・セッションが`-wal`に残り欠落したバックアップになる。別プロセスで`openDb()`し直すとWAL競合でデータ喪失しうるため、必ず既存ハンドルを使う)。ホスト側と同じディスク上のため、ホスト障害には無力(誤操作・バグからの復旧用)。常時ホスティング移行後、本格的なバックアップ(別ストレージへの定期スナップショット等)への切り替えを想定
 
 ## セキュリティヘッダー(`server/index.js`、2026-08-16実装)
 

@@ -23,6 +23,23 @@ function createVotesRouter(db) {
       res.status(400).json({ error: 'topicId and optionId must be strings' });
       return;
     }
+    // voterIdも同様に型検証する(2026-08-18、開発運用者ペルソナの意地悪テストで発見:
+    // voterIdにオブジェクト/配列/真偽値を渡すと、SQLバインドで例外が投げられ400ではなく
+    // 500になっていた。topicId/optionIdと同じ横展開の漏れ)。未指定(null/undefined)は許容。
+    if (voterId != null && typeof voterId !== 'string') {
+      res.status(400).json({ error: 'voterId must be a string' });
+      return;
+    }
+    // profileはオブジェクト(年代/性別/血液型/利き手の既知キー)想定。配列・文字列・巨大JSON等の
+    // 逸脱は受け付けず空扱いにする(同レビューの指摘: profile無検証で1MB級JSONが投票行に入り
+    // DB肥大化・breakdown集計時のparse負荷増を招く)。既知の属性キー・文字列値のみ通す。
+    const ALLOWED_PROFILE_KEYS = ['age', 'gender', 'blood_type', 'handedness'];
+    let cleanProfile = {};
+    if (profile && typeof profile === 'object' && !Array.isArray(profile)) {
+      for (const k of ALLOWED_PROFILE_KEYS) {
+        if (typeof profile[k] === 'string') cleanProfile[k] = profile[k];
+      }
+    }
     if (!optionExists.get(topicId, optionId)) {
       res.status(404).json({ error: 'unknown topicId/optionId' });
       return;
@@ -33,7 +50,7 @@ function createVotesRouter(db) {
     const result = insertVote.run(
       topicId,
       optionId,
-      JSON.stringify(profile ?? {}),
+      JSON.stringify(cleanProfile),
       voterId ?? null,
       majorityOptionId
     );
