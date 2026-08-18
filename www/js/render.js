@@ -1,3 +1,5 @@
+import { hapticLight } from './native.js';
+
 function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
@@ -514,6 +516,8 @@ export function renderQuizQuestion(topic, index, total, onAnswer, onQuit) {
     const btn = el('button', { class: 'btn', text: option.label });
     btn.addEventListener('click', () => {
       if (btn.disabled) return;
+      // ネイティブでは軽い触覚フィードバックでタップの実感を補強(Web/PWAではno-op)。
+      hapticLight();
       // 選んだ選択肢を一瞬ハイライトしてから次へ進む(タップした実感を持たせる)。
       for (const b of buttons) b.disabled = true;
       btn.classList.add('btn-selected');

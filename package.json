@@ -8,7 +8,9 @@
     "backup": "node -e \"console.log(require('./server/backup').backupNow())\""
   },
   "dependencies": {
+    "@capacitor/haptics": "^8.0.2",
     "@capacitor/ios": "^8.5.0",
+    "@capacitor/status-bar": "^8.0.3",
     "better-sqlite3": "^11",
     "express": "^4",
     "express-rate-limit": "^8.6.2"

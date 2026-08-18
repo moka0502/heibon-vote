@@ -1,4 +1,4 @@
-const CACHE_NAME = 'heibon-vote-shell-v8';
+const CACHE_NAME = 'heibon-vote-shell-v9';
 const SHELL_ASSETS = [
   './',
   'index.html',
@@ -8,6 +8,7 @@ const SHELL_ASSETS = [
   'js/render.js',
   'js/storage.js',
   'js/effects.js',
+  'js/native.js',
   'js/register-sw.js',
   'js/vendor/gsap.min.js',
   'manifest.webmanifest',

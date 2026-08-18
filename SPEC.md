@@ -141,6 +141,7 @@
 - `capacitor.config.json`(リポジトリ直下)を作成済み。`server.url`は本番ドメイン未確定のためプレースホルダ。`@capacitor/core`・`@capacitor/cli`を`devDependencies`に追加済み
 - `npx cap add ios`はまだ実行していない(CocoaPods/Xcodeが必要でLinux devcontainer上では完結しないため)。macOS環境が用意でき次第、`cap add ios`→`@capacitor/assets generate`→Xcodeでビルドの順で進める
 - App Store掲載用マスターアイコン(`www/icons/icon-1024.png`、1024x1024)を用意済み。iOS各サイズ(@2x/@3x等)への展開は`ios/`プロジェクト作成後に`@capacitor/assets`で行う
+- **ネイティブAPIの利用**(2026-08-18、App Store Guideline 4.2「ネイティブらしさ」対策): `@capacitor/haptics`・`@capacitor/status-bar`を導入。`www/js/native.js`が薄いブリッジで、バンドラを使わない構成のためnpmパッケージを直接importせず、ネイティブランタイムが注入する`window.Capacitor.Plugins.*`を実行時参照する(`isNativePlatform()`が偽=Web/PWAでは全て安全にno-op)。回答タップで軽い触覚(`hapticLight`)、結果表示で成功触覚(`hapticSuccess`)、起動時にステータスバー色をアプリ配色へ(`initStatusBar`)。実挙動はiOSビルド後のTestFlightでのみ確認可能。`@capacitor/share`は不採用(iOS WKWebViewは`navigator.share`とファイル共有をネイティブ共有シートで処理するため既存実装で足りる)
 
 ## 未確定・保留事項
 

@@ -10,6 +10,7 @@ import {
   markPlayed,
 } from './storage.js';
 import { playResultReveal } from './effects.js';
+import { initStatusBar, hapticSuccess } from './native.js';
 import {
   renderIntro,
   renderProfileForm,
@@ -316,6 +317,8 @@ async function finishQuiz(state) {
       showHome
     );
     playResultReveal(appEl, summary);
+    // ネイティブでは結果表示の瞬間に成功の触覚フィードバック(Web/PWAではno-op)。
+    hapticSuccess();
   } catch (err) {
     mountError(err.message, showHome, showHome);
   }
@@ -357,6 +360,8 @@ async function showProfileSetup() {
 }
 
 async function init() {
+  // ネイティブ(iOS)ではステータスバーをアプリ配色に合わせる(Web/PWAではno-op)。
+  initStatusBar();
   const profile = getProfile();
   if (!profile) {
     // 初手で属性フォームを強制せず、まず遊べるようにする(2026-08-18、マーケ/CX指摘の離脱対策)。
