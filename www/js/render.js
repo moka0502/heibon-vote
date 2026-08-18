@@ -536,20 +536,20 @@ export function renderQuestionFeedback(
   majorityOptionId,
   percentages,
   totalVotes,
-  isNearTie,
+  isTie,
   onNext
 ) {
   // 当たり判定と文言(2026-08-18、実プレイFB):
-  // - 実質互角(isNearTie、サーバー判定)は「どちらを選んでも多数派＝○」。50.1対49.9で少数派を
-  //   選んだだけで✕にされる理不尽を無くす。
+  // - 完全互角(isTie、得票がぴったり同数)のときだけ「どちらを選んでも正解＝○」。
+  //   わずかでも差があれば、多数決で負けた方は従来通り不一致。
   // - 接戦で勝った(一致かつ自分の選択肢<60%)ときは「さすが平凡!割れる中で多数派を引いた」と褒める。
-  // - 明確な不一致だけ従来通り「平凡じゃない!」+✕。
+  // - 不一致は従来通り「平凡じゃない!」+✕。
   const chosenPct = percentages[chosenOptionId] ?? 0;
   let icon;
   let bannerText;
-  if (isNearTie) {
+  if (isTie) {
     icon = '○';
-    bannerText = 'ほぼ互角! どちらを選んでも多数派、あなたも平凡です';
+    bannerText = 'ぴったり五分五分! どちらを選んでも正解です';
   } else if (isMajorityMatch && chosenPct < 60) {
     icon = '○';
     bannerText = 'さすが平凡! 割れる中で多数派を引きました';
@@ -560,7 +560,7 @@ export function renderQuestionFeedback(
     icon = '✕';
     bannerText = '平凡じゃない! 多数派とは不一致でした';
   }
-  const isMatchLike = isNearTie || isMajorityMatch;
+  const isMatchLike = isTie || isMajorityMatch;
   const wrap = el('div', { class: 'card' });
   wrap.appendChild(
     el('div', { class: `feedback-banner ${isMatchLike ? 'is-match' : 'is-mismatch'}` }, [

@@ -265,7 +265,7 @@ function runQuiz(state) {
 
 async function answerQuestion(state, topic, optionId) {
   try {
-    const { voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes, isNearTie } =
+    const { voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes, isTie } =
       await api.postVote({
         topicId: topic.id,
         optionId,
@@ -281,7 +281,7 @@ async function answerQuestion(state, topic, optionId) {
         majorityOptionId,
         percentages,
         totalVotes,
-        isNearTie,
+        isTie,
         () => runQuiz(nextState)
       ),
       showHome
