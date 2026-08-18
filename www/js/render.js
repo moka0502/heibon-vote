@@ -138,6 +138,9 @@ function renderVoteBreakdownRow(vote) {
 export function renderLoading() {
   const wrap = el('div', { class: 'card loading-card' });
   wrap.appendChild(el('div', { class: 'spinner' }));
+  // スピナーだけだと通信が遅いとき「固まった/重い」に見えるため、読み込み中と明示する
+  // (2026-08-18、審査官/ユーザー視点レビュー: サーバー遅延時の白画面対策)。
+  wrap.appendChild(el('p', { class: 'loading-text', text: '読み込み中…' }));
   return wrap;
 }
 
