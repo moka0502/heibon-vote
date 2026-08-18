@@ -44,17 +44,19 @@
 ★ ここが重要: 以下の 1〜4 は「サーバー（Oracle）が無くても今すぐ進められる」。
   Oracleの返事を待つ間の手待ちを減らせるので、先にやっておく。
 
-   1. Bundle ID を登録
-      Certificates, Identifiers & Profiles → Identifiers → ＋
-      → App IDs → App → Bundle ID: com.moka0502.heibonvote
-      （Capabilities は何も追加しない。プッシュ通知も課金も使わないため）
+   ※ 1〜2 のクリック単位の手順は、手順書「PART D」に全部書いてある。
+     PCの前に座ったら、そこだけ開けば進められる。
+     作業はすべてPCのブラウザ（iPhoneの「Apple Developer」アプリは登録用で、もう使わない）。
 
-   2. App Store Connect でアプリを新規作成
-      マイApp → ＋ → 新規App
-        プラットフォーム: iOS / 名称: 平凡投票 / 主言語: 日本語
-        バンドルID: 上で作ったもの / SKU: heibon-vote-001
+   1. Bundle ID を登録  → 手順書 PART D-1
+      developer.apple.com（英語画面）で com.moka0502.heibonvote を登録する。
+      アプリの「ナンバープレート」。これが無いと 2 のプルダウンが空で先へ進めない。
+
+   2. App Store Connect でアプリを新規作成  → 手順書 PART D-2・D-3
+      appstoreconnect.apple.com（日本語画面）で「平凡投票」を作る。
       → 作成後、URLかApp情報に出てくる「Apple ID（数字10桁）」を控える
         ＝ codemagic.yaml の APP_STORE_APPLE_ID に入れる値
+      あわせて「無料App契約」への同意も済ませておく（PART D-4、ハマりやすい罠）
 
    3. App Store Connect API キーを発行
       ユーザーとアクセス → 統合 → App Store Connect API → キーを生成

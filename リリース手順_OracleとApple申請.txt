@@ -180,12 +180,72 @@ capacitor.config.json は cleartext:false = https 必須。生IPでは Let's Enc
 
 
 ============================================================
- PART D. Apple Developer Program 登録（早めに）
+ PART D. Apple Developer 登録【承認済み】→ Bundle ID とアプリの登録
 ============================================================
-  - https://developer.apple.com/programs/ から登録（$99/年）
-  - 個人(Individual)なら D-U-N-S 番号は不要でシンプル。法人だと D-U-N-S が要り時間がかかる
-  - Apple ID に二要素認証を有効化しておく
-  - 支払い後、承認まで数時間〜数日かかることがある（＝先に申し込むほど良い）
+■ D-0. 登録は完了済み（2026-08-18 承認確認）
+  - Individual(個人)で登録・$99/年・自動更新。二要素認証オン。
+  - iPhoneの「Apple Developer」アプリは【登録・支払い・更新の手続き専用】。
+    承認が下りた今、もう出番はない。
+  - 以降の作業は【すべてPCのブラウザ】で行う（Windowsで問題ない。
+    Macが要るのはビルドだけで、そこはCodemagicが肩代わりする）。
+      developer.apple.com        … D-1（画面は英語）
+      appstoreconnect.apple.com  … D-2以降（画面は日本語）
+    どちらも登録に使ったのと同じApple IDでログイン。二要素認証のコードが
+    iPhoneに飛ぶので、PC作業中もiPhoneを手元に置いておくこと。
+
+★ D-1 と D-2 は【サーバーが無くても今すぐできる】。Oracle待ちの間に済ませておく。
+
+■ D-1. Bundle ID を登録する（5分）
+  Bundle IDはアプリの「ナンバープレート」。世界で1つだけの識別子で、
+  Appleはアプリを表示名ではなくこの文字列で識別する。表示名「平凡投票」は
+  後から変えられるが、Bundle IDは一度決めたら二度と変えられない。
+  平凡投票のものは capacitor.config.json で決定済み → com.moka0502.heibonvote
+
+  https://developer.apple.com/account を開いてログイン（画面は英語）
+   1. 「Certificates, Identifiers & Profiles」をクリック
+   2. 左メニューの「Identifiers」をクリック
+   3. 見出し横の青い「＋」をクリック
+   4. 「App IDs」を選んで Continue
+   5. 「App」を選んで Continue
+   6. 入力欄が2つ:
+        Description : Heibon Vote
+                      ← 英数字のみ。日本語を入れるとエラーになる
+        Bundle ID   : 左のプルダウンを「Explicit」にして、右に
+                      com.moka0502.heibonvote
+                      ← 1文字でも違うとビルドが通らない。コピペ推奨
+   7. Capabilities の一覧が出るが【何もチェックしない】
+      （プッシュ通知も課金も使わないため）
+   8. Continue → 確認画面 → Register
+
+■ D-2. App Store Connect でアプリを作る（5分）
+  https://appstoreconnect.apple.com を開く（画面は日本語）
+   1. 「マイApp」をクリック
+   2. 左上の「＋」→「新規App」
+   3. 入力:
+        プラットフォーム : iOS にチェック
+        名前             : 平凡投票
+        プライマリ言語   : 日本語
+        バンドルID       : プルダウンから com.moka0502.heibonvote を選ぶ
+        SKU              : heibon-vote-001
+        ユーザーアクセス : フルアクセス
+   4. 「作成」をクリック
+
+  ※バンドルIDがプルダウンに出てこないときは、D-1が完了していないか反映待ち。
+    数分置いてページを再読み込みする。
+
+■ D-3. アプリの「Apple ID（数字10桁）」を控える（10秒）
+  作成するとそのままアプリのページに飛ぶ。ブラウザのアドレスバーを見る:
+
+    https://appstoreconnect.apple.com/apps/1234567890/appstore/info
+                                           ~~~~~~~~~~ ここ
+
+  見つからなければ 左メニュー「App情報」→「一般情報」の中の「Apple ID」にも同じ数字。
+  → これが codemagic.yaml の APP_STORE_APPLE_ID に入る値。Claudeに渡す。
+
+■ D-4. 無料App契約に同意しておく（ハマりやすい罠）
+  App Store Connect →「契約、税金、および銀行取引」
+  無料App契約への同意が済んでいないと、後で提出できない。
+  無料アプリなので【銀行口座の登録は不要】、同意ボタンを押すだけ。
 
 
 ============================================================
