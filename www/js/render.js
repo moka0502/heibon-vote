@@ -535,6 +535,7 @@ export function renderQuestionFeedback(
   isMajorityMatch,
   majorityOptionId,
   percentages,
+  voteCounts,
   totalVotes,
   isTie,
   onNext
@@ -573,9 +574,16 @@ export function renderQuestionFeedback(
     wrap.appendChild(el('p', { class: 'progress', text: `${totalVotes}件の回答から算出` }));
   }
 
+  // 接戦(2択で両方が同じ整数%に丸まる=50.x/49.xの帯)のときだけ小数第1位で出す。
+  // 50.1対49.9が「50/50」に見えて"互角なのに✕"と誤解されるのを防ぐ(2026-08-18、実プレイFB)。
+  const ps = topic.options.map((o) => percentages[o.id] ?? 0);
+  const roundedTie = topic.options.length === 2 && ps[0] === ps[1];
+  const usePrecise = roundedTie && voteCounts && totalVotes > 0;
+
   const bars = [];
   for (const option of topic.options) {
-    const pct = percentages[option.id] ?? 0;
+    const intPct = percentages[option.id] ?? 0;
+    const precise = usePrecise ? (voteCounts[option.id] / totalVotes) * 100 : intPct;
     const isYours = option.id === chosenOptionId;
     const tags = [
       isYours ? 'あなた' : null,
@@ -584,20 +592,25 @@ export function renderQuestionFeedback(
     const label = tags.length ? `${option.label}(${tags.join('・')})` : option.label;
 
     const bar = el('div', { class: isYours ? 'bar' : 'bar bar-muted' });
-    const countEl = el('span', { class: 'bar-count', text: '0%' });
+    const countEl = el('span', { class: 'bar-count', text: usePrecise ? '' : '0%' });
     // 自分の一票が反映された行だけ、着地の瞬間を一度だけ強調する演出(Slido深掘り分S3)。
     const line = el('div', { class: isYours ? 'bar-line bar-line-you' : 'bar-line' });
     line.appendChild(el('span', { class: 'bar-option-label', text: label }));
     line.appendChild(el('div', { class: 'bar-track' }, [bar]));
     line.appendChild(countEl);
     wrap.appendChild(line);
-    bars.push([bar, countEl, pct]);
+    bars.push([bar, countEl, intPct, precise]);
   }
 
   wrap.appendChild(el('button', { class: 'btn btn-primary', text: '次へ', onclick: onNext }));
-  for (const [bar, countEl, pct] of bars) {
-    animateBarWidth(bar, pct);
-    animateCountUp(countEl, pct, { suffix: '%' });
+  for (const [bar, countEl, intPct, precise] of bars) {
+    animateBarWidth(bar, precise);
+    if (usePrecise) {
+      // 小数はカウントアップ(整数前提)せず、確定値を直接出す。
+      countEl.textContent = `${precise.toFixed(1)}%`;
+    } else {
+      animateCountUp(countEl, intPct, { suffix: '%' });
+    }
   }
   return wrap;
 }

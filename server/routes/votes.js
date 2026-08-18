@@ -71,12 +71,17 @@ function createVotesRouter(db) {
     const total = counts.reduce((sum, c) => sum + c.count, 0);
     const percentages = percentagesFor(counts);
 
+    // 50.1対49.9のような僅差が「50/50」に丸められて"互角なのに✕"に見える怖さへの対処として、
+    // クライアントが接戦時だけ小数第1位を出せるよう、生の得票数も返す(2026-08-18、実プレイFB)。
+    const voteCounts = Object.fromEntries(counts.map((c) => [c.optionId, c.count]));
+
     res.json({
       voteId: result.lastInsertRowid,
       isMajorityMatch: optionId === effectiveMajorityId,
       majorityOptionId: effectiveMajorityId,
       isTie,
       percentages,
+      voteCounts,
       totalVotes: total,
     });
   });
