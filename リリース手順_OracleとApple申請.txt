@@ -163,14 +163,15 @@ capacitor.config.json は cleartext:false = https 必須。生IPでは Let's Enc
 ============================================================
 （この PART は macOS + Xcode が必須。Linux/devcontainer では完結しない）
 
-■ E-0. 事前準備（★重要な注意）
-  現状 package.json は @capacitor/core が 8系・@capacitor/cli が 7系でメジャーがズレている。
-  cap add ios の前に「同じメジャー」に揃える（推奨: 両方7に統一＝実績が多い / または両方8）。
-    $ npm install @capacitor/core@7 @capacitor/cli@7
-    （@capacitor/ios も同じメジャーで入れる: 下記 E-1 で @7 指定）
+■ E-0. 事前準備
+  @capacitor の core / cli / ios はすべて 8.5.0 に揃っている（2026-08-18 時点。
+  以前あったメジャー不一致は解消済み）。バージョンを触る必要はない。
+  ※ Mac を持っていない場合、この PART E は Codemagic（クラウドmacOS）が
+    codemagic.yaml のとおり自動でやるので、手作業は不要。
+    以下は Mac が手元にある場合の手順。
 
 ■ E-1. iOS プロジェクトを作る
-  $ npm install @capacitor/ios@7
+  $ npm ci
   $ npx cap add ios
   $ npx cap sync ios
       ※ cap add ios は CocoaPods が要る（$ sudo gem install cocoapods）
@@ -197,14 +198,20 @@ capacitor.config.json は cleartext:false = https 必須。生IPでは Let's Enc
     名称: 平凡投票 / Bundle ID: com.moka0502.heibonvote / 言語: 日本語 / SKU: 任意
 
 ■ F-2. 掲載素材
+  ★ 掲載素材と入力文はすべて appstore/ に用意済み。
+     → appstore/掲載情報_コピペ用.txt を開いて、そのまま貼っていくだけ。
+
   - アプリアイコン(1024x1024): www/icons/icon-1024.png を使用
-  - スクリーンショット（必須サイズ、iPhone）:
-      6.9"/6.7"(1290x2796) は必須。5.5"(1242x2208) も用意すると無難
-      → クイズ画面・結果画面(平凡メーター)・シェアカード あたりが"映える"
-  - 説明文/キーワード/プロモーションテキスト: 「『平凡』は、実はすごい」を主役に
+  - スクリーンショット: appstore/screenshots/framed/*.png（1290x2796 = 6.9"、6枚）
+      6.9" だけ登録すれば他サイズは App Store 側で自動縮小される。
+      撮り直しは $ node appstore/generate-screenshots.js
+  - 説明文/キーワード/プロモーションテキスト/サブタイトル:
+      appstore/掲載情報_コピペ用.txt にそのまま貼れる形で記載
   - プライバシーポリシーURL: https://YOUR-DOMAIN/privacy.html
 
 ■ F-3. App Privacy 申告（実態と一致させる。ここが要注意）
+  ★ 各設問への回答は appstore/掲載情報_コピペ用.txt の「App Privacy 申告」節に
+     項目ごと（Identifiers / User Content / Sensitive Info）で記載済み。
   平凡投票が集める情報（www/privacy.html と実装に一致）:
     - 年代・性別・血液型・利き手（任意。未選択なら取得しない）
     - 匿名 voterId（localStorage の UUID。端末識別子に相当）
@@ -237,11 +244,16 @@ capacitor.config.json は cleartext:false = https 必須。生IPでは Let's Enc
  [済] capacitor.config.json 作成（server.url はプレースホルダのまま＝B で差し替え）
  [済] App Store 用マスターアイコン www/icons/icon-1024.png
  [済] サーバー堅牢性/セキュリティ（横取り対策・400/413・CSP・レート制限）
+ [済] Apple Developer Program 登録・承認（2026-08-18 有効化確認）
+ [済] @capacitor core/cli/ios のバージョン統一（すべて 8.5.0）
+ [済] 掲載素材一式（説明文・キーワード・App Privacy の回答・スクリーンショット6枚）
+      → appstore/ フォルダ
+ [未・あなた] Bundle ID 登録 / App Store Connect でアプリ作成（サーバー不要・今すぐ可）
+ [未・あなた] App Store Connect API キー発行 → Codemagic 接続（サーバー不要・今すぐ可）
  [未・あなた] Oracle Cloud VPS 契約・構築（PART A）
  [未・あなた] ドメイン取得 + HTTPS（PART B）
- [未] capacitor server.url 差し替え + appName「平凡投票」（PART C）
- [未・あなた] Apple Developer Program 登録（PART D）
- [未・Mac] cap add ios / assets / Xcode ビルド（PART E、※capacitorのcore/cliメジャー統一先に）
+ [未] capacitor server.url 差し替え（PART C）
+ [未] Codemagic でビルド → TestFlight（PART E は Codemagic が代行）
  [未・あなた] App Store Connect 提出（PART F）
 
 
