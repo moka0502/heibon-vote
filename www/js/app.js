@@ -227,7 +227,18 @@ async function startQuiz(category, categoryLabel, part) {
     const { topics } = await api.getRandomTopics(QUESTIONS_PER_SESSION, category, part);
     markPlayed(category, part);
     const fullCategoryLabel = categoryLabel && part ? `${categoryLabel} Part${part}` : categoryLabel;
-    runQuiz({ topics, profile, index: 0, voteIds: [], categoryLabel: fullCategoryLabel });
+    // category/part/categoryLabelBase を state に持たせ、結果画面の「もう一度挑戦」で
+    // 同じお題種類を即再挑戦できるようにする(2026-08-18、実プレイFB: 毎回カテゴリ選択に戻るのが面倒)。
+    runQuiz({
+      topics,
+      profile,
+      index: 0,
+      voteIds: [],
+      categoryLabel: fullCategoryLabel,
+      category,
+      part,
+      categoryLabelBase: categoryLabel,
+    });
   } catch (err) {
     mountError(err.message, showHome, showHome);
   }
@@ -241,8 +252,12 @@ function runQuiz(state) {
   saveQuizState(state);
   const topic = state.topics[state.index];
   mount(
-    renderQuizQuestion(topic, state.index, state.topics.length, (optionId) =>
-      answerQuestion(state, topic, optionId)
+    renderQuizQuestion(
+      topic,
+      state.index,
+      state.topics.length,
+      (optionId) => answerQuestion(state, topic, optionId),
+      showHome
     ),
     showHome
   );
@@ -250,12 +265,13 @@ function runQuiz(state) {
 
 async function answerQuestion(state, topic, optionId) {
   try {
-    const { voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes } = await api.postVote({
-      topicId: topic.id,
-      optionId,
-      profile: state.profile,
-      voterId: getVoterId(),
-    });
+    const { voteId, isMajorityMatch, majorityOptionId, percentages, totalVotes, isNearTie } =
+      await api.postVote({
+        topicId: topic.id,
+        optionId,
+        profile: state.profile,
+        voterId: getVoterId(),
+      });
     const nextState = { ...state, index: state.index + 1, voteIds: [...state.voteIds, voteId] };
     mount(
       renderQuestionFeedback(
@@ -265,6 +281,7 @@ async function answerQuestion(state, topic, optionId) {
         majorityOptionId,
         percentages,
         totalVotes,
+        isNearTie,
         () => runQuiz(nextState)
       ),
       showHome
@@ -290,7 +307,10 @@ async function finishQuiz(state) {
       renderResult({ ...summary, categoryLabel: state.categoryLabel }, votes, stats, {
         onHome: showHome,
         onHistory: showHistory,
-        onRetry: () => showCategoryPicker(),
+        // 「もう一度挑戦」は同じお題種類で即再挑戦(ランダム挑戦時はランダム再開)。
+        onRetry: () => startQuiz(state.category, state.categoryLabelBase, state.part),
+        // カテゴリを変えたい人向けの副導線。
+        onPickCategory: () => showCategoryPicker(),
       }),
       showHome
     );

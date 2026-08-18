@@ -53,7 +53,8 @@
 ## 投票の正誤判定(`server/routes/votes.js` / `server/routes/sessions.js`)
 
 - `POST /api/votes`時点で、その一票を数える**前**の多数派を`majority_option_id_at_vote`としてスナップショットし、`votes`テーブルに保存する
-- クライアントには、その一票を含めた最新の内訳(`percentages`)と、その一票が多数派と一致したか(`isMajorityMatch`)を返す。`percentages`は`server/majority.js`の`percentagesFor()`で計算し、最後の選択肢だけ「残り」として算出することで合計が必ず100%になるようにしている(各選択肢を独立に`Math.round`すると101%等になる実例が確認されたため、2026-08-16に修正)
+- **実質互角(near-tie)の扱い**(2026-08-18、実プレイFB「本当に僅差ならどっちも正解でしょ」): 投票前の分布で多数派の割合が**52%未満**(=2択で48〜52%のほぼ拮抗)なら、50.1対49.9のような僅差で少数派を選んだだけで不一致にされるのを避けるため、**どちらを選んでも一致扱い**にする。実装上は`majority_option_id_at_vote`に「選んだ選択肢」を保存する(→`isMajorityMatch=true`、セッションの`match_count`でも一致として数えられ、満点判定も崩れない)。レスポンスに`isNearTie`を返し、クライアントは「ほぼ互角! どちらを選んでも多数派」と表示する
+- クライアントには、その一票を含めた最新の内訳(`percentages`)と、その一票が多数派と一致したか(`isMajorityMatch`)、実質互角か(`isNearTie`)を返す。`percentages`は`server/majority.js`の`percentagesFor()`で計算し、最後の選択肢だけ「残り」として算出することで合計が必ず100%になるようにしている(各選択肢を独立に`Math.round`すると101%等になる実例が確認されたため、2026-08-16に修正)
 - `POST /api/sessions`(10問終わった時点)では、クライアントの自己申告を一切信用せず、`votes.majority_option_id_at_vote`と`votes.option_id`をサーバー側で突き合わせて`match_count`を再計算する。`voteIds`はちょうど10件でないと400、既に別のセッションに使われたvoteIdが含まれる場合も400(2026-08-16、大規模テストで発見した不具合への対応。以前はどちらも未検証で、他セッションのvoteIdを再送すると元セッションの内訳が消える不具合があった)
 
 ## 重複投票の扱い(`server/votes-dedup.js`)
@@ -113,6 +114,8 @@
 - 画面遷移はSPA的に`appEl.replaceChildren(node)`で行い、`mount(node, backTo)`が`history.pushState`/`popstate`と連動する。各画面は「戻ったらどこに行くか」を`backTo`として渡す。`popstate`発火時は`currentBack`(なければ`showHome`)を呼ぶ
 - **プロフィール**: `localStorage`の`heibonVote.profile`に保存。未設定ならイントロ→属性設定を強制。属性設定フォーム(`renderProfileForm`)は各属性を**初期状態「未選択」**で表示し、ユーザーが選ばなかった属性はプロフィールに含めない(送信可能・必須ではない)。以前は先頭の選択肢を常に選択済み扱いにしており、未入力のつもりのユーザーの属性まで事実と異なる値で保存され、`privacy.html`の「未入力の場合は取得しません」という記述と矛盾していた(2026-08-17修正)。サーバー側(`GET /api/topics/:id/breakdown`の集計)は元々欠損した属性キーを`if (!valueId) continue`で無視する設計のため、この変更に追随済み
 - **クイズ進行状態の永続化**: `localStorage`の`heibonVote.quizState`に1問答えるたびに保存。`init()`起動時、未完了のクイズがあれば`runQuiz()`で直接再開する。`showHome()`に到達する経路(戻るボタン含む)では毎回`clearQuizState()`を呼び、離脱=中断とみなして状態を破棄する(2026-08-15修正: 以前はここが抜けており、離脱後のリロードで中断したクイズに強制的に戻される不具合があった)
+- **クイズ中の中断**(2026-08-18、実プレイFB「ミスると逃げ道がない」): クイズ画面に「クイズを中断する」リンクを常設し、`showHome()`で進行を破棄してホームへ戻れる。
+- **結果画面の再挑戦**(2026-08-18): 「もう一度挑戦する」は直前と**同じカテゴリ/Partで即再挑戦**(ランダム挑戦時はランダム再開)。カテゴリを変えたい場合は別導線「カテゴリを選び直す」→カテゴリ選択画面。クイズstateに`category`/`part`/`categoryLabelBase`を保持して実現。
 - **voter_id**: `localStorage`の`heibonVote.voterId`に`crypto.randomUUID()`で生成、初回アクセス時に一度だけ払い出す
 
 ## レート制限・タイムアウト・バックアップ(2026-08-16実装)

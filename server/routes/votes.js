@@ -1,5 +1,5 @@
 const express = require('express');
-const { getMajorityOptionId, getVoteCounts, percentagesFor } = require('../majority');
+const { getVoteCounts, percentagesFor } = require('../majority');
 
 function createVotesRouter(db) {
   const router = express.Router();
@@ -45,14 +45,25 @@ function createVotesRouter(db) {
       return;
     }
 
-    // 自分の一票を数える前の多数派を基準に、正誤をこの時点でスナップショットする
-    const majorityOptionId = getMajorityOptionId(db, topicId);
+    // 自分の一票を数える前の分布で、多数派と「実質互角か」を判定する。
+    // 2択で多数派の割合が52%未満(=48〜52でほぼ拮抗)なら、50.1対49.9のような僅差で
+    // 少数派を選んだだけで不一致(✕)にされるのは理不尽なので、どちらを選んでも一致扱いにする
+    // (2026-08-18、実プレイFB「本当に僅差ならどっちも正解でしょ」)。満点判定も崩れなくなる。
+    const preCounts = getVoteCounts(db, topicId);
+    const preTotal = preCounts.reduce((sum, c) => sum + c.count, 0);
+    let majority = preCounts[0];
+    for (const c of preCounts) if (c.count > majority.count) majority = c; // 同数はsort_order先頭
+    const majorityShare = preTotal > 0 ? majority.count / preTotal : 0;
+    const isNearTie = preTotal > 0 && majorityShare < 0.52;
+    // 互角なら「選んだ方＝正解」として保存(セッションの一致数も match として数えられる)。
+    const effectiveMajorityId = isNearTie ? optionId : majority.optionId;
+
     const result = insertVote.run(
       topicId,
       optionId,
       JSON.stringify(cleanProfile),
       voterId ?? null,
-      majorityOptionId
+      effectiveMajorityId
     );
 
     // 自分の一票を含めた最新の内訳を、そのまま画面のフィードバックに使う
@@ -62,8 +73,9 @@ function createVotesRouter(db) {
 
     res.json({
       voteId: result.lastInsertRowid,
-      isMajorityMatch: optionId === majorityOptionId,
-      majorityOptionId,
+      isMajorityMatch: optionId === effectiveMajorityId,
+      majorityOptionId: effectiveMajorityId,
+      isNearTie,
       percentages,
       totalVotes: total,
     });

@@ -694,6 +694,13 @@ input[type='text'] {
   line-height: 1;
 }
 
+/* クイズの「中断する」逃げ道リンクは、目立たせすぎず控えめに(2026-08-18) */
+.quiz-quit {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
 @keyframes banner-pop {
   from {
     opacity: 0;

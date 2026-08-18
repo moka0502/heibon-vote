@@ -482,7 +482,7 @@ export function renderTopicBreakdown(
   return wrap;
 }
 
-export function renderQuizQuestion(topic, index, total, onAnswer) {
+export function renderQuizQuestion(topic, index, total, onAnswer, onQuit) {
   const wrap = el('div', { class: 'card' });
 
   // 残り問題数を「カードの厚み」で物理的に感じさせる(Tinder/Bumble深掘り分B1)。
@@ -520,7 +520,13 @@ export function renderQuizQuestion(topic, index, total, onAnswer) {
     wrap.appendChild(btn);
   }
 
-  return stack;
+  // 逃げ道: ミスしても最後まで縛られず、いつでも抜けられるように(2026-08-18、実プレイFB)。
+  if (!onQuit) return stack;
+  const outer = el('div', {}, [stack]);
+  outer.appendChild(
+    el('button', { class: 'btn-link quiz-quit', onclick: onQuit }, [icon('home'), 'クイズを中断する(いつでもOK)'])
+  );
+  return outer;
 }
 
 export function renderQuestionFeedback(
@@ -530,20 +536,35 @@ export function renderQuestionFeedback(
   majorityOptionId,
   percentages,
   totalVotes,
+  isNearTie,
   onNext
 ) {
-  // 僅差の一致は「割れる中で多数派を引いた」と特別に褒める(2026-08-18、CX指摘+ユーザー要望:
-  // "さすが平凡!わかってらっしゃる"的に、僅差だからこそ称える)。自分の選択肢%が55%未満なら僅差扱い。
+  // 当たり判定と文言(2026-08-18、実プレイFB):
+  // - 実質互角(isNearTie、サーバー判定)は「どちらを選んでも多数派＝○」。50.1対49.9で少数派を
+  //   選んだだけで✕にされる理不尽を無くす。
+  // - 接戦で勝った(一致かつ自分の選択肢<60%)ときは「さすが平凡!割れる中で多数派を引いた」と褒める。
+  // - 明確な不一致だけ従来通り「平凡じゃない!」+✕。
   const chosenPct = percentages[chosenOptionId] ?? 0;
-  const isCloseCall = isMajorityMatch && chosenPct < 55;
+  let icon;
   let bannerText;
-  if (!isMajorityMatch) bannerText = '平凡じゃない! 多数派とは不一致でした';
-  else if (isCloseCall) bannerText = 'さすが平凡! 割れる中で多数派を引きました';
-  else bannerText = '平凡! 多数派と一致でした';
+  if (isNearTie) {
+    icon = '○';
+    bannerText = 'ほぼ互角! どちらを選んでも多数派、あなたも平凡です';
+  } else if (isMajorityMatch && chosenPct < 60) {
+    icon = '○';
+    bannerText = 'さすが平凡! 割れる中で多数派を引きました';
+  } else if (isMajorityMatch) {
+    icon = '○';
+    bannerText = '平凡! 多数派と一致でした';
+  } else {
+    icon = '✕';
+    bannerText = '平凡じゃない! 多数派とは不一致でした';
+  }
+  const isMatchLike = isNearTie || isMajorityMatch;
   const wrap = el('div', { class: 'card' });
   wrap.appendChild(
-    el('div', { class: `feedback-banner ${isMajorityMatch ? 'is-match' : 'is-mismatch'}` }, [
-      el('span', { class: 'feedback-icon', text: isMajorityMatch ? '○' : '✕' }),
+    el('div', { class: `feedback-banner ${isMatchLike ? 'is-match' : 'is-mismatch'}` }, [
+      el('span', { class: 'feedback-icon', text: icon }),
       el('span', { text: bannerText }),
     ])
   );
@@ -807,7 +828,7 @@ function renderTierMeter(matchCount, totalCount) {
   return el('div', { class: 'tier-meter' }, [track, labels]);
 }
 
-export function renderResult(summary, detailVotes, stats, { onHome, onHistory, onRetry }) {
+export function renderResult(summary, detailVotes, stats, { onHome, onHistory, onRetry, onPickCategory }) {
   const wrap = el('div');
 
   const card = el('div', { class: 'card card-hero' });
@@ -887,6 +908,12 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   detailCard.appendChild(details);
   wrap.appendChild(detailCard);
 
+  // 「もう一度挑戦」は同じお題種類。カテゴリを変えたい人向けの副導線を分ける(2026-08-18)。
+  if (onPickCategory) {
+    wrap.appendChild(
+      el('button', { class: 'btn-link', onclick: onPickCategory }, [icon('chart'), 'カテゴリを選び直す'])
+    );
+  }
   wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onHome }));
   wrap.appendChild(el('button', { class: 'btn-link', text: '履歴を見る', onclick: onHistory }));
   return wrap;
