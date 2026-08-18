@@ -48,6 +48,16 @@ workflows:
           npx cap add ios || true
           npx cap sync ios
 
+      - name: iPhone のみ対応にする
+        # Capacitor が生成する iOS プロジェクトは既定で iPhone+iPad 対応(1,2)。
+        # iPad 対応のままだと App Store Connect で iPad 用スクリーンショットも必須になり、
+        # iPad での表示崩れも審査対象になるため、初回リリースは iPhone のみ(1)に絞る。
+        # iPad も出したくなったら、この step を消して iPad スクリーンショットを用意する。
+        script: |
+          sed -i '' 's/TARGETED_DEVICE_FAMILY = "1,2";/TARGETED_DEVICE_FAMILY = 1;/g' \
+            ios/App/App.xcodeproj/project.pbxproj
+          grep -n TARGETED_DEVICE_FAMILY ios/App/App.xcodeproj/project.pbxproj
+
       - name: Set up code signing
         script: xcode-project use-profiles
 

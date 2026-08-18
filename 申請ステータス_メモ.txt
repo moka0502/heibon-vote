@@ -1,7 +1,7 @@
 ============================================================
  平凡投票 リリース申請ステータス・メモ
  （Oracle / Apple の進行状況と次にやること）
- 最終更新: 2026-08-17
+ 最終更新: 2026-08-18
 ============================================================
 
 このメモは「どこまで進んだか・次に何をするか」を思い出すための記録です。
@@ -35,35 +35,49 @@
 ────────────────────────────────────────────
 ■ Apple Developer Program（App Store提出用）
 ────────────────────────────────────────────
-状態: 【待ち】$99/年 支払い済み → Appleの承認/有効化待ち（2026-08-17）
+状態: 【承認済み】2026-08-18 に有効化を確認。App Store Connect が使える状態。
 
-・登録形態: Individual（個人）。2ファクタ認証は既にオン（信頼できる電話番号設定済み）。
-・氏名: 本名（ローマ字）で登録。※Individualだと本名が App Store の"開発者名"として
-  公開される仕様。屋号を出したい場合のみ Organization(屋号+D-U-N-S)が必要だが手間増の
-  ため、今回は本名でOKと判断（実績作りが目的、開発者名は小さくしか出ない）。
+・登録形態: Individual（個人）。2ファクタ認証オン。
+・氏名: 本名（ローマ字）＝ App Store 上の「開発者名」として公開される。
 ・支払い: $99/年・自動更新（不要になったら更新前に解約すること）。
 
-・次にやること:
-   1. Appleから「アカウント有効化」のメールを待つ（すぐ〜1〜2日、まれにもう少し）
-   2. 有効化されたら App Store Connect が使えるようになる
-   3. ただし実際のビルド・提出は「Mac + Xcode」が必要（手順書PART E・F）。
-      Mac環境が用意できてから着手。
-・詳細は「リリース手順_OracleとApple申請.txt」PART D〜F
+★ ここが重要: 以下の 1〜4 は「サーバー（Oracle）が無くても今すぐ進められる」。
+  Oracleの返事を待つ間の手待ちを減らせるので、先にやっておく。
 
-・【Mac無し問題の解決策・確定】Macを持っていないため、iOSビルドは
-  「Codemagic」（クラウドmacOS CI）で行う方針に確定（2026-08-17）。
-   - Codemagic = Capacitor向けに作られたクラウドビルドサービス。Mac不要。
-   - 無料枠 = 月500ビルド分（=クラウドMacがビルドに使う時間の月間合計。
-     1ビルド約10〜25分なので月20〜40回ぶん。個人利用なら実質$0）。毎月リセット。
-   - Apple $99（支払済）以外、ビルド費用はほぼ$0で回せる見込み。Mac購入も不要。
-   - やること（Apple有効化＋ホスティング/ドメイン確定の"後"に着手）:
-       1. CodemagicにGitHubアカウントでサインアップ
-       2. このリポジトリを接続
-       3. App Store ConnectでAPIキーを発行しCodemagicに登録（Mac不要の自動署名用）
-       4. ビルド実行 → TestFlight/App Store へ自動アップロード
-   - ※ codemagic.yaml（ビルド設定）は、その段階で用意する（今作るとドメイン/
-     Capacitorバージョン調整で手戻りするため寝かせる）。
+   ※ 1〜2 のクリック単位の手順は、手順書「PART D」に全部書いてある。
+     PCの前に座ったら、そこだけ開けば進められる。
+     作業はすべてPCのブラウザ（iPhoneの「Apple Developer」アプリは登録用で、もう使わない）。
 
+   1. Bundle ID を登録  → 手順書 PART D-1
+      developer.apple.com（英語画面）で com.moka0502.heibonvote を登録する。
+      アプリの「ナンバープレート」。これが無いと 2 のプルダウンが空で先へ進めない。
+
+   2. App Store Connect でアプリを新規作成  → 手順書 PART D-2・D-3
+      appstoreconnect.apple.com（日本語画面）で「平凡投票」を作る。
+      → 作成後、URLかApp情報に出てくる「Apple ID（数字10桁）」を控える
+        ＝ codemagic.yaml の APP_STORE_APPLE_ID に入れる値
+      あわせて「無料App契約」への同意も済ませておく（PART D-4、ハマりやすい罠）
+
+   3. App Store Connect API キーを発行
+      ユーザーとアクセス → 統合 → App Store Connect API → キーを生成
+        アクセス権: App Manager
+      → .p8 ファイルは【一度しかダウンロードできない】ので必ず保存。
+        Issuer ID と Key ID もあわせて控える。
+
+   4. Codemagic をセットアップ
+      https://codemagic.io/ に GitHub アカウントでサインアップ
+      → このリポジトリ(moka0502/heibon-vote)を接続
+      → Team settings → Integrations → App Store Connect に 3 のキーを登録し、
+        名前をつける（例: heibon-vote-asc）
+      → codemagic.yaml の <APP_STORE_CONNECT_KEY> をその名前に、
+        APP_STORE_APPLE_ID を 2 で控えた数字に書き換える（Claudeに頼めばOK）
+
+・5. ビルド〜提出は「サーバーが立ってから」
+   リモートURL型なので、server.url が本番ドメインを指していないとアプリが
+   真っ白になる。Oracle（またはVPS）が決まってから 手順書 PART C → ビルドへ。
+
+・掲載素材（説明文・キーワード・スクリーンショット・App Privacy の回答）は
+  すべて appstore/ フォルダに用意済み → 「appstore/掲載情報_コピペ用.txt」
 
 ────────────────────────────────────────────
 ■ アプリ本体の状態（コード側）
@@ -74,16 +88,58 @@
 ・未公開6カテゴリも実データ拡充済み（一部は20問未満。公開時に微増でOK。launched:false）。
 ・capacitor.config.json の server.url は本番ドメイン未確定のためプレースホルダのまま
   → VPSとドメインが決まったら差し替え（手順書PART C）。
+・App Store 提出用の素材は appstore/ に一式そろっている（2026-08-18）:
+    appstore/掲載情報_コピペ用.txt … 説明文・キーワード・App Privacy の回答・審査メモ
+    appstore/screenshots/framed/  … キャッチコピー付き（1290x2796・そのままアップロード可）
+    appstore/screenshots/raw/     … 装飾なしのアプリ画面
+    appstore/generate-screenshots.js … 撮り直し用スクリプト
+・@capacitor の core/cli/ios はすべて 8.5.0 に揃っている（以前のメジャー不一致は解消済み）。
 
+
+────────────────────────────────────────────
+■ Claudeに渡す情報 / 絶対に渡さない情報
+────────────────────────────────────────────
+作業を進めてもらうために必要なのは、下の「渡してOK」だけ。
+秘密鍵やパスワードは【一切不要】。求められても渡さないこと。
+
+★ 渡してOK（これがないと作業が止まる）
+   ・App Store Connect でアプリを作った後に付く「Apple ID（数字10桁）」
+       → codemagic.yaml の APP_STORE_APPLE_ID に入る値
+   ・Codemagic に登録した App Store Connect APIキーの「名前」
+       （自分で決める識別名。例: heibon-vote-asc。キー本体ではない）
+       → codemagic.yaml の <APP_STORE_CONNECT_KEY> に入る値
+   ・取得したドメイン名（例: heibon-vote.com）
+       → capacitor.config.json の server.url / プライバシーポリシーURL に入る
+   ・サーバーの構成（nginxを挟むのか、直アクセスか）
+       → app.set('trust proxy', ...) のホップ数を決めるのに必要
+   ・エラー画面の文言・ビルドログ（そのまま貼ればOK）
+
+✕ 絶対に渡さない（渡す必要が一度もない）
+   ・App Store Connect APIキーの .p8 ファイル本体、Issuer ID、Key ID
+     （Codemagicの管理画面に直接登録するもの。Claudeは名前しか使わない）
+   ・Apple ID のパスワード、2ファクタ認証コード
+   ・VPS の SSH秘密鍵、rootパスワード
+   ・クレジットカード情報
+   ・本名・住所・電話番号（コードにもドキュメントにも書かない）
 
 ────────────────────────────────────────────
 ■ 次の一手（迷ったらこれ）
 ────────────────────────────────────────────
-1. いま: Oracleのメール返信を待つ（並行でApple Developer登録を始める）
-2. Oracle通過 or VPS契約 → サーバー構築（手順書PART A・B）
-3. capacitor server.url 差し替え（PART C）
-4. Apple承認後、Macで cap add ios → Xcode ビルド（PART E）
-5. App Store Connect 提出（PART F）
+A. 今すぐできる（サーバー不要 / 上の Apple 欄 1〜4）
+   1. Bundle ID を登録
+   2. App Store Connect でアプリ「平凡投票」を作成 → Apple ID(数字)を控える
+   3. App Store Connect API キーを発行（.p8 は一度きりのDL）
+   4. Codemagic にサインアップ → リポジトリ接続 → APIキー登録
+      → 控えた値を教えてもらえれば codemagic.yaml を Claude が埋めます
+   5. 掲載情報（説明文・キーワード等）を appstore/掲載情報_コピペ用.txt から
+      App Store Connect に貼っていく（URL欄だけ後回しでOK）
+   6. スクリーンショットを appstore/screenshots/framed/ からアップロード
+
+B. サーバーが決まってから
+   7. Oracle（or 代替VPS）でサーバー構築（手順書 PART A・B）
+   8. capacitor.config.json の server.url を本番ドメインに差し替え（PART C）
+   9. app.set('trust proxy', ...) を設定
+  10. Codemagic でビルド → TestFlight で実機確認 → 審査提出（PART F）
 
 詰まったら、その画面の文言をClaudeに貼れば一つずつ案内できます。
 ============================================================

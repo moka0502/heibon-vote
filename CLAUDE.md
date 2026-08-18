@@ -116,9 +116,23 @@
 **次にMac環境が用意できたときの手順**: `npx cap add ios` → `npx @capacitor/assets generate`(アイコン・スプラッシュのiOS各サイズ展開) → Xcodeでビルド・実機/シミュレータ確認。
 
 **ユーザー本人のアクション待ちで未着手のまま**:
-- Oracle Cloud Always Free VPSの契約・常時稼働ホスティングの構築(`capacitor.config.json`の`server.url`はこれが確定してから本番ドメインに差し替える)
-- Apple Developer Program登録($99/年)
-- App Store Connectでのアプリ登録・提出(スクリーンショット等の掲載素材、App Privacy申告も含む)
+- Oracle Cloud Always Free VPSの契約・常時稼働ホスティングの構築(`capacitor.config.json`の`server.url`はこれが確定してから本番ドメインに差し替える)。2026-08-17時点でサインアップが自動拒否されサポートチケット待ち(インシデント番号は`申請ステータス_メモ.txt`)
+- App Store ConnectでのBundle ID登録・アプリ作成・API キー発行・Codemagic接続(**サーバー不要なので今すぐ着手できる**)、および審査提出
+
+### Apple Developer Program 承認済み + 提出素材の準備完了(2026-08-18)
+
+Apple Developer Programが承認・有効化された(登録形態はIndividual、$99/年・自動更新)。これにより「Mac無し・サーバー無しでも進められる作業」が一気に開いたので、devcontainer内で完結する提出素材を一括で用意した。
+
+- **`appstore/` フォルダを新設**(一つの事実源):
+  - `appstore/掲載情報_コピペ用.txt` … App名/サブタイトル/説明文/キーワード/プロモーションテキスト/カテゴリ/年齢レーティング/**App Privacy申告の項目別の回答**/審査メモ(App Review Notes)/輸出コンプライアンス/提出前チェックリスト。App Store Connectの入力欄にそのまま貼れる形にしてある
+  - `appstore/screenshots/raw/*.png` … アプリ画面そのまま(1290x2796 = 6.9インチiPhone、提出必須サイズ)
+  - `appstore/screenshots/framed/*.png` … 同サイズでキャッチコピーを添えた掲載用。**アップロードするのはこちらを推奨**
+  - `appstore/generate-screenshots.js` … 撮り直し用。`npm run dev`しておいて`node appstore/generate-screenshots.js`(playwright-core + システムchromium、`CHROMIUM_PATH`/`BASE_URL`/`SHOT_DIR`で上書き可)。CSS 430x932 を`deviceScaleFactor:3`で撮ると1290x2796ちょうどになる
+- **`www/privacy.html`のアプリ名が旧称`heibon-vote`のままだった**のを「平凡投票」に統一(審査官が必ず開くページなので、App名との不一致は避ける)。`www/`を変更したので`sw.js`の`CACHE_NAME`をv4→v5に更新
+- **`codemagic.yaml`に「iPhoneのみ対応にする」stepを追加**。Capacitorが生成するiOSプロジェクトは既定で`TARGETED_DEVICE_FAMILY = "1,2"`(iPhone+iPad)で、iPad対応のままだとiPad用スクリーンショットが必須になり、iPadでの表示崩れも審査対象になるため、初回リリースは`1`に絞る
+- 手順書(`リリース手順_OracleとApple申請.txt`)のPART E-0にあった「@capacitorのcore 8系/cli 7系のメジャー不一致」の警告は**すでに解消済み**(core/cli/ios すべて8.5.0)だったため記述を削除した
+
+**リモートURL型の制約として残る依存**: ビルドしたアプリは`server.url`を開くだけなので、**ホスティングが立つまでTestFlight配信・審査提出はできない**(WebViewが真っ白になる)。逆に言うと、Bundle ID登録・アプリレコード作成・APIキー発行・Codemagic接続・掲載情報の入力はホスティング無しで全部先に済ませられる。
 
 ### デプロイ時の反映(pushしただけでは本番に反映されない)(2026-08-17追記)
 
