@@ -106,13 +106,13 @@ heibon-vote-001
 
 
 ────────────────────────────────────────────
-■ URL 各種  ★要差し替え（本番ドメイン確定後）
+■ URL 各種  （本番ドメイン heibon.mokahub.dev で確定・2026-08-20）
 ────────────────────────────────────────────
 プライバシーポリシーURL（必須）:
-https://★YOUR-DOMAIN/privacy.html
+https://heibon.mokahub.dev/privacy.html
 
 サポートURL（必須）:
-https://★YOUR-DOMAIN/     ← 専用ページが無ければトップでも通ります
+https://heibon.mokahub.dev/     ← 専用ページが無ければトップでも通ります
 
 マーケティングURL（任意・空欄でOK）:
 （空欄）
@@ -224,11 +224,11 @@ appstore/screenshots/ に生成済み（すべて 1290x2796 = 6.9インチ iPhon
 ────────────────────────────────────────────
 ■ 提出前の最終チェック
 ────────────────────────────────────────────
- [ ] 本番サーバーが稼働している（審査官が実際に触る。落ちていると即Reject）
- [ ] https://YOUR-DOMAIN/ をシークレットウィンドウで開き、最後まで遊べる
- [ ] https://YOUR-DOMAIN/privacy.html が開ける
- [ ] capacitor.config.json の server.url が本番ドメインになっている
- [ ] app.set('trust proxy', ...) を設定済み（レート制限で審査官を弾かないため）
+ [x] 本番サーバーが稼働している（2026-08-20 ConoHa VPSで稼働・HTTPS済。API/画面をリモート点検で確認）
+ [ ] https://heibon.mokahub.dev/ をシークレットウィンドウで開き、最後まで遊べる（審査直前に再確認）
+ [x] https://heibon.mokahub.dev/privacy.html が開ける（リモート点検で確認）
+ [x] capacitor.config.json の server.url が本番ドメインになっている（https://heibon.mokahub.dev）
+ [x] app.set('trust proxy', 1) を設定済み（2026-08-20デプロイ済。レート制限で審査官を弾かないため）
  [ ] App Privacy 申告と privacy.html の内容が食い違っていない
  [ ] 対応デバイスを iPhone のみにした（iPad対応のままだとiPad用の
      スクリーンショットも必須になり、iPadでの表示崩れも審査対象になる）

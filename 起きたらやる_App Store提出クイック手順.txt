@@ -1,0 +1,82 @@
+============================================================
+ 起きたらやる — App Store 提出クイック手順（2026-08-20 作成）
+============================================================
+
+サーバー(ホスティング)は完成済み。あとは「ビルド→TestFlight→提出」だけ。
+すべて PCブラウザ + iPhone で完結する。確定値はこのファイルに埋め込み済み。
+
+【確定値（コピペ用）】
+  本番URL           : https://heibon.mokahub.dev
+  Bundle ID         : com.moka0502.heibonvote
+  App Store Apple ID : 6802689228
+  Codemagicのキー名  : heibon-vote-asc
+  プライバシーポリシーURL : https://heibon.mokahub.dev/privacy.html
+  サポートURL        : https://heibon.mokahub.dev/
+
+
+────────────────────────────────────────────
+STEP 0. 前提の存在確認（過去に設定済のはず。念のため）
+────────────────────────────────────────────
+codemagic.yaml には Apple ID とキー名が入っている＝過去に下記を済ませた形跡あり。
+起きたら、実際に存在するかだけ確認する（無ければ手順書 PART D を見て作る）:
+ [ ] App Store Connect に「平凡投票」アプリが作成済（appstoreconnect.apple.com）
+ [ ] App Store Connect API キー（.p8）を発行済で、Codemagicに登録済
+ [ ] Codemagic の Team → Integrations → App Store Connect に
+     「heibon-vote-asc」という名前で登録されている
+ [ ] Bundle ID com.moka0502.heibonvote が Certificates,Identifiers に登録済
+
+  ↑ どれか欠けていたら、そこだけ「リリース手順_OracleとApple申請.txt」PART D で補う。
+    全部あれば STEP 1 へ。
+
+
+────────────────────────────────────────────
+STEP 1. Codemagic でビルド（クラウドmacOSがXcode作業を代行）
+────────────────────────────────────────────
+1. https://codemagic.io/ にログイン → アプリ moka0502/heibon-vote を開く
+2. 「Start new build」→ ブランチ master / ワークフロー（codemagic.yaml のもの）を選ぶ
+3. ビルド開始 → 完了まで待つ（十数分）。
+   ・codemagic.yaml で iPhoneのみ対応・自動でTestFlightアップロードまで走る設定
+   ・失敗したらログの最後を Claude に貼れば原因を特定できる
+4. 成功すると TestFlight に自動でアップロードされる
+
+
+────────────────────────────────────────────
+STEP 2. TestFlight で実機確認（超重要・ここで本番URLが開くか）
+────────────────────────────────────────────
+1. iPhoneに「TestFlight」アプリを入れる（App Storeから）
+2. TestFlightで「平凡投票」をインストール → 起動
+3. 確認:
+   [ ] 起動して真っ白にならない（＝ server.url=https://heibon.mokahub.dev が開けている）
+   [ ] 「挑戦する」→ 10問 → 結果 → シェア まで最後まで動く
+   [ ] 履歴・お題一覧・属性設定 も開ける
+   ※ ここで真っ白なら server.url かサーバー稼働を疑う（今は稼働確認済なのでURL設定を見る）
+
+
+────────────────────────────────────────────
+STEP 3. 掲載情報を入力（App Store Connect）
+────────────────────────────────────────────
+「appstore/掲載情報_コピペ用.txt」から貼っていく（本番URLは反映済）:
+ [ ] 名前・サブタイトル・説明文・キーワード・プロモーションテキスト
+ [ ] プライバシーポリシーURL: https://heibon.mokahub.dev/privacy.html
+ [ ] サポートURL: https://heibon.mokahub.dev/
+ [ ] カテゴリ・年齢レーティング
+ [ ] App Privacy 申告（同ファイルの回答どおり。privacy.html と一致必須）
+ [ ] スクリーンショット: appstore/screenshots/framed/ を推奨順にアップロード
+ [ ] 配信地域: 日本のみ（EU配信は住所等が公開され得るので外す）
+ [ ] 輸出コンプライアンス: 掲載情報ファイルの回答どおり
+
+
+────────────────────────────────────────────
+STEP 4. 審査に提出
+────────────────────────────────────────────
+1. ビルド（STEP1でTestFlightに上がったもの）をこのバージョンに紐付け
+2. 「審査へ提出（Submit for Review）」を押す
+3. App Review Notes（審査メモ）は掲載情報ファイルの文面を貼る
+   （ログイン不要・匿名で遊べる旨、収集データの説明など）
+4. 提出 → あとは待つ（初回は1〜3日が目安）
+
+────────────────────────────────────────────
+詰まったら: その画面の文言・エラー・ビルドログを Claude に貼れば1つずつ案内できる。
+渡してOKなのは Apple ID(数字)・キーの"名前"・ドメイン・エラー文言まで。
+.p8本体・Issuer ID・Key ID・パスワード・カード情報は渡さない（Codemagicに直接登録するもの）。
+============================================================
