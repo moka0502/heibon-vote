@@ -83,6 +83,9 @@ const writeMethodsOnly = (limiter) => (req, res, next) => {
 // 429で巻き込まれ得る。2026-08-17、開発運用者ペルソナ指摘)。ここで無条件に有効化しないのは、
 // プロキシが無い直アクセス構成だとクライアントがX-Forwarded-Forを偽装してレート制限を回避
 // できてしまうため。デプロイ構成が確定した時点で、そのホップ数に合わせて設定すること。
+// 2026-08-20: 本番構成が「nginx(1ホップ)→ Node」で確定したため有効化。これで req.ip が
+// X-Forwarded-Forの実クライアントIPになり、レート制限がユーザーごとに正しく効く。
+app.set('trust proxy', 1);
 app.use('/api', generalApiLimiter);
 app.use('/api/votes', writeMethodsOnly(writeLimiter));
 app.use('/api/sessions', writeMethodsOnly(writeLimiter));

@@ -4,7 +4,7 @@
   "webDir": "www",
   "backgroundColor": "#faf9f7",
   "server": {
-    "url": "https://TODO-set-production-domain.example.com",
+    "url": "https://heibon.mokahub.dev",
     "cleartext": false
   },
   "ios": {
