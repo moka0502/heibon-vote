@@ -84,6 +84,8 @@
 
 ## iOS化・App Store提出に向けて(2026-08-16〜検討開始)
 
+**★ホスティング完成(2026-08-20)**: Oracleを見切り **ConoHa VPS** で本番公開まで到達。**https://heibon.mokahub.dev** で稼働中(HTTPS/pm2/nginx、API・画面をリモート点検で確認済)。独自ドメイン `mokahub.dev`(Cloudflare、複数アプリの受け皿)。`trust proxy=1`・`capacitor.config.json`の`server.url`・SW版数をデプロイ済。**残るは Codemagicビルド→TestFlight→審査提出のみ**(codemagic.yamlは`APP_STORE_APPLE_ID=6802689228`/`heibon-vote-asc`で設定済)。詳細は `申請ステータス_メモ.txt`・`起きたらやる_App Store提出クイック手順.txt`・Obsidian「2026-08-20_平凡投票 本番サーバー設定」・memory `project_vps_deploy_2026-08-20`。ConoHaのUbuntuは**ufwが初期状態で80/443を塞ぐ**点、**生http+IPだとJSのfetch()が弾かれHTTPS化で解消**した点に注意。
+
 **目的**: ユーザー本人の転職活動における実績(「iOSアプリを一気通貫で作った」)としての価値が主目的で、DL数・収益は主目的ではない(トラフィック0でも投資対効果ありと判断)。
 
 **技術方針の決定事項**:
