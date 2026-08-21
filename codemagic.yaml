@@ -31,6 +31,13 @@ workflows:
       # プロファイルが無い時点で "No matching profiles found ..." で即失敗し、
       # 下の Set up code signing ステップまで到達しない。
       # APIキー(integrations)経由の手動署名に一本化し、--create で作らせる。
+      # Codemagicのアプリ設定に登録した環境変数グループを読み込む。
+      # このグループに CERTIFICATE_PRIVATE_KEY(2048bit RSA秘密鍵, secure)が入っている。
+      # fetch-signing-files --create は証明書を新規作成する際にこの鍵を使う。
+      # 未設定だと "Cannot save Signing Certificates without certificate private key"
+      # で落ちる(2026-08-21に踏んだ)。鍵の実体はリポジトリに置かない。
+      groups:
+        - ios_signing
       vars:
         BUNDLE_ID: "com.moka0502.heibonvote"
         # App Store Connectでアプリ「平凡投票」を作成して付いた数値のApple ID(2026-08-18設定)
