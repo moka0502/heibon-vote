@@ -82,6 +82,17 @@ workflows:
             ios/App/App.xcodeproj/project.pbxproj
           grep -n TARGETED_DEVICE_FAMILY ios/App/App.xcodeproj/project.pbxproj
 
+      - name: 暗号化の輸出コンプライアンスをInfo.plistで宣言する
+        # これが無いと、ビルドをアップロードするたびにApp Store Connect上で
+        # 「コンプライアンスがありません」となり、暗号化の質問に手で答える必要がある
+        # (2026-08-21に実際に踏んだ。Apple自身が画面でこのキーの明記を案内している)。
+        # このアプリはHTTPS(iOS標準の通信機能)を使うだけで暗号化を自前実装していないため
+        # 免除対象＝false。ios/は毎回新規生成されるのでキーは必ず存在しない→insertで確実に入る。
+        script: |
+          set -eux
+          plutil -insert ITSAppUsesNonExemptEncryption -bool NO ios/App/App/Info.plist
+          plutil -p ios/App/App/Info.plist | grep ITSAppUsesNonExemptEncryption
+
       - name: Set up code signing
         # xcode-project use-profiles は「取得済みのプロファイルを適用する」だけで、
         # プロファイルの取得・作成はしない。初回ビルドはプロファイルが存在せず
