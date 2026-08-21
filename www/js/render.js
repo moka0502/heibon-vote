@@ -75,20 +75,32 @@ function lifetimeTitleBadgeClass(title) {
 // 外部アイコンライブラリは追加せず、ローカルの最小限のインラインSVGで完結させる。
 const ICONS = {
   history:
-    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.5"/><path d="M10 6v4l3 2"/></svg>',
+    '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.5"/><path d="M10 6v4l3 2"/></svg>',
   chart:
-    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16V9M10 16V4M16 16v-6"/></svg>',
+    '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16V9M10 16V4M16 16v-6"/></svg>',
   person:
-    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3 2.5-5 6-5s6 2 6 5"/></svg>',
+    '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3 2.5-5 6-5s6 2 6 5"/></svg>',
   bulb:
-    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-3 9c.6.5 1 1.2 1 2h4c0-.8.4-1.5 1-2a5 5 0 0 0-3-9z"/><path d="M8 17h4"/></svg>',
+    '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-3 9c.6.5 1 1.2 1 2h4c0-.8.4-1.5 1-2a5 5 0 0 0-3-9z"/><path d="M8 17h4"/></svg>',
   shield:
-    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.5 4.5 4.8v4.4c0 3.3 2.2 6.1 5.5 7.3 3.3-1.2 5.5-4 5.5-7.3V4.8L10 2.5z"/></svg>',
+    '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.5 4.5 4.8v4.4c0 3.3 2.2 6.1 5.5 7.3 3.3-1.2 5.5-4 5.5-7.3V4.8L10 2.5z"/></svg>',
+  home:
+    '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 10 3l7 5.5V16a1 1 0 0 1-1 1h-3v-5H7v5H4a1 1 0 0 1-1-1z"/></svg>',
+  back:
+    '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 6 10l6 6"/></svg>',
 };
 
 function icon(name) {
   const span = el('span', { class: 'icon' });
-  span.innerHTML = ICONS[name] ?? '';
+  // 未定義のアイコン名を黙って空文字にすると、画面上は「アイコンが無いだけ」に見えて
+  // 気づけない。実際に icon('home') が ICONS 未定義のまま長く放置され、全画面監査で
+  // ようやく見つかった(2026-08-22)。共通標準の「fail loudly」に沿って必ず知らせる。
+  const svg = ICONS[name];
+  if (!svg) {
+    console.error(`[render] 未定義のアイコン名です: ${name}`);
+    return span;
+  }
+  span.innerHTML = svg;
   return span;
 }
 
@@ -241,14 +253,14 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
 
   const wrap = el('div');
   wrap.appendChild(form);
-  wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onCancel }));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onCancel }, [icon('back'), '戻る']));
   return wrap;
 }
 
 export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, onSuggest, profileEmpty }) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
-  card.appendChild(el('h2', { text: '挑戦しよう' }));
+  card.appendChild(el('h2', { text: 'あなたは何問、多数派?' }));
   card.appendChild(
     el('p', { text: '色々なカテゴリの10問に答えて、世間の多数派とどれだけ一致できるか試そう。' })
   );
@@ -280,16 +292,16 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
   }
   wrap.appendChild(card);
   wrap.appendChild(
-    el('button', { class: 'btn-link btn-link-emphasis', onclick: onHistory }, [icon('history'), '履歴を見る'])
+    el('button', { class: 'btn-link', onclick: onHistory }, [icon('history'), '履歴を見る'])
   );
-  wrap.appendChild(el('button', { class: 'btn-link', onclick: onTopics }, [icon('chart'), 'お題の内訳を見る']));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onTopics }, [icon('chart'), 'どんなお題があるか見る']));
   wrap.appendChild(
     el('button', { class: 'btn-link', onclick: onSettings }, [icon('person'), 'あなたについての設定'])
   );
   wrap.appendChild(el('button', { class: 'btn-link', onclick: onSuggest }, [icon('bulb'), 'お題を提案する']));
   // 他の項目と同じく先頭にアイコンを置く(2026-08-22の実機FB: ここだけアイコンが無く統一感を欠いていた)
   wrap.appendChild(
-    el('a', { class: 'btn-link', href: 'privacy.html' }, [icon('shield'), 'プライバシーポリシー'])
+    el('a', { class: 'btn-link btn-link-legal', href: 'privacy.html' }, [icon('shield'), 'プライバシーポリシー'])
   );
   return wrap;
 }
@@ -302,8 +314,8 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
       class: `btn btn-outline category-option${done ? ' is-played' : ''}`,
       onclick: () => onSelectCategory(category.id, category.label, part),
     });
-    btn.appendChild(el('span', { text: `${category.label} Part${part}` }));
-    if (done) btn.appendChild(el('span', { class: 'played-badge', text: '挑戦済み' }));
+    btn.appendChild(el('span', { text: `その${part}` }));
+    if (done) btn.appendChild(el('span', { class: 'played-badge', text: '回答済' }));
     return btn;
   };
   const wrap = el('div');
@@ -320,7 +332,7 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
     card.appendChild(
       el('p', {
         class: 'progress',
-        text: '「Part1」「Part2」は同じカテゴリ内の別々の10問です(問題は重複しません)。',
+        text: '「その1」「その2」は同じカテゴリ内の別々の10問です(問題は重複しません)。',
       })
     );
   }
@@ -332,21 +344,28 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
     })
   );
   for (const category of categories) {
-    // 「食事(11問)」のような半端な数を見せず、常に10問ぴったりの「Part」単位で選ばせる。
-    // Part1は固定10問、Part2は残りが10問貯まったカテゴリだけに出す(2026-08-16)。
+    // 「食事(11問)」のような半端な数を見せず、常に10問ぴったりの束単位で選ばせる。
+    // その1は固定10問、その2は残りが10問貯まったカテゴリだけに出す(2026-08-16)。
     const parts = Math.floor(category.count / 10);
-    if (parts >= 1) card.appendChild(partButton(category, 1));
-    if (parts >= 2) card.appendChild(partButton(category, 2));
+    if (parts < 1) continue;
+    // カテゴリ名を束ごとに繰り返すと「食事 その1」「食事 その2」で10行に伸びて走査しづらい
+    // (2026-08-22、UIレビュー指摘)。カテゴリ名は1回だけ出し、束は横に並べる。
+    const group = el('div', { class: 'category-group' });
+    group.appendChild(el('p', { class: 'category-group-label', text: category.label }));
+    const row = el('div', { class: 'category-group-parts' });
+    for (let part = 1; part <= Math.min(parts, 2); part++) row.appendChild(partButton(category, part));
+    group.appendChild(row);
+    card.appendChild(group);
   }
   wrap.appendChild(card);
-  wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onBack }));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onBack }, [icon('home'), 'ホームに戻る']));
   return wrap;
 }
 
 export function renderTopicList(topics, { onSelect, onBack }) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
-  card.appendChild(el('h2', { text: 'お題の内訳を見る' }));
+  card.appendChild(el('h2', { text: 'どんなお題があるか見る' }));
   card.appendChild(
     el('p', {
       class: 'progress',
@@ -375,7 +394,7 @@ export function renderTopicList(topics, { onSelect, onBack }) {
     card.appendChild(details);
   }
   wrap.appendChild(card);
-  wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onBack }));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onBack }, [icon('home'), 'ホームに戻る']));
   return wrap;
 }
 
@@ -426,7 +445,7 @@ export function renderTopicBreakdown(
       })
     );
     wrap.appendChild(card);
-    wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onBack }));
+    wrap.appendChild(el('button', { class: 'btn-link', onclick: onBack }, [icon('back'), '戻る']));
     return wrap;
   }
 
@@ -488,7 +507,7 @@ export function renderTopicBreakdown(
   renderRows(attributes[0]?.id);
 
   wrap.appendChild(card);
-  wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onBack }));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onBack }, [icon('back'), '戻る']));
   return wrap;
 }
 
@@ -939,7 +958,7 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
       el('button', { class: 'btn-link', onclick: onPickCategory }, [icon('chart'), 'カテゴリを選び直す'])
     );
   }
-  wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onHome }));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onHome }, [icon('home'), 'ホームに戻る']));
   // ホーム(renderHome)の同じ「履歴を見る」はアイコン付きなのに、ここだけ無く不統一だった
   // (2026-08-22の自動監査で検出)。同一ラベル・同一機能なので揃える。
   wrap.appendChild(el('button', { class: 'btn-link', onclick: onHistory }, [icon('history'), '履歴を見る']));
@@ -972,7 +991,7 @@ export function renderHistoryList(sessions, { onSelect, onBack }) {
     card.appendChild(item);
   }
   wrap.appendChild(card);
-  wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onBack }));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onBack }, [icon('home'), 'ホームに戻る']));
   return wrap;
 }
 
@@ -1010,6 +1029,14 @@ export function renderSuggestionForm(onSubmit, onCancel) {
   card.appendChild(
     el('p', { text: '「こんな二択のお題を入れてほしい」というアイデアを送ってください。' })
   );
+  // 唯一の自由入力欄。ユーザーが本名や連絡先を書くと、こちらが意図せず個人情報を
+  // 預かることになるため明示的に注意する(2026-08-22、プライバシー観点のレビュー指摘)。
+  card.appendChild(
+    el('p', {
+      class: 'progress',
+      text: 'お名前・メールアドレス・電話番号などの個人情報は書かないでください。お題のアイデアだけをお送りください。',
+    })
+  );
 
   const form = el('form');
   const textarea = el('textarea', {
@@ -1042,7 +1069,7 @@ export function renderSuggestionForm(onSubmit, onCancel) {
 
   card.appendChild(form);
   wrap.appendChild(card);
-  wrap.appendChild(el('button', { class: 'btn-link', text: '戻る', onclick: onCancel }));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onCancel }, [icon('back'), '戻る']));
   return wrap;
 }
 
