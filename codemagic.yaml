@@ -59,7 +59,15 @@ workflows:
           grep -n TARGETED_DEVICE_FAMILY ios/App/App.xcodeproj/project.pbxproj
 
       - name: Set up code signing
-        script: xcode-project use-profiles
+        # xcode-project use-profiles は「取得済みのプロファイルを適用する」だけで、
+        # プロファイルの取得・作成はしない。初回ビルドはプロファイルが存在せず
+        # "No matching profiles found for bundle identifier ..." で落ちたため(2026-08-21)、
+        # App Store Connect APIキー経由で明示的に取得し、不足分は --create で作らせる。
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
 
       - name: Set build number
         # TestFlightの最新ビルド番号+1を採番（重複を防ぐ）
