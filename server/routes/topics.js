@@ -31,26 +31,35 @@ function createTopicsRouter(db) {
     // (2026-08-16、カテゴリボタンの「(11問)」のような表示が気持ち悪いという指摘を受けて追加)。
     const part = category ? Number(req.query.part) : null;
     let topicRows;
+    // カテゴリを明示指定した経路は categories.launched を見ておらず、
+    // /api/topics/random?category=<未公開カテゴリ> を直接叩けば未公開のお題が配信された
+    // (2026-08-22のレビューで発見)。カテゴリ非指定のランダムだけが launched を尊重していた。
+    // 公開範囲の判定は1箇所に揃える。
     if (part === 1) {
       topicRows = db
         .prepare(
-          "SELECT id, question FROM topics WHERE status = 'active' AND category = ? ORDER BY rowid LIMIT 10"
+          `SELECT t.id, t.question FROM topics t
+             JOIN categories c ON c.id = t.category AND c.launched = 1
+             WHERE t.status = 'active' AND t.category = ? ORDER BY t.rowid LIMIT 10`
         )
         .all(category);
     } else if (part === 2) {
       topicRows = db
         .prepare(
           `SELECT id, question FROM (
-             SELECT id, question, rowid FROM topics
-             WHERE status = 'active' AND category = ?
-             ORDER BY rowid LIMIT -1 OFFSET 10
+             SELECT t.id, t.question, t.rowid FROM topics t
+             JOIN categories c ON c.id = t.category AND c.launched = 1
+             WHERE t.status = 'active' AND t.category = ?
+             ORDER BY t.rowid LIMIT -1 OFFSET 10
            ) ORDER BY RANDOM() LIMIT 10`
         )
         .all(category);
     } else if (category) {
       topicRows = db
         .prepare(
-          "SELECT id, question FROM topics WHERE status = 'active' AND category = ? ORDER BY RANDOM() LIMIT ?"
+          `SELECT t.id, t.question FROM topics t
+             JOIN categories c ON c.id = t.category AND c.launched = 1
+             WHERE t.status = 'active' AND t.category = ? ORDER BY RANDOM() LIMIT ?`
         )
         .all(category, count);
     } else {

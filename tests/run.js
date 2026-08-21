@@ -65,6 +65,23 @@ async function main() {
       check(`API ${p} が200を返す`, res.status === 200, `status=${res.status}`);
     }
 
+    // 回帰: 未公開カテゴリ(launched=0)のお題が配信されないこと。
+    // 以前はカテゴリを明示指定した経路がlaunchedを見ておらず、URLを直接叩けば
+    // 未公開のお題が取れた(2026-08-22に発見)。公開カテゴリ側も同時に確認して、
+    // 「常に0件になっただけ」の見せかけの成功を防ぐ。
+    for (const [cat, expectEmpty] of [['home-routine', true], ['leisure', true], ['food', false]]) {
+      for (const q of [`?category=${cat}&part=1`, `?category=${cat}&part=2`, `?category=${cat}&count=10`]) {
+        const res = await fetch(`${BASE}/api/topics/random${q}`);
+        const body = await res.json().catch(() => ({}));
+        const n = (body.topics || []).length;
+        check(
+          `${expectEmpty ? '未公開' : '公開'}カテゴリ ${cat}${q.replace(`?category=${cat}`, '')} が${expectEmpty ? '0件' : '出題される'}`,
+          expectEmpty ? n === 0 : n > 0,
+          `${n}件`
+        );
+      }
+    }
+
     browser = await chromium.launch({ executablePath: CHROMIUM, args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 390, height: 664 } });
     await ctx.addInitScript(PROFILE_SEED);
@@ -98,9 +115,9 @@ async function main() {
     }
     check('ホームの全リンクがアイコンを持つ', n > 0 && withIcon === n, `${withIcon}/${n} : ${names.join(', ')}`);
 
-    // --- 回帰: 1問も答えず離脱しても「挑戦済み」にならない ---
+    // --- 回帰: 1問も答えず離脱しても「回答済」にならない ---
     await toPicker();
-    check('開始前は「挑戦済み」バッジが0個', (await badges()) === 0);
+    check('開始前は「回答済」バッジが0個', (await badges()) === 0);
 
     const firstCat = page.locator('.category-option').first();
     const catName = (await firstCat.innerText()).trim().replace(/\n/g, ' ');
@@ -114,7 +131,7 @@ async function main() {
     await page.evaluate(() => localStorage.removeItem('heibonVote.quizState'));
     await goHome();
     await toPicker();
-    check(`離脱後も「挑戦済み」バッジが0個 (${catName})`, (await badges()) === 0);
+    check(`離脱後も「回答済」バッジが0個 (${catName})`, (await badges()) === 0);
 
     // --- ランダム挑戦はカテゴリを記録しない(markPlayedのガード) ---
     const playedAfter = await page.evaluate(() => localStorage.getItem('heibonVote.playedParts'));
