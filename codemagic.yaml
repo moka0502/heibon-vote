@@ -35,7 +35,10 @@ workflows:
         BUNDLE_ID: "com.moka0502.heibonvote"
         # App Store Connectでアプリ「平凡投票」を作成して付いた数値のApple ID(2026-08-18設定)
         APP_STORE_APPLE_ID: "6802689228"
-      node: 20
+      # Capacitor 8系のCLIは Node >=22 を要求する(2026-08-21: node 20指定で
+      # "The Capacitor CLI requires NodeJS >=22.0.0" によりcap syncが失敗した)。
+      # ローカルのdevcontainerは node 20 のままだが、ios/はCIでのみ生成するため影響しない。
+      node: 22
       xcode: latest
       cocoapods: default
 
