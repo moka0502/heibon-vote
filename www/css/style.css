@@ -50,7 +50,11 @@ body {
 }
 
 .app-header {
-  padding: 24px 20px 8px;
+  /* index.html で viewport-fit=cover を指定しているため、WebViewはステータスバー
+     (時刻・電池表示)の下まで広がる。上の余白にsafe-area-inset-topを足さないと
+     タイトルが時刻表示と重なって読めなくなる(2026-08-22に実機で判明)。
+     bottom/left/rightは対応済みだったが top だけ漏れていた。 */
+  padding: calc(24px + env(safe-area-inset-top)) 20px 8px;
   text-align: center;
 }
 
