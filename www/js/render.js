@@ -940,7 +940,9 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
     );
   }
   wrap.appendChild(el('button', { class: 'btn-link', text: 'ホームに戻る', onclick: onHome }));
-  wrap.appendChild(el('button', { class: 'btn-link', text: '履歴を見る', onclick: onHistory }));
+  // ホーム(renderHome)の同じ「履歴を見る」はアイコン付きなのに、ここだけ無く不統一だった
+  // (2026-08-22の自動監査で検出)。同一ラベル・同一機能なので揃える。
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onHistory }, [icon('history'), '履歴を見る']));
   return wrap;
 }
 

@@ -291,6 +291,10 @@ button {
   text-decoration: underline;
   padding: 12px 0;
   min-height: 44px;
+  /* min-heightだけでは短い文言(「戻る」など)が幅32pxになり、
+     Apple HIGの44x44を下回って押しにくかった(2026-08-22の自動監査で検出)。
+     左右パディングが0のため、幅も明示的に確保する。 */
+  min-width: 44px;
 }
 
 .btn-link .icon {
