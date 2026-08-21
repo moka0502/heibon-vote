@@ -82,6 +82,8 @@ const ICONS = {
     '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3 2.5-5 6-5s6 2 6 5"/></svg>',
   bulb:
     '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-3 9c.6.5 1 1.2 1 2h4c0-.8.4-1.5 1-2a5 5 0 0 0-3-9z"/><path d="M8 17h4"/></svg>',
+  shield:
+    '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.5 4.5 4.8v4.4c0 3.3 2.2 6.1 5.5 7.3 3.3-1.2 5.5-4 5.5-7.3V4.8L10 2.5z"/></svg>',
 };
 
 function icon(name) {
@@ -285,7 +287,10 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
     el('button', { class: 'btn-link', onclick: onSettings }, [icon('person'), 'あなたについての設定'])
   );
   wrap.appendChild(el('button', { class: 'btn-link', onclick: onSuggest }, [icon('bulb'), 'お題を提案する']));
-  wrap.appendChild(el('a', { class: 'btn-link', href: 'privacy.html', text: 'プライバシーポリシー' }));
+  // 他の項目と同じく先頭にアイコンを置く(2026-08-22の実機FB: ここだけアイコンが無く統一感を欠いていた)
+  wrap.appendChild(
+    el('a', { class: 'btn-link', href: 'privacy.html' }, [icon('shield'), 'プライバシーポリシー'])
+  );
   return wrap;
 }
 
