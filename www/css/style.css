@@ -357,8 +357,17 @@ button {
   color: var(--text-muted);
   /* 0.65rem(実測10.4px)は判読しづらいとa11yレビューで指摘、0.75remに引き上げ(2026-08-17)。
      ただし320px幅で5ラベルが詰まるため0.7remに微調整し、両端は内側に寄せて端の余白を確保
-     (2026-08-18、UI指摘)。 */
+     (2026-08-18、UI指摘)。
+     2026-08-22: 実測11.2pxは日本語では小さいとa11y監査で再指摘。ただし0.75rem固定に戻すと
+     320px幅で詰まる問題が再発するため、幅で切り替える。360px以上(iPhone SE以降の実機の大半)
+     だけ0.75remに上げ、それ未満は従来どおり0.7remを維持する。 */
   font-size: 0.7rem;
+}
+
+@media (min-width: 360px) {
+  .tier-meter-labels {
+    font-size: 0.75rem;
+  }
 }
 
 .tier-meter-labels span:first-child {
@@ -762,3 +771,73 @@ input[type='text'] {
     transition: none !important;
   }
 }
+
+/* プライバシーポリシーは機能リンクではなく法務系のフッター項目。
+   同じ大きさ・同じ間隔で並ぶと情報階層が平坦になるため、小さく・薄く・下に離す
+   (2026-08-22、UIレビュー指摘)。 */
+.btn-link-legal {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+.btn-link-legal .icon {
+  opacity: 0.75;
+}
+
+/* クイズ中の片手操作対応(2026-08-22、片手操作レビュー指摘)。
+   選択肢が画面上部(y≈268/332)にあり、親指が届きやすい下半分が空いていた。
+   クイズ画面かどうかは .quiz-progress-track の有無で判別できるので、:has() を使い
+   JS側で状態クラスを管理しない(render→mountの順序で解除と競合するのを避ける)。 */
+body:has(.quiz-progress-track) .app-header {
+  /* クイズ中はタイトル+タグラインで約90px使っていた。1問に集中させるため畳む。 */
+  padding-top: calc(10px + env(safe-area-inset-top));
+  padding-bottom: 0;
+}
+body:has(.quiz-progress-track) .app-header .tagline {
+  display: none;
+}
+body:has(.quiz-progress-track) .app-header h1 {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+/* 選択肢を親指の届く下方へ落とす。
+   当初は質問文の下マージンを足す方式にしたが、ヘッダーを縮めた分と打ち消し合って
+   かえって上に詰まった(2026-08-22に実測)。カード自体を縦に伸ばし、選択肢をカードの
+   下端に寄せる方式に変更する。縦に余裕のある端末でだけ効かせ、小さい端末では従来どおり。 */
+@media (min-height: 600px) {
+  body:has(.quiz-progress-track) .card {
+    display: flex;
+    flex-direction: column;
+    min-height: 62vh;
+  }
+  /* 最初の選択肢より上にすべての余白を集める(=選択肢が下端に寄る)。 */
+  body:has(.quiz-progress-track) .card > .btn:first-of-type {
+    margin-top: auto;
+  }
+}
+
+/* カテゴリ選択: カテゴリ名を1回だけ出し、束(その1/その2)は横並びにする。
+   以前は「食事 その1」「食事 その2」と10行に伸びていた(2026-08-22、UIレビュー指摘)。 */
+.category-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+.category-group-label {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.category-group-parts {
+  display: flex;
+  gap: 8px;
+}
+.category-group-parts .category-option {
+  flex: 1;
+  margin: 0;
+}
+
