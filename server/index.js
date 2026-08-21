@@ -10,7 +10,8 @@ const { createVotesRouter } = require('./routes/votes');
 const { createSessionsRouter } = require('./routes/sessions');
 const { createSuggestionsRouter } = require('./routes/suggestions');
 
-const PORT = 4322;
+// テストを開発サーバー(4322)と衝突させずに別ポートで起動できるようにする。
+const PORT = Number(process.env.PORT) || 4322;
 const db = openDb();
 // dbハンドルを渡してWALをflushしてからバックアップする(単純コピーだとWAL内の最新票が欠落)。
 backupNow(db);

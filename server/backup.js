@@ -1,8 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const DB_PATH = path.join(__dirname, 'data', 'heibon-vote.db');
-const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
+const { DB_PATH, BACKUP_DIR } = require('./paths');
 // 1日1回運用を想定し、2週間分残す(2026-08-16、公開前の既知タスクへの対応)。
 // ホスト側と同じディスク上のバックアップなのでホスト障害には無力だが、
 // 誤操作・バグによるDB破壊にはすぐ戻せる。

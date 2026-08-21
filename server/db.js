@@ -3,7 +3,7 @@ const path = require('node:path');
 const Database = require('better-sqlite3');
 const { seed } = require('./seed');
 
-const DB_PATH = path.join(__dirname, 'data', 'heibon-vote.db');
+const { DB_PATH } = require('./paths');
 const SCHEMA_PATH = path.join(__dirname, 'db', 'schema.sql');
 
 function openDb() {
