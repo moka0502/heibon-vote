@@ -48,7 +48,7 @@ workflows:
 
       - name: Generate & sync iOS project
         # ios/ フォルダはリポジトリに含めず、ビルド時にCapacitorで生成する
-        # （cap add ios はCocoaPods/macOSが要るためCI(mac)で実行）。
+        # （cap add ios はmacOS/Xcodeが要るためCI(mac)で実行）。
         #
         # 以前は `npx cap add ios || true` と書いていたが、これは生成失敗を握りつぶし、
         # 何も出来ていないのに1秒で「成功」扱いのまま後続へ進み、遠く離れた Build IPA で
@@ -59,11 +59,9 @@ workflows:
           set -eux
           npx cap add ios
           npx cap sync ios
-          # .xcworkspace を作るのは CocoaPods。cap sync が pod install を
-          # 走らせなかった場合に備えて明示的に実行する(冪等)。
-          cd ios/App
-          pod install
-          cd -
+          # Capacitor 8 は CocoaPods ではなく Swift Package Manager を使う
+          # (ログに "Writing Package.swift" が出る)。よって Podfile も .xcworkspace も
+          # 生成されない。pod install を呼ぶと "No `Podfile' found" で落ちる(2026-08-21に踏んだ)。
           # 生成物を可視化しておく(次に壊れたとき原因がすぐ分かるように)
           ls -la ios/App
 
@@ -98,7 +96,7 @@ workflows:
       - name: Build IPA
         script: |
           xcode-project build-ipa \
-            --workspace "ios/App/App.xcworkspace" \
+            --project "ios/App/App.xcodeproj" \
             --scheme "App"
 
     artifacts:
