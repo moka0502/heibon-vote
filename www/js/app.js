@@ -226,7 +226,6 @@ async function startQuiz(category, categoryLabel, part) {
   try {
     const profile = getProfile();
     const { topics } = await api.getRandomTopics(QUESTIONS_PER_SESSION, category, part);
-    markPlayed(category, part);
     const fullCategoryLabel = categoryLabel && part ? `${categoryLabel} Part${part}` : categoryLabel;
     // category/part/categoryLabelBase を state に持たせ、結果画面の「もう一度挑戦」で
     // 同じお題種類を即再挑戦できるようにする(2026-08-18、実プレイFB: 毎回カテゴリ選択に戻るのが面倒)。
@@ -301,6 +300,9 @@ async function finishQuiz(state) {
     const voterId = getVoterId();
     const summary = await api.postSession(state.voteIds, voterId);
     clearQuizState();
+    // 「挑戦済み」は完走した時点で記録する。以前はstartQuizで出題を取得した直後に
+    // 記録していたため、1問も答えずに戻っても「挑戦済み」になっていた(2026-08-22の実機FB)。
+    markPlayed(state.category, state.part);
     const [{ votes }, stats] = await Promise.all([
       api.getSession(summary.sessionId, voterId),
       api.getSessionStats(voterId),
