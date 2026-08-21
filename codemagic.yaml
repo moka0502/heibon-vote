@@ -26,9 +26,11 @@ workflows:
       app_store_connect: heibon-vote-asc
 
     environment:
-      ios_signing:
-        distribution_type: app_store          # App Store配布用の署名
-        bundle_identifier: com.moka0502.heibonvote
+      # ios_signing ブロックは意図的に置かない(2026-08-21)。
+      # これを書くとCodemagicがスクリプト実行前の準備段階で「自動署名」を走らせ、
+      # プロファイルが無い時点で "No matching profiles found ..." で即失敗し、
+      # 下の Set up code signing ステップまで到達しない。
+      # APIキー(integrations)経由の手動署名に一本化し、--create で作らせる。
       vars:
         BUNDLE_ID: "com.moka0502.heibonvote"
         # App Store Connectでアプリ「平凡投票」を作成して付いた数値のApple ID(2026-08-18設定)
