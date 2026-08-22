@@ -171,9 +171,36 @@ async function main() {
       }
       check(
         'レート制限(429)は userFacing 付きの日本語で返る',
-        !!limited && limited.userFacing === true && /しばらく|待って/.test(limited.error || ''),
+        !!limited && limited.userFacing === true && /しばらく|少し待って|待って/.test(limited.error || ''),
         limited ? `error=${limited.error} userFacing=${limited.userFacing}` : '429に到達しなかった'
       );
+
+      // 回帰: 送信に失敗しても入力を捨てず、フォームに留まって理由を出し、
+      // ボタンが操作できる状態に戻ること(共通標準「1.5 操作の後始末」)。
+      //
+      // 失敗の作り方はオフライン化にする。レート制限で失敗させようとすると、
+      // Nodeのfetch(::1)とブラウザ(127.0.0.1)でレート制限のバケットが別々になり、
+      // API側で使い切ってもブラウザからの送信は通ってしまう(2026-08-22に踏んだ)。
+      await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+      await page.waitForTimeout(SETTLE_MS);
+      await page.locator('.btn-link', { hasText: '提案' }).first().click();
+      await page.locator('textarea').first().waitFor({ timeout: 10000 });
+      const typed = 'これは失敗時に消えてはいけない長めの提案テキストです。'.repeat(2);
+      await page.locator('textarea').first().fill(typed);
+      await ctx.setOffline(true);
+      await page.locator('button[type=submit]').first().click();
+      await page.waitForTimeout(2500);
+      const stillOnForm = (await page.locator('textarea').count()) > 0;
+      check('送信失敗時にフォームへ留まる(エラー画面へ遷移しない)', stillOnForm);
+      if (stillOnForm) {
+        const kept = await page.locator('textarea').first().inputValue();
+        const shown = await page.locator('p.error').first().innerText().catch(() => '');
+        const disabled = await page.locator('button[type=submit]').first().isDisabled();
+        check('送信失敗時に入力テキストが失われない', kept === typed, `${kept.length}/${typed.length}文字`);
+        check('送信失敗時に理由が画面に出る', shown.trim().length > 0, shown);
+        check('送信失敗後に送信ボタンが押せる状態に戻る', disabled === false, `disabled=${disabled}`);
+      }
+      await ctx.setOffline(false);
     }
 
     await browser.close();

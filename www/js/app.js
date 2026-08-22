@@ -136,13 +136,10 @@ async function showHome() {
 
 function showSuggestionForm() {
   mount(
+    // 送信失敗はフォーム側で受けて入力を残す(mountErrorで画面ごと遷移させない)。
     renderSuggestionForm(async (text) => {
-      try {
-        await api.postSuggestion(text);
-        mount(renderSuggestionThanks(text, showHome), showHome);
-      } catch (err) {
-        mountError(err, showHome, showHome);
-      }
+      await api.postSuggestion(text);
+      mount(renderSuggestionThanks(text, showHome), showHome);
     }, showHome),
     showHome
   );

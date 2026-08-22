@@ -11,7 +11,7 @@ async function request(path, options) {
     res = await fetch(path, { ...options, signal: controller.signal });
   } catch (err) {
     if (err.name === 'AbortError') {
-      throw new Error('通信がタイムアウトしました。通信環境を確認してから、もう一度お試しください。');
+      throw new Error('通信がタイムアウトした。通信環境を確認してから、もう一度試してみよう。');
     }
     throw err;
   } finally {

@@ -50,7 +50,7 @@ app.use((req, res, next) => {
 // 見せてよいものだけを明示する(2026-08-22、カスタマーサポート観点のレビューで発覚)。
 const rateLimitHandler = (req, res) => {
   res.status(429).json({
-    error: 'アクセスが集中しています。しばらく待ってから再度お試しください。',
+    error: 'アクセスが集中している。少し待ってから、もう一度試してみよう。',
     userFacing: true,
   });
 };

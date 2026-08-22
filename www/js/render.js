@@ -166,18 +166,18 @@ export function renderIntro(onNext) {
   card.appendChild(el('h2', { text: '「平凡」は、実はすごい' }));
   card.appendChild(
     el('p', {
-      text: 'このアプリは、二択のお題に答えて「世間の多数派」とどれだけ一致できるかを競うクイズです。10問中、何問"平凡"でいられるか試してみましょう。',
+      text: '2つから選ぶお題に答えて、「世間の多数派」とどれだけ一致できるかを競うクイズ。10問中、何問"平凡"でいられるか試してみよう。',
     })
   );
   card.appendChild(
     el('p', {
-      text: '一致すれば「平凡」、外れれば「平凡じゃない」。どちらも面白い結果です。少数派だったお題ほど、あなたの個性が見えてきます。',
+      text: '一致すれば「平凡」、外れれば「平凡じゃない」。どちらも面白い。少数派だったお題ほど、あなたの個性が見えてくる。',
     })
   );
   card.appendChild(
     el('p', {
       class: 'progress',
-      text: '次に、年代・性別・血液型・利き手を聞きます。これは「A型の人はこう答えがち」のような属性別の傾向を見せるためだけに使い、多数派の判定自体には影響しません。',
+      text: '次に、年代・性別・血液型・利き手を教えてほしい。「A型の人はこう答えがち」のような傾向を見せるためだけに使うもので、多数派の判定には影響しない。',
     })
   );
   card.appendChild(el('button', { class: 'btn btn-primary', text: 'はじめる', onclick: onNext }));
@@ -199,14 +199,14 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
   form.appendChild(
     el('p', {
       class: 'progress',
-      text: '答えたくない項目は空のままでOK。あとでいつでも変更できます。',
+      text: '答えたくない項目は空のままでOK。あとでいつでも変えられる。',
     })
   );
   if (currentValues) {
     form.appendChild(
       el('p', {
         class: 'progress',
-        text: 'ここで変更しても、これまでの挑戦履歴やスコアは変わりません。次回以降の回答に使われます。',
+        text: 'ここで変えても、これまでの挑戦履歴やスコアは変わらない。次回以降の回答に使われる。',
       })
     );
   }
@@ -277,7 +277,7 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
     );
     const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
     if (nextTitleHint) {
-      card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえます)` }));
+      card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえる)` }));
     }
   }
   card.appendChild(el('button', { class: 'btn btn-primary', text: '挑戦する', onclick: onStart }));
@@ -286,7 +286,7 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
     card.appendChild(
       el('p', {
         class: 'progress',
-        text: '年代・血液型などを設定すると、属性別の傾向も見られます(任意・下の「あなたについての設定」から)。',
+        text: '年代・血液型などを設定すると、年代別・血液型別の傾向も見られる(任意・下の「あなたについての設定」から)。',
       })
     );
   }
@@ -332,7 +332,7 @@ export function renderCategoryPicker(categories, { onSelectRandom, onSelectCateg
     card.appendChild(
       el('p', {
         class: 'progress',
-        text: '「その1」「その2」は同じカテゴリ内の別々の10問です(問題は重複しません)。',
+        text: '「その1」「その2」は同じカテゴリ内の別々の10問(問題は重複しない)。',
       })
     );
   }
@@ -369,7 +369,7 @@ export function renderTopicList(topics, { onSelect, onBack }) {
   card.appendChild(
     el('p', {
       class: 'progress',
-      text: '気になるお題を選ぶと、選択肢ごとの割合や年代・血液型などの属性別の傾向が見られます。',
+      text: '気になるお題を選ぶと、選択肢ごとの割合や、年代・血液型ごとの傾向が見られる。',
     })
   );
   // カテゴリごとに折りたたむ(2026-08-18、UI指摘: 全100問フラットで7000px超のスクロールを解消)。
@@ -412,7 +412,7 @@ export function renderTopicBreakdown(
   // 選択肢ごとの全体%は、実データが100件に届いていなくても常に見せる(2026-08-17、
   // マーケレビュー: %まで隠すとローンチ初期は「何も見せない機能」に見える)。
   if (typeof totalVotes === 'number' && totalVotes > 0) {
-    card.appendChild(el('p', { class: 'progress', text: `${totalVotes}件の回答から算出` }));
+    card.appendChild(el('p', { class: 'progress', text: `${totalVotes}件の回答をもとに集計` }));
     const overallBars = [];
     for (const option of topic.options) {
       const pct = percentages[option.id] ?? 0;
@@ -434,14 +434,14 @@ export function renderTopicBreakdown(
   }
 
   // 属性別のクロス集計だけは、サンプルが少ないと誤読を招くため100件ゲートを維持する。
-  card.appendChild(el('h3', { class: 'breakdown-attr-heading', text: '属性別の傾向' }));
+  card.appendChild(el('h3', { class: 'breakdown-attr-heading', text: '年代・血液型ごとの傾向' }));
   if (realVoteCount < breakdownMinRealVotes) {
     // 「N/100件」のテキストだけで十分。ラベルの無い空の進捗バーは宙に浮いて誤読を招くので出さない
     // (2026-08-18、UI指摘)。
     card.appendChild(
       el('p', {
         class: 'progress',
-        text: `属性別の傾向はまだ表示できません(実際の回答 ${realVoteCount} / ${breakdownMinRealVotes}件)。もっとみんなが挑戦すると見られるようになります。`,
+        text: `この傾向はまだ表示できない(実際の回答 ${realVoteCount} / ${breakdownMinRealVotes}件)。もっとみんなが挑戦すると見られるようになる。`,
       })
     );
     wrap.appendChild(card);
@@ -497,7 +497,7 @@ export function renderTopicBreakdown(
       rowsContainer.appendChild(
         el('p', {
           class: 'progress',
-          text: 'この属性ではまだ十分なデータがありません。みんなが挑戦するほど、傾向がくっきり見えてきます。',
+          text: 'ここはまだデータが足りない。みんなが挑戦するほど、傾向がくっきり見えてくる。',
         })
       );
     }
@@ -602,7 +602,7 @@ export function renderQuestionFeedback(
   );
   wrap.appendChild(el('h2', { class: 'question-heading', text: topic.question }));
   if (typeof totalVotes === 'number') {
-    wrap.appendChild(el('p', { class: 'progress', text: `${totalVotes}件の回答から算出` }));
+    wrap.appendChild(el('p', { class: 'progress', text: `${totalVotes}件の回答をもとに集計` }));
   }
 
   // 接戦(2択で両方が同じ整数%に丸まる=50.x/49.xの帯)のときだけ小数第1位で出す。
@@ -851,11 +851,11 @@ function renderShareButton(summary, { primary = false } = {}) {
 // 全段階に一言コピーを添えて、ボリューム層(平凡寄り/バランス派)が素っ気なく終わらないようにする
 // (2026-08-18、マーケ指摘。「平凡=すごい」のコンセプトに沿って、どの段階も肯定的に)。
 function resultFlavorText(tier) {
-  if (tier === '真の平凡') return '実はあなたは、"普通"を体現する才能の持ち主かもしれません。';
-  if (tier === '平凡寄り') return 'みんなと同じを引ける共感力の持ち主。"だいたい多数派"が強みです。';
+  if (tier === '真の平凡') return '実はあなたは、"普通"を体現する才能の持ち主かもしれない。';
+  if (tier === '平凡寄り') return 'みんなと同じを引ける共感力の持ち主。"だいたい多数派"が強み。';
   if (tier === 'バランス派') return '王道もわかりつつ自分の色も混ざる、ちょうどいいバランス感覚。';
-  if (tier === '個性派') return 'ちょっと逆張り、が多め。人と違う視点を持っています。';
-  if (tier === '唯一無二') return '実はあなたは、かなり個性的な選択をする人でした。';
+  if (tier === '個性派') return 'ちょっと逆張り、が多め。人と違う視点を持っている。';
+  if (tier === '唯一無二') return '実はあなたは、かなり個性的な選択をする人だった。';
   return null;
 }
 
@@ -907,7 +907,7 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
         el('p', {
           class: 'progress',
           style: 'text-align:center',
-          text: `これまでの挑戦者${summary.totalSessions}人中、あなたより「共感性が高く、定番を理解し、万人受けする王道」だった人は${summary.moreCommonCount}人でした`,
+          text: `これまでの挑戦者${summary.totalSessions}人のうち、あなたより平凡だったのは${summary.moreCommonCount}人。`,
         })
       );
     } else {
@@ -915,7 +915,7 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
         el('p', {
           class: 'progress',
           style: 'text-align:center',
-          text: `これまで${summary.totalSessions}人が挑戦しています(もう少し集まると、あなたの"平凡順位"も出ます)`,
+          text: `これまで${summary.totalSessions}人が挑戦(もう少し集まると、あなたの"平凡順位"も出る)`,
         })
       );
     }
@@ -937,7 +937,7 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
     );
     const nextTitleHint = nextLifetimeTitleHint(stats.perfectCount);
     if (nextTitleHint) {
-      card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえます)` }));
+      card.appendChild(el('p', { class: 'progress', text: `${nextTitleHint}(満点を重ねると称号がもらえる)` }));
     }
   }
   // シェアを主役に(2026-08-18、マーケ指摘: 拡散が生命線)。もう一度挑戦はアウトライン化。
@@ -978,7 +978,7 @@ export function renderHistoryList(sessions, { onSelect, onBack }) {
     card.appendChild(
       el('p', {
         class: 'progress',
-        text: 'まだ挑戦履歴がありません。最初の10問で、世間の多数派とどれだけ「平凡」でいられるか試してみましょう。',
+        text: 'まだ挑戦履歴がない。最初の10問で、世間の多数派とどれだけ「平凡」でいられるか試してみよう。',
       })
     );
   }
@@ -1032,14 +1032,14 @@ export function renderSuggestionForm(onSubmit, onCancel) {
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: 'お題を提案する' }));
   card.appendChild(
-    el('p', { text: '「こんな二択のお題を入れてほしい」というアイデアを送ってください。' })
+    el('p', { text: '「こんなお題を入れてほしい」というアイデアを送ってほしい。' })
   );
   // 唯一の自由入力欄。ユーザーが本名や連絡先を書くと、こちらが意図せず個人情報を
   // 預かることになるため明示的に注意する(2026-08-22、プライバシー観点のレビュー指摘)。
   card.appendChild(
     el('p', {
       class: 'progress',
-      text: 'お名前・メールアドレス・電話番号などの個人情報は書かないでください。お題のアイデアだけをお送りください。',
+      text: 'お名前・メールアドレス・電話番号などの個人情報は書かないこと。お題のアイデアだけを送ってほしい。',
     })
   );
 
@@ -1051,16 +1051,17 @@ export function renderSuggestionForm(onSubmit, onCancel) {
   });
   textarea.style.width = '100%';
   form.appendChild(textarea);
-  const validationError = el('p', { class: 'error', style: 'display:none', text: '入力してから送ってください。' });
+  const validationError = el('p', { class: 'error', style: 'display:none', text: '入力してから送ろう。' });
   form.appendChild(validationError);
   const submitBtn = el('button', { class: 'btn btn-primary', type: 'submit', text: '送る' });
   form.appendChild(submitBtn);
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (submitBtn.disabled) return;
     const text = textarea.value.trim();
     if (!text) {
+      validationError.textContent = '入力してから送ろう。';
       validationError.style.display = 'block';
       textarea.focus();
       return;
@@ -1069,7 +1070,20 @@ export function renderSuggestionForm(onSubmit, onCancel) {
     // onSubmitはAPI呼び出し完了(サンクス画面への遷移)まで非同期のため、連打・二重タップで
     // 同じ提案が2回送信されてしまう(2026-08-16、「よくあるバグ100項目」チェックで発見)。
     submitBtn.disabled = true;
-    onSubmit(text);
+    const label = submitBtn.textContent;
+    submitBtn.textContent = '送信中…';
+    try {
+      await onSubmit(text);
+    } catch (err) {
+      // 送信に失敗したとき画面ごとエラー画面へ飛ばすと、書いた文章がまるごと消える
+      // (2026-08-22、レート制限に当たったときの実挙動で確認)。フォームに留まって
+      // 理由を出し、入力とボタンを操作できる状態に戻す。
+      validationError.textContent =
+        err && err.userFacing && err.message ? err.message : '送信できなかった。もう一度試してみよう。';
+      validationError.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = label;
+    }
   });
 
   card.appendChild(form);
@@ -1081,11 +1095,11 @@ export function renderSuggestionForm(onSubmit, onCancel) {
 export function renderSuggestionThanks(text, onBack) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
-  card.appendChild(el('h2', { text: 'ありがとうございます!' }));
+  card.appendChild(el('h2', { text: 'ありがとう!' }));
   // 汎用文言だけでなく、実際に送った内容を引用して「ちゃんと届いた」実感を持たせる(T3)。
   const preview = text.length > 40 ? `${text.slice(0, 40)}…` : text;
   card.appendChild(
-    el('p', { text: `「${preview}」、確かに届きました。お題の追加時に参考にさせてもらいます。` })
+    el('p', { text: `「${preview}」、確かに届いた。お題の追加時に参考にさせてもらう。` })
   );
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn btn-primary', text: 'ホームに戻る', onclick: onBack }));
@@ -1094,7 +1108,7 @@ export function renderSuggestionThanks(text, onBack) {
 
 export function renderOffline(onRetry) {
   const wrap = el('div', { class: 'card' });
-  wrap.appendChild(el('p', { class: 'error', text: 'オフラインのようです。通信環境を確認してから、もう一度お試しください。' }));
+  wrap.appendChild(el('p', { class: 'error', text: 'オフラインのようだ。通信環境を確認してから、もう一度試してみよう。' }));
   if (onRetry) wrap.appendChild(el('button', { class: 'btn btn-outline', text: '再読み込み', onclick: onRetry }));
   return wrap;
 }
@@ -1110,7 +1124,7 @@ export function renderError(message, onRetry, userFacing = false) {
   wrap.appendChild(
     el('p', {
       class: 'error',
-      text: userFacing && message ? message : '通信がうまくいきませんでした。もう一度お試しください。',
+      text: userFacing && message ? message : '通信がうまくいかなかった。もう一度試してみよう。',
     })
   );
   if (onRetry) wrap.appendChild(el('button', { class: 'btn btn-outline', text: '再読み込み', onclick: onRetry }));
