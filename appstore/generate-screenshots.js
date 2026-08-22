@@ -21,7 +21,7 @@ const BASE = process.env.BASE_URL || 'http://localhost:4322';
 const CAPTIONS = {
   '01-intro': ['「平凡」は、実はすごい', '世間の多数派と何問一致できる?'],
   '02-category': ['気になるテーマを選ぶ', '10問ぴったりで気軽に挑戦'],
-  '03-question': ['二択に答えるだけ', '難しいことは考えなくていい'],
+  '03-question': ['2つから選ぶだけ', '難しいことは考えなくていい'],
   '04-feedback': ['その場でみんなの答えが出る', '実データにもとづく本物の割合'],
   '05-result': ['あなたの"平凡度"を判定', '満点なら「真の平凡」'],
   '06-breakdown': ['どこで外したかも一目で', '少数派だったお題ほど個性が見える'],
@@ -42,12 +42,21 @@ const shot = async (page, name) => {
   console.log('raw:', name);
 };
 
+// 「食事」の「その2」のように、カテゴリ名と束番号でボタンを指す。
+const pickBundle = (page, categoryLabel, part) =>
+  page
+    .locator('.category-group')
+    .filter({ hasText: categoryLabel })
+    .first()
+    .locator('button.category-option')
+    .nth(part - 1);
+
 const seedProfile = (page) =>
   page.evaluate(() => {
     localStorage.setItem('heibonVote.voterId', 'appstore-shot-0001');
     localStorage.setItem(
       'heibonVote.profile',
-      JSON.stringify({ version: 1, values: { age: '30s', gender: 'male', blood: 'a', hand: 'right' } })
+      JSON.stringify({ version: 1, values: { age: '30s', gender: 'male', blood_type: 'a', handedness: 'right' } })
     );
     localStorage.setItem('heibonVote.playedParts', JSON.stringify(['food:1']));
   });
@@ -94,7 +103,10 @@ async function playQuiz(page, { missIndices = [], onQuestion = null, onFeedback 
   await page.waitForTimeout(800);
   await shot(page, '02-category');
 
-  const start = page.locator('button.category-option').filter({ hasText: '食事 Part2' }).first();
+  // カテゴリ名は .category-group の見出しに移り、ボタンは「その1/その2」だけになった
+  // (2026-08-22のUI変更)。以前は 'food Part2' のテキストで探しており、該当なしのまま
+  // .first() にフォールバックして意図と違うカテゴリを撮っていた。
+  const start = pickBundle(page, '食事', 2);
   await ((await start.count()) ? start : page.locator('button.category-option').first()).click();
   await page.waitForTimeout(1800);
 
@@ -121,7 +133,7 @@ async function playQuiz(page, { missIndices = [], onQuestion = null, onFeedback 
   await page2.waitForTimeout(1200);
   await page2.getByRole('button', { name: '挑戦する' }).click();
   await page2.waitForTimeout(800);
-  const start2 = page2.locator('button.category-option').filter({ hasText: '恋愛 Part1' }).first();
+  const start2 = pickBundle(page2, '恋愛', 1);
   await ((await start2.count()) ? start2 : page2.locator('button.category-option').first()).click();
   await page2.waitForTimeout(1800);
   await playQuiz(page2, { missIndices: [1, 4] });
