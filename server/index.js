@@ -100,6 +100,14 @@ app.use('/api/votes', writeMethodsOnly(writeLimiter));
 app.use('/api/sessions', writeMethodsOnly(writeLimiter));
 app.use('/api/suggestions', suggestionLimiter);
 
+// バージョンの一次情報源は package.json ひとつにする(画面と二重管理しない)。
+// 不具合報告を受けたとき「どのバージョンか」が分からないと調査できないため、
+// アバウト画面がこれを読んで表示する(RELEASE-KIT 2章)。
+const appVersion = require('../package.json').version;
+app.get('/api/version', (req, res) => {
+  res.json({ version: appVersion });
+});
+
 app.use('/api/attributes', createAttributesRouter(db));
 app.use('/api/categories', createCategoriesRouter(db));
 app.use('/api/topics', createTopicsRouter(db));

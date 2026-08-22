@@ -17,6 +17,10 @@ const { chromium } = require('playwright-core');
 const PORT = Number(process.env.TEST_PORT) || 4399;
 const BASE = `http://localhost:${PORT}`;
 const CHROMIUM = process.env.CHROMIUM_PATH || '/usr/bin/chromium';
+// CI(CodemagicのmacOS)には /usr/bin/chromium が無い。ブラウザが無い環境では
+// API側の検査だけを門番として実行し、UI検査はスキップする。
+// 「ブラウザが無いから素通り」ではなく、スキップした事実を出力に残す。
+const HAS_BROWSER = fs.existsSync(CHROMIUM);
 // 起動スプラッシュと画面遷移アニメの分。実測3.5秒で安定していた。
 const SETTLE_MS = 3500;
 
@@ -60,7 +64,7 @@ async function main() {
     }
 
     // --- APIスモーク ---
-    for (const p of ['/', '/privacy.html', '/api/topics', '/api/categories', '/api/attributes']) {
+    for (const p of ['/', '/privacy.html', '/support.html', '/api/topics', '/api/categories', '/api/attributes']) {
       const res = await fetch(BASE + p);
       check(`API ${p} が200を返す`, res.status === 200, `status=${res.status}`);
     }
@@ -91,6 +95,35 @@ async function main() {
         body: JSON.stringify({ text: `種別テスト:${kind}`, kind }),
       });
       check(`提案API ${label} を受理する`, res.status === 201, `status=${res.status}`);
+    }
+
+    if (!HAS_BROWSER) {
+      console.log('');
+      console.log(`[スキップ] ${CHROMIUM} が無いため、UI検査は実行しない(API検査のみで門番とする)`);
+      console.log('  ブラウザのある環境で npm test を実行すると、UIの回帰も含めて検査される');
+      console.log('');
+      const failedApiOnly = results.filter((r) => !r.pass);
+      for (const r of results) {
+        console.log(`  ${r.pass ? '[OK]' : '[NG]'} ${r.name}${r.detail ? ` -- ${r.detail}` : ''}`);
+      }
+      console.log('');
+      console.log(`API検査 ${results.length}件中 ${results.length - failedApiOnly.length}件 成功 / ${failedApiOnly.length}件 失敗`);
+      if (server) server.kill('SIGTERM');
+      await new Promise((r) => setTimeout(r, 500));
+      fs.rmSync(dataDir, { recursive: true, force: true });
+      process.exit(failedApiOnly.length ? 1 : 0);
+    }
+
+    // 回帰: バージョンの一次情報源は package.json ひとつであること(画面と二重管理しない)。
+    {
+      const pkg = require(path.join(__dirname, '..', 'package.json')).version;
+      const res = await fetch(`${BASE}/api/version`);
+      const body = await res.json().catch(() => ({}));
+      check(
+        '/api/version が package.json の version と一致する',
+        res.status === 200 && body.version === pkg,
+        `api=${body.version} / package.json=${pkg}`
+      );
     }
 
     browser = await chromium.launch({ executablePath: CHROMIUM, args: ['--no-sandbox'] });
@@ -147,6 +180,16 @@ async function main() {
     // --- ランダム挑戦はカテゴリを記録しない(markPlayedのガード) ---
     const playedAfter = await page.evaluate(() => localStorage.getItem('heibonVote.playedParts'));
     check('ランダム/離脱を経ても playedParts が空のまま', !playedAfter || playedAfter === '[]', `値=${playedAfter}`);
+
+    // 回帰: アバウト画面にバージョンが出ること(不具合報告時にこれが分からないと調査できない)
+    await goHome();
+    await page.locator('.btn-link', { hasText: 'このアプリについて' }).first().click();
+    await page.waitForTimeout(2000);
+    {
+      const pkg = require(path.join(__dirname, '..', 'package.json')).version;
+      const shown = await page.locator('.about-version').first().innerText().catch(() => '');
+      check('アバウト画面に package.json のバージョンが表示される', shown.includes(pkg), `表示="${shown}" 期待="${pkg}"`);
+    }
 
     check('JSエラーが発生していない', pageErrors.length === 0, pageErrors.slice(0, 3).join(' / '));
 

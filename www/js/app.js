@@ -24,6 +24,7 @@ import {
   renderTopicBreakdown,
   renderQuestionFeedback,
   renderSuggestionForm,
+  renderAbout,
   renderSuggestionThanks,
   renderError,
   renderOffline,
@@ -126,12 +127,25 @@ async function showHome() {
         onTopics: showTopics,
         onSettings: showSettings,
         onSuggest: showSuggestionForm,
+        onAbout: showAbout,
         profileEmpty: Object.keys(getProfile() ?? {}).length === 0,
       })
     );
   } catch (err) {
     mountError(err, showHome);
   }
+}
+
+async function showAbout() {
+  showLoading();
+  let version = null;
+  try {
+    ({ version } = await api.getVersion());
+  } catch (err) {
+    // バージョンが取れなくても画面自体は出す(リンクとライセンス表記に価値があるため)。
+    console.error('version fetch failed:', err);
+  }
+  mount(renderAbout(version, { onBack: showHome }), showHome);
 }
 
 function showSuggestionForm() {

@@ -29,6 +29,7 @@ async function request(path, options) {
 }
 
 export const api = {
+  getVersion: () => request('/api/version'),
   getAttributes: () => request('/api/attributes'),
   getCategories: () => request('/api/categories'),
   getRandomTopics: (count, category, part) =>

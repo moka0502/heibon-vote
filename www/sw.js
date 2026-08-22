@@ -1,4 +1,4 @@
-const CACHE_NAME = 'heibon-vote-shell-v20';
+const CACHE_NAME = 'heibon-vote-shell-v21';
 const SHELL_ASSETS = [
   './',
   'index.html',

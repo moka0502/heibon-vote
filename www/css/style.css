@@ -25,9 +25,25 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  /* 100vh はiOS Safariのアドレスバーの分だけ実際の表示領域より大きくなり、下端が隠れる。
+     dvh(動的ビューポート)を使う(RELEASE-KIT 3章)。非対応環境向けに100vhを先に置く。 */
   min-height: 100vh;
+  min-height: 100dvh;
   overscroll-behavior-y: contain;
   overflow-x: hidden;
+  /* Webをそのまま包んだ見た目にしないための最低限(RELEASE-KIT 3章)。
+     タップ時の青いハイライト・ダブルタップズーム・意図しない範囲選択を止める。 */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 入力欄だけは選択・コピーができないと不便なので戻す。 */
+textarea,
+input {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* JS読み込み完了までの一瞬の白画面を防ぐスプラッシュ(Native#9)。アイコン(www/icons/)と

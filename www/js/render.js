@@ -82,6 +82,8 @@ const ICONS = {
     '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3 2.5-5 6-5s6 2 6 5"/></svg>',
   bulb:
     '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-3 9c.6.5 1 1.2 1 2h4c0-.8.4-1.5 1-2a5 5 0 0 0-3-9z"/><path d="M8 17h4"/></svg>',
+  info:
+    '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v4.5"/><circle cx="10" cy="6.4" r="0.5" fill="currentColor"/></svg>',
   shield:
     '<svg viewBox="0 0 20 20" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.5 4.5 4.8v4.4c0 3.3 2.2 6.1 5.5 7.3 3.3-1.2 5.5-4 5.5-7.3V4.8L10 2.5z"/></svg>',
   home:
@@ -257,7 +259,7 @@ export function renderProfileForm(attributes, onSubmit, options = {}) {
   return wrap;
 }
 
-export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, onSuggest, profileEmpty }) {
+export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, onSuggest, onAbout, profileEmpty }) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: 'あなたは何問、多数派?' }));
@@ -299,10 +301,46 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
     el('button', { class: 'btn-link', onclick: onSettings }, [icon('person'), 'あなたについての設定'])
   );
   wrap.appendChild(el('button', { class: 'btn-link', onclick: onSuggest }, [icon('bulb'), 'お題の提案・不具合の報告']));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onAbout }, [icon('info'), 'このアプリについて']));
   // 他の項目と同じく先頭にアイコンを置く(2026-08-22の実機FB: ここだけアイコンが無く統一感を欠いていた)
   wrap.appendChild(
     el('a', { class: 'btn-link btn-link-legal', href: 'privacy.html' }, [icon('shield'), 'プライバシーポリシー'])
   );
+  return wrap;
+}
+
+// バージョン・リンク・同梱ライブラリを1箇所にまとめた画面。
+// 不具合報告を受けたとき「どのバージョンか」が分からないと調査できない(RELEASE-KIT 2章)。
+// バージョンの一次情報源は package.json で、/api/version 経由で受け取る。
+export function renderAbout(version, { onBack }) {
+  const wrap = el('div');
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('h2', { text: 'このアプリについて' }));
+  card.appendChild(el('p', { text: '平凡投票 — 世間の多数派とどれだけ一致できるか試す、二択のクイズ。' }));
+  card.appendChild(
+    el('p', { class: 'progress about-version', text: `バージョン ${version ?? '取得できなかった'}` })
+  );
+  card.appendChild(
+    el('p', {
+      class: 'progress',
+      text: '不具合の報告をもらうときは、このバージョンを一緒に教えてもらえると調べやすい。',
+    })
+  );
+  wrap.appendChild(card);
+
+  const links = el('div', { class: 'card' });
+  links.appendChild(el('h2', { text: 'リンク' }));
+  links.appendChild(el('a', { class: 'btn-link', href: 'privacy.html' }, [icon('shield'), 'プライバシーポリシー']));
+  links.appendChild(el('a', { class: 'btn-link', href: 'support.html' }, [icon('bulb'), 'よくある質問']));
+  wrap.appendChild(links);
+
+  const lib = el('div', { class: 'card' });
+  lib.appendChild(el('h2', { text: '同梱しているもの' }));
+  lib.appendChild(el('p', { class: 'progress', text: 'GSAP (GreenSock) — 画面の演出に使用' }));
+  lib.appendChild(el('p', { class: 'progress', text: 'Capacitor — iOSアプリとして動かすための土台' }));
+  wrap.appendChild(lib);
+
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onBack }, [icon('home'), 'ホームに戻る']));
   return wrap;
 }
 
