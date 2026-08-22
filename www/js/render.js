@@ -879,7 +879,7 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   // カテゴリを選んで挑戦した場合だけ、そのカテゴリ名を振り返りとして添える(CX#17)。
   if (summary.categoryLabel) {
     card.appendChild(
-      el('p', { class: 'progress', style: 'text-align:center', text: `「${summary.categoryLabel}」のお題に挑戦しました` })
+      el('p', { class: 'progress', style: 'text-align:center', text: `「${summary.categoryLabel}」のお題に回答しました` })
     );
   }
   card.appendChild(
@@ -945,7 +945,7 @@ export function renderResult(summary, detailVotes, stats, { onHome, onHistory, o
   // 内訳は初期折りたたみ(2026-08-18、UI指摘: スコア/メーター/シェアCTAが縦長に埋もれるのを解消)。
   const detailCard = el('div', { class: 'card' });
   const details = el('details', { class: 'breakdown-accordion' });
-  details.appendChild(el('summary', { text: 'くわしい内訳を見る' }));
+  details.appendChild(el('summary', { text: '1問ずつの結果を見る' }));
   for (const vote of detailVotes) {
     details.appendChild(renderVoteBreakdownRow(vote));
   }
@@ -1011,7 +1011,7 @@ export function renderHistoryDetail(session, votes, onBack) {
   // 内訳は結果画面と同様に初期折りたたみ(縦長解消)。
   const detailCard = el('div', { class: 'card' });
   const details = el('details', { class: 'breakdown-accordion' });
-  details.appendChild(el('summary', { text: 'くわしい内訳を見る' }));
+  details.appendChild(el('summary', { text: '1問ずつの結果を見る' }));
   for (const vote of votes) {
     details.appendChild(renderVoteBreakdownRow(vote));
   }
