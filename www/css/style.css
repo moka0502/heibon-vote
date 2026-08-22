@@ -54,8 +54,13 @@ input {
   inset: 0;
   z-index: 9999;
   display: flex;
+  /* アイコン・ネイティブのスプラッシュと同じ縦書き「平凡」に揃える(2026-08-23)。
+     アイコンだけ2文字で起動画面が1文字だと、タップした直後に別物に見える。 */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.25em;
+  line-height: 0.8;
   background: var(--accent);
 }
 
