@@ -1,7 +1,7 @@
 {
   "name": "heibon-vote",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "真の平凡投票アプリ(属性別集計)",
   "scripts": {
     "dev": "node server/index.js",
