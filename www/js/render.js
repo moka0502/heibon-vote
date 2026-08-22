@@ -298,7 +298,7 @@ export function renderHome(stats, { onStart, onHistory, onTopics, onSettings, on
   wrap.appendChild(
     el('button', { class: 'btn-link', onclick: onSettings }, [icon('person'), 'あなたについての設定'])
   );
-  wrap.appendChild(el('button', { class: 'btn-link', onclick: onSuggest }, [icon('bulb'), 'お題を提案する']));
+  wrap.appendChild(el('button', { class: 'btn-link', onclick: onSuggest }, [icon('bulb'), 'お題の提案・不具合の報告']));
   // 他の項目と同じく先頭にアイコンを置く(2026-08-22の実機FB: ここだけアイコンが無く統一感を欠いていた)
   wrap.appendChild(
     el('a', { class: 'btn-link btn-link-legal', href: 'privacy.html' }, [icon('shield'), 'プライバシーポリシー'])
@@ -1030,16 +1030,53 @@ export function renderHistoryDetail(session, votes, onBack) {
 export function renderSuggestionForm(onSubmit, onCancel) {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
-  card.appendChild(el('h2', { text: 'お題を提案する' }));
-  card.appendChild(
-    el('p', { text: '「こんなお題を入れてほしい」というアイデアを送ってほしい。' })
-  );
+  card.appendChild(el('h2', { text: 'お題の提案・不具合の報告' }));
+  // 以前は「お題のアイデア」専用で、不具合を見つけた人の行き場が無かった
+  // (2026-08-22、カスタマーサポート観点のレビュー指摘)。種別を選べるようにする。
+  const KINDS = [
+    {
+      id: 'idea',
+      label: 'お題のアイデア',
+      lead: '「こんなお題を入れてほしい」というアイデアを送ってほしい。',
+      placeholder: '例: エスカレーターで歩く派? 立ち止まる派?',
+    },
+    {
+      id: 'bug',
+      label: '不具合の報告',
+      lead: 'うまく動かなかったところを教えてほしい。どの画面で何をしたときか書いてあると助かる。',
+      placeholder: '例: 結果画面でシェアを押しても何も起きなかった',
+    },
+  ];
+  let selectedKind = KINDS[0];
+
+  const kindRow = el('div', { class: 'kind-row' });
+  const kindButtons = [];
+  const lead = el('p', { text: selectedKind.lead });
+
+  for (const kind of KINDS) {
+    const btn = el('button', {
+      type: 'button',
+      class: `btn btn-outline kind-option${kind.id === selectedKind.id ? ' is-selected' : ''}`,
+      text: kind.label,
+    });
+    btn.addEventListener('click', () => {
+      selectedKind = kind;
+      for (const b of kindButtons) b.classList.remove('is-selected');
+      btn.classList.add('is-selected');
+      lead.textContent = kind.lead;
+      textarea.placeholder = kind.placeholder;
+    });
+    kindButtons.push(btn);
+    kindRow.appendChild(btn);
+  }
+  card.appendChild(kindRow);
+  card.appendChild(lead);
   // 唯一の自由入力欄。ユーザーが本名や連絡先を書くと、こちらが意図せず個人情報を
   // 預かることになるため明示的に注意する(2026-08-22、プライバシー観点のレビュー指摘)。
   card.appendChild(
     el('p', {
       class: 'progress',
-      text: 'お名前・メールアドレス・電話番号などの個人情報は書かないこと。お題のアイデアだけを送ってほしい。',
+      text: 'お名前・メールアドレス・電話番号などの個人情報は書かないこと。',
     })
   );
 
@@ -1047,7 +1084,7 @@ export function renderSuggestionForm(onSubmit, onCancel) {
   const textarea = el('textarea', {
     rows: '4',
     maxlength: '500',
-    placeholder: '例: エスカレーターで歩く派? 立ち止まる派?',
+    placeholder: selectedKind.placeholder,
   });
   textarea.style.width = '100%';
   form.appendChild(textarea);
@@ -1073,7 +1110,7 @@ export function renderSuggestionForm(onSubmit, onCancel) {
     const label = submitBtn.textContent;
     submitBtn.textContent = '送信中…';
     try {
-      await onSubmit(text);
+      await onSubmit(text, selectedKind.id);
     } catch (err) {
       // 送信に失敗したとき画面ごとエラー画面へ飛ばすと、書いた文章がまるごと消える
       // (2026-08-22、レート制限に当たったときの実挙動で確認)。フォームに留まって
@@ -1092,15 +1129,15 @@ export function renderSuggestionForm(onSubmit, onCancel) {
   return wrap;
 }
 
-export function renderSuggestionThanks(text, onBack) {
+export function renderSuggestionThanks(text, onBack, kind = 'idea') {
   const wrap = el('div');
   const card = el('div', { class: 'card' });
   card.appendChild(el('h2', { text: 'ありがとう!' }));
   // 汎用文言だけでなく、実際に送った内容を引用して「ちゃんと届いた」実感を持たせる(T3)。
   const preview = text.length > 40 ? `${text.slice(0, 40)}…` : text;
-  card.appendChild(
-    el('p', { text: `「${preview}」、確かに届いた。お題の追加時に参考にさせてもらう。` })
-  );
+  const followUp =
+    kind === 'bug' ? '内容を確認して直していく。' : 'お題の追加時に参考にさせてもらう。';
+  card.appendChild(el('p', { text: `「${preview}」、確かに届いた。${followUp}` }));
   wrap.appendChild(card);
   wrap.appendChild(el('button', { class: 'btn btn-primary', text: 'ホームに戻る', onclick: onBack }));
   return wrap;

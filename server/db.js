@@ -39,6 +39,13 @@ function migrate(db) {
     db.exec('ALTER TABLE quiz_sessions ADD COLUMN voter_id TEXT');
   }
 
+  const suggestionColumns = db.prepare('PRAGMA table_info(suggestions)').all();
+  const hasKind = suggestionColumns.some((col) => col.name === 'kind');
+  if (!hasKind) {
+    // 既存行はすべて「お題のアイデア」として送られたものなので 'idea' が正しい既定値
+    db.exec("ALTER TABLE suggestions ADD COLUMN kind TEXT NOT NULL DEFAULT 'idea'");
+  }
+
   const categoryColumns = db.prepare('PRAGMA table_info(categories)').all();
   const hasLaunched = categoryColumns.some((col) => col.name === 'launched');
   if (!hasLaunched) {

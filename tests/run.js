@@ -82,6 +82,17 @@ async function main() {
       }
     }
 
+    // 回帰: お題の提案と不具合の報告を種別で送り分けられること(2026-08-22追加)。
+    // レート制限(60秒5回)を使い切る前に投げる。保存結果は最後にDBで確認する。
+    for (const [kind, label] of [['idea', 'お題のアイデア'], ['bug', '不具合の報告'], ['ぜんぜん違う値', '未知の種別']]) {
+      const res = await fetch(`${BASE}/api/suggestions`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: `種別テスト:${kind}`, kind }),
+      });
+      check(`提案API ${label} を受理する`, res.status === 201, `status=${res.status}`);
+    }
+
     browser = await chromium.launch({ executablePath: CHROMIUM, args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 390, height: 664 } });
     await ctx.addInitScript(PROFILE_SEED);
@@ -208,8 +219,22 @@ async function main() {
   } finally {
     if (browser) await browser.close().catch(() => {});
     if (server) server.kill('SIGTERM');
+    await new Promise((r) => setTimeout(r, 800));
+    // 種別が実際に保存されているか、未知の値が既定へ倒れているかをDBで確認する
+    try {
+      const Database = require('better-sqlite3');
+      const db = new Database(path.join(dataDir, 'heibon-vote.db'), { readonly: true });
+      const rows = db.prepare("SELECT kind, text FROM suggestions WHERE text LIKE '種別テスト:%'").all();
+      db.close();
+      const kindOf = (suffix) => (rows.find((r) => r.text.endsWith(suffix)) || {}).kind;
+      check('種別 idea が保存される', kindOf('idea') === 'idea', `kind=${kindOf('idea')}`);
+      check('種別 bug が保存される', kindOf('bug') === 'bug', `kind=${kindOf('bug')}`);
+      check('未知の種別は idea に倒れる', kindOf('ぜんぜん違う値') === 'idea', `kind=${kindOf('ぜんぜん違う値')}`);
+    } catch (e) {
+      check('提案の種別をDBで確認できる', false, e.message);
+    }
     // 後片付け: 使い捨てDBを消し、消えたことを確認する
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 200));
     fs.rmSync(dataDir, { recursive: true, force: true });
     check('使い捨てデータディレクトリを削除した', !fs.existsSync(dataDir), dataDir);
   }

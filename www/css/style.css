@@ -841,3 +841,22 @@ body:has(.quiz-progress-track) .app-header h1 {
   margin: 0;
 }
 
+/* 提案フォームの種別選択(お題のアイデア / 不具合の報告)。
+   以前はお題のアイデア専用で、不具合を見つけた人の行き場が無かった
+   (2026-08-22、カスタマーサポート観点のレビュー指摘)。 */
+.kind-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.kind-row .kind-option {
+  flex: 1;
+  margin: 0;
+  font-size: 0.92rem;
+}
+.kind-row .kind-option.is-selected {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+}
+

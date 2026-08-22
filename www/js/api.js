@@ -53,10 +53,10 @@ export const api = {
   getSession: (id, voterId) =>
     request(`/api/sessions/${id}${voterId ? `?voterId=${encodeURIComponent(voterId)}` : ''}`),
   getSessionStats: (voterId) => request(`/api/sessions/stats?voterId=${encodeURIComponent(voterId)}`),
-  postSuggestion: (text) =>
+  postSuggestion: (text, kind = 'idea') =>
     request('/api/suggestions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, kind }),
     }),
 };

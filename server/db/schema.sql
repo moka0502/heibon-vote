@@ -75,5 +75,8 @@ CREATE INDEX IF NOT EXISTS idx_votes_topic_voter ON votes(topic_id, voter_id);
 CREATE TABLE IF NOT EXISTS suggestions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   text TEXT NOT NULL,
+  -- 'idea' = お題のアイデア / 'bug' = 不具合の報告。
+  -- 以前は用途がお題のアイデアだけで、不具合報告の行き場が無かった(2026-08-22のFB)。
+  kind TEXT NOT NULL DEFAULT 'idea',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
