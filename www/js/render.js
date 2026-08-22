@@ -805,14 +805,19 @@ function renderShareButton(summary, { primary = false } = {}) {
     // コピーごと止まり、ボタンの見た目も無反応のまま何も起きていないように見えていた)。
     let downloadOk = false;
     if (file) {
+      // revokeObjectURL が a.click() の後ろにあると、click() が例外を投げた場合に
+      // 解放されずリークする(この関数はまさに a.click() が投げうる前提で書かれている)。
+      // finally で必ず解放する(2026-08-22、リーク観点のレビューで発見)。
+      let url = null;
       try {
-        const url = URL.createObjectURL(file);
+        url = URL.createObjectURL(file);
         const a = el('a', { href: url, download: file.name });
         a.click();
-        URL.revokeObjectURL(url);
         downloadOk = true;
       } catch (err) {
         console.error('share image download failed:', err);
+      } finally {
+        if (url) URL.revokeObjectURL(url);
       }
     }
     let copyOk = false;
