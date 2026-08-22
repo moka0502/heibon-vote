@@ -68,3 +68,32 @@ export function markPlayed(category, part) {
   set.add(key);
   localStorage.setItem(PLAYED_PARTS_KEY, JSON.stringify([...set]));
 }
+
+// レビュー依頼(App Storeの★)の出し分けに使う記録。
+// Appleは1年に3回までしかレビューダイアログを表示しないため、条件を絞って
+// 「良い体験の直後」だけに寄せる(RELEASE-KIT 2章)。判定は端末単位で完結させる
+// (レビュー依頼の表示制限自体が端末単位のため、サーバーに置く意味がない)。
+const PLAY_COUNT_KEY = 'heibonVote.playCount';
+const REVIEW_ASKED_AT_KEY = 'heibonVote.reviewAskedAt';
+
+// 完走(結果画面に到達)した回数。満点回数(サーバー側のperfectCount)とは別物。
+export function getPlayCount() {
+  const raw = Number(localStorage.getItem(PLAY_COUNT_KEY));
+  return Number.isFinite(raw) && raw > 0 ? raw : 0;
+}
+
+export function incrementPlayCount() {
+  const next = getPlayCount() + 1;
+  localStorage.setItem(PLAY_COUNT_KEY, String(next));
+  return next;
+}
+
+export function getReviewAskedAt() {
+  const raw = Number(localStorage.getItem(REVIEW_ASKED_AT_KEY));
+  return Number.isFinite(raw) && raw > 0 ? raw : null;
+}
+
+export function markReviewAsked(now = Date.now()) {
+  localStorage.setItem(REVIEW_ASKED_AT_KEY, String(now));
+}
+

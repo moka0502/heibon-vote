@@ -8,9 +8,13 @@ import {
   clearQuizState,
   getPlayedParts,
   markPlayed,
+  getPlayCount,
+  incrementPlayCount,
+  getReviewAskedAt,
+  markReviewAsked,
 } from './storage.js';
 import { playResultReveal } from './effects.js';
-import { initStatusBar, hapticSuccess } from './native.js';
+import { initStatusBar, hapticSuccess, requestReview, shouldRequestReview } from './native.js';
 import {
   renderIntro,
   renderProfileForm,
@@ -317,6 +321,7 @@ async function finishQuiz(state) {
     // 「回答済」は完走した時点で記録する。以前はstartQuizで出題を取得した直後に
     // 記録していたため、1問も答えずに戻っても「回答済」になっていた(2026-08-22の実機FB)。
     markPlayed(state.category, state.part);
+    const playCount = incrementPlayCount();
     const [{ votes }, stats] = await Promise.all([
       api.getSession(summary.sessionId, voterId),
       api.getSessionStats(voterId),
@@ -333,6 +338,22 @@ async function finishQuiz(state) {
       showHome
     );
     playResultReveal(appEl, summary);
+    // 良い結果を見せきってから、条件を満たしたときだけレビューを依頼する。
+    // 結果の演出に被せると「何が起きたか分からないうちにダイアログが出る」体験になる。
+    if (shouldRequestReview({
+      matchCount: summary.matchCount,
+      totalCount: summary.totalCount,
+      playCount,
+      lastAskedAt: getReviewAskedAt(),
+    })) {
+      setTimeout(async () => {
+        // 依頼した事実は、実際に表示できたかに関わらず記録する。
+        // Appleは年3回の上限を超えると黙って出さないため、成否で分岐すると
+        // 上限に達した端末へ毎回投げ続けることになる。
+        markReviewAsked();
+        await requestReview();
+      }, 2600);
+    }
     // ネイティブでは結果表示の瞬間に成功の触覚フィードバック(Web/PWAではno-op)。
     hapticSuccess();
   } catch (err) {

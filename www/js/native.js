@@ -46,3 +46,33 @@ export async function initStatusBar() {
     await C.Plugins.StatusBar.setBackgroundColor?.({ color: '#faf9f7' });
   } catch (_) {}
 }
+
+// App Storeのレビュー依頼ダイアログ。Web/PWAでは何もしない。
+// プラグインはimportせず window.Capacitor.Plugins 経由で呼ぶ(バンドラなし構成のため)。
+export async function requestReview() {
+  const C = native();
+  if (!C || !C.Plugins.InAppReview) return false;
+  try {
+    await C.Plugins.InAppReview.requestReview();
+    return true;
+  } catch (err) {
+    // 表示できなくても体験を止めない(Appleは年3回の上限を超えると黙って出さない)。
+    console.error('in-app review request failed:', err);
+    return false;
+  }
+}
+
+// レビュー依頼を出してよいかの判定。「良い体験の直後」に絞る(RELEASE-KIT 2章)。
+// 起動直後や、うまくいかなかった直後に出すのは最悪手。
+export const REVIEW_MIN_SCORE_RATIO = 0.8; // 10問中8問以上一致
+export const REVIEW_MIN_PLAYS = 3;         // 通算3回以上完走している
+export const REVIEW_COOLDOWN_DAYS = 90;    // 前回の依頼から90日以上
+
+export function shouldRequestReview({ matchCount, totalCount, playCount, lastAskedAt, now = Date.now() }) {
+  if (!totalCount) return false;
+  if (matchCount / totalCount < REVIEW_MIN_SCORE_RATIO) return false;
+  if (playCount < REVIEW_MIN_PLAYS) return false;
+  if (lastAskedAt && now - lastAskedAt < REVIEW_COOLDOWN_DAYS * 24 * 60 * 60 * 1000) return false;
+  return true;
+}
+

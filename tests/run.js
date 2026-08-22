@@ -114,6 +114,31 @@ async function main() {
       process.exit(failedApiOnly.length ? 1 : 0);
     }
 
+    // ユニット: レビュー依頼の出し分け(純粋ロジックの境界値)。
+    // Appleは年3回しか表示しないため、条件を1つでも緩めると無駄撃ちになる。
+    {
+      const { pathToFileURL } = require('node:url');
+      const mod = await import(pathToFileURL(path.join(__dirname, '..', 'www', 'js', 'native.js')).href);
+      const { shouldRequestReview, REVIEW_COOLDOWN_DAYS } = mod;
+      const DAY = 24 * 60 * 60 * 1000;
+      const now = Date.UTC(2026, 7, 23);
+      const base = { matchCount: 8, totalCount: 10, playCount: 3, lastAskedAt: null, now };
+      const cases = [
+        ['条件を全て満たす → 出す', { ...base }, true],
+        ['スコア8/10(閾値ちょうど) → 出す', { ...base, matchCount: 8 }, true],
+        ['スコア7/10(閾値未満) → 出さない', { ...base, matchCount: 7 }, false],
+        ['満点 → 出す', { ...base, matchCount: 10 }, true],
+        ['通算3回(閾値ちょうど) → 出す', { ...base, playCount: 3 }, true],
+        ['通算2回(閾値未満) → 出さない', { ...base, playCount: 2 }, false],
+        [`前回から${REVIEW_COOLDOWN_DAYS}日ちょうど → 出す`, { ...base, lastAskedAt: now - REVIEW_COOLDOWN_DAYS * DAY }, true],
+        [`前回から${REVIEW_COOLDOWN_DAYS - 1}日 → 出さない`, { ...base, lastAskedAt: now - (REVIEW_COOLDOWN_DAYS - 1) * DAY }, false],
+        ['0問(異常値) → 出さない', { ...base, totalCount: 0 }, false],
+      ];
+      for (const [name, arg, expected] of cases) {
+        check(`レビュー依頼: ${name}`, shouldRequestReview(arg) === expected, `結果=${shouldRequestReview(arg)}`);
+      }
+    }
+
     // 回帰: バージョンの一次情報源は package.json ひとつであること(画面と二重管理しない)。
     {
       const pkg = require(path.join(__dirname, '..', 'package.json')).version;
