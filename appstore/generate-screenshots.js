@@ -1,5 +1,5 @@
 // App Store 提出用スクリーンショット生成
-//  - raw/    : 実機ピクセル等倍のアプリ画面 (1290x2796 = 6.9インチ iPhone / 提出必須サイズ)
+//  - raw/    : 実機ピクセル等倍のアプリ画面 (1320x2868 = 6.9インチ iPhone / 提出必須サイズ)
 //  - framed/ : 上記にキャッチコピーを添えた App Store 掲載用(同サイズ)
 //
 // 使い方(devcontainer / Linux):
@@ -8,7 +8,9 @@
 //   3) `node appstore/generate-screenshots.js`
 //      ※ chromium のパスは CHROMIUM_PATH で上書きできる(既定は /usr/bin/chromium)
 //
-// CSS 430x932 を deviceScaleFactor 3 で撮ると 1290x2796 ちょうどになる。
+// CSS 440x956(iPhone 16 Pro Maxのポイント数) を deviceScaleFactor 3 で撮ると
+// 1320x2868 ちょうどになる。以前は 430x932→1290x2796(6.7インチ相当)で、
+// 6.9インチの必須サイズと食い違っていた(2026-08-23、RELEASE-KITとの照合で判明)。
 const { chromium } = require('playwright-core');
 const fs = require('fs');
 const path = require('path');
@@ -29,7 +31,7 @@ const CAPTIONS = {
 
 const newPhone = async (browser) =>
   browser.newContext({
-    viewport: { width: 430, height: 932 },
+    viewport: { width: 440, height: 956 },
     deviceScaleFactor: 3,
     locale: 'ja-JP',
     isMobile: true,
@@ -153,7 +155,7 @@ async function playQuiz(page, { missIndices = [], onQuestion = null, onFeedback 
   await ctx2.close();
 
   // ===== キャプション付きフレーム版を生成 =====
-  const ctx3 = await browser.newContext({ viewport: { width: 1290, height: 2796 }, deviceScaleFactor: 1 });
+  const ctx3 = await browser.newContext({ viewport: { width: 1320, height: 2868 }, deviceScaleFactor: 1 });
   const framePage = await ctx3.newPage();
   for (const [name, [title, sub]] of Object.entries(CAPTIONS)) {
     const src = path.join(RAW, `${name}.png`);
@@ -163,7 +165,7 @@ async function playQuiz(page, { missIndices = [], onQuestion = null, onFeedback 
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    width:1290px; height:2796px; overflow:hidden;
+    width:1320px; height:2868px; overflow:hidden;
     background:linear-gradient(165deg,#6b6bdd 0%,#5b5bd6 45%,#4a4ab5 100%);
     font-family:"Noto Sans CJK JP","Noto Sans JP",sans-serif;
     display:flex; flex-direction:column; align-items:center;
