@@ -53,6 +53,12 @@ workflows:
       - name: Install JS dependencies
         script: npm ci
 
+      - name: テスト(壊れたまま審査に出さないための門番)
+        # CIのmacOSには /usr/bin/chromium が無いため、tests/run.js はUI検査をスキップし
+        # API検査だけを実行する(スキップした事実はログに出る)。
+        # ここで落ちればビルドは走らない。
+        script: npm test
+
       - name: Generate & sync iOS project
         # ios/ フォルダはリポジトリに含めず、ビルド時にCapacitorで生成する
         # （cap add ios はmacOS/Xcodeが要るためCI(mac)で実行）。
@@ -71,6 +77,16 @@ workflows:
           # 生成されない。pod install を呼ぶと "No `Podfile' found" で落ちる(2026-08-21に踏んだ)。
           # 生成物を可視化しておく(次に壊れたとき原因がすぐ分かるように)
           ls -la ios/App
+
+      - name: アプリアイコンとスプラッシュを生成する
+        # ios/ は毎回 cap add ios で新規生成されるため、何もしないと
+        # Capacitor既定のアイコン(AppIcon-512@2x.png)のまま出荷される
+        # (2026-08-23、RELEASE-KITとの照合で発覚。TestFlightの1ビルド目が実際にそうだった)。
+        # assets/ の元画像から Assets.xcassets を毎回焼き直す。
+        script: |
+          set -eux
+          npx capacitor-assets generate --ios
+          ls -la ios/App/App/Assets.xcassets/AppIcon.appiconset/ | head -5
 
       - name: iPhone のみ対応にする
         # Capacitor が生成する iOS プロジェクトは既定で iPhone+iPad 対応(1,2)。
@@ -112,10 +128,25 @@ workflows:
 
       - name: Set build number
         # TestFlightの最新ビルド番号+1を採番（重複を防ぐ）
+        # `|| echo 0` を付けると、APP_STORE_APPLE_IDが空だったり取得に失敗したときに
+        # 静かに 0 → ビルド番号1 となり、2回目のアップロードで初めて重複として露見する。
+        # 空や非数値はその場で落とす(RELEASE-KIT 6章)。
         script: |
+          set -eu
+          if [ -z "${APP_STORE_APPLE_ID:-}" ]; then
+            echo "APP_STORE_APPLE_ID が空です。ビルド番号を採番できません" >&2
+            exit 1
+          fi
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
+          case "$LATEST" in
+            ''|*[!0-9]*)
+              echo "TestFlightの最新ビルド番号を取得できませんでした: '$LATEST'" >&2
+              exit 1
+              ;;
+          esac
+          echo "最新ビルド番号: $LATEST → $((LATEST + 1)) を採番"
           cd ios/App
-          LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" || echo 0)
-          agvtool new-version -all $(($LATEST + 1))
+          agvtool new-version -all $((LATEST + 1))
 
       - name: Build IPA
         script: |
