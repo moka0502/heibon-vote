@@ -19,7 +19,11 @@ async function request(path, options) {
   }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `request failed: ${res.status}`);
+    const error = new Error(body.error || `request failed: ${res.status}`);
+    // サーバーが userFacing を立てたものだけ、そのまま画面に出してよい。
+    // それ以外(英語の技術文言)は画面では共通文言に伏せる(renderError側で判定)。
+    if (body.userFacing === true) error.userFacing = true;
+    throw error;
   }
   return res.json();
 }

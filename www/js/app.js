@@ -102,8 +102,11 @@ function showLoading() {
 }
 
 // オフライン時は「通信エラー」ではなく専用の案内を出す(Native#5)。
-function mountError(message, onRetry, backTo) {
-  const node = navigator.onLine ? renderError(message, onRetry) : renderOffline(onRetry);
+function mountError(error, onRetry, backTo) {
+  const message = typeof error === 'string' ? error : error?.message;
+  // サーバーが「見せてよい」と明示したメッセージのみそのまま表示する。
+  const userFacing = typeof error === 'object' && error !== null && error.userFacing === true;
+  const node = navigator.onLine ? renderError(message, onRetry, userFacing) : renderOffline(onRetry);
   mount(node, backTo);
 }
 
@@ -127,7 +130,7 @@ async function showHome() {
       })
     );
   } catch (err) {
-    mountError(err.message, showHome);
+    mountError(err, showHome);
   }
 }
 
@@ -138,7 +141,7 @@ function showSuggestionForm() {
         await api.postSuggestion(text);
         mount(renderSuggestionThanks(text, showHome), showHome);
       } catch (err) {
-        mountError(err.message, showHome, showHome);
+        mountError(err, showHome, showHome);
       }
     }, showHome),
     showHome
@@ -167,7 +170,7 @@ async function showSettings() {
       showHome
     );
   } catch (err) {
-    mountError(err.message, showHome, showHome);
+    mountError(err, showHome, showHome);
   }
 }
 
@@ -177,7 +180,7 @@ async function showTopics() {
     const { topics } = await api.getAllTopics();
     mount(renderTopicList(topics, { onSelect: showTopicBreakdown, onBack: showHome }), showHome);
   } catch (err) {
-    mountError(err.message, showHome, showHome);
+    mountError(err, showHome, showHome);
   }
 }
 
@@ -199,7 +202,7 @@ async function showTopicBreakdown(topicId) {
       showTopics
     );
   } catch (err) {
-    mountError(err.message, showTopics, showTopics);
+    mountError(err, showTopics, showTopics);
   }
 }
 
@@ -217,7 +220,7 @@ async function showCategoryPicker() {
       showHome
     );
   } catch (err) {
-    mountError(err.message, showHome, showHome);
+    mountError(err, showHome, showHome);
   }
 }
 
@@ -240,7 +243,7 @@ async function startQuiz(category, categoryLabel, part) {
       categoryLabelBase: categoryLabel,
     });
   } catch (err) {
-    mountError(err.message, showHome, showHome);
+    mountError(err, showHome, showHome);
   }
 }
 
@@ -290,7 +293,7 @@ async function answerQuestion(state, topic, optionId) {
   } catch (err) {
     // 送信失敗(レート制限等)でHomeへ飛ばすとclearQuizState()で進行状況が消えるため、
     // 再読み込みは同じ問題への再挑戦にする(戻るボタンでの意図的な離脱時のみクリアされる)。
-    mountError(err.message, () => runQuiz(state), showHome);
+    mountError(err, () => runQuiz(state), showHome);
   }
 }
 
@@ -322,7 +325,7 @@ async function finishQuiz(state) {
     // ネイティブでは結果表示の瞬間に成功の触覚フィードバック(Web/PWAではno-op)。
     hapticSuccess();
   } catch (err) {
-    mountError(err.message, showHome, showHome);
+    mountError(err, showHome, showHome);
   }
 }
 
@@ -332,7 +335,7 @@ async function showHistory() {
     const { sessions } = await api.getSessions(getVoterId());
     mount(renderHistoryList(sessions, { onSelect: showHistoryDetail, onBack: showHome }), showHome);
   } catch (err) {
-    mountError(err.message, showHome, showHome);
+    mountError(err, showHome, showHome);
   }
 }
 
@@ -342,7 +345,7 @@ async function showHistoryDetail(sessionId) {
     const { session, votes } = await api.getSession(sessionId, getVoterId());
     mount(renderHistoryDetail(session, votes, showHistory), showHistory);
   } catch (err) {
-    mountError(err.message, showHistory, showHistory);
+    mountError(err, showHistory, showHistory);
   }
 }
 
@@ -357,7 +360,7 @@ async function showProfileSetup() {
       })
     );
   } catch (err) {
-    mountError(err.message, showProfileSetup);
+    mountError(err, showProfileSetup);
   }
 }
 

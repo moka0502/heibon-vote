@@ -139,6 +139,43 @@ async function main() {
 
     check('JSエラーが発生していない', pageErrors.length === 0, pageErrors.slice(0, 3).join(' / '));
 
+    // 回帰: サーバーのエラー文言の出し分け(2026-08-22)。
+    // 英語の技術文言(invalid JSON 等)は画面に出してはいけないが、レート制限のように
+    // 利用者向けに書いた日本語は出さないと「通信がうまくいきませんでした」としか伝わらず、
+    // 待てば直ることも分からない。サーバーが userFacing を立てたものだけ通す契約にした。
+    // 提案APIは60秒5回制限なので、6回投げて429を引き出す。テストの最後に置くこと。
+    {
+      const bad = await fetch(`${BASE}/api/suggestions`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const badBody = await bad.json().catch(() => ({}));
+      check(
+        '英語の技術文言には userFacing が付かない(画面では伏せられる)',
+        bad.status === 400 && badBody.userFacing !== true,
+        `status=${bad.status} error=${badBody.error} userFacing=${badBody.userFacing}`
+      );
+
+      let limited = null;
+      for (let i = 0; i < 6; i++) {
+        const res = await fetch(`${BASE}/api/suggestions`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ text: `レート制限の回帰テスト ${i}` }),
+        });
+        if (res.status === 429) {
+          limited = await res.json().catch(() => ({}));
+          break;
+        }
+      }
+      check(
+        'レート制限(429)は userFacing 付きの日本語で返る',
+        !!limited && limited.userFacing === true && /しばらく|待って/.test(limited.error || ''),
+        limited ? `error=${limited.error} userFacing=${limited.userFacing}` : '429に到達しなかった'
+      );
+    }
+
     await browser.close();
     browser = null;
   } finally {

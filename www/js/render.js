@@ -1094,13 +1094,19 @@ export function renderOffline(onRetry) {
   return wrap;
 }
 
-export function renderError(message, onRetry) {
-  // ユーザーには技術的な詳細(HTTPステータス等)を出さず、常に同じやさしい文言にする。
+export function renderError(message, onRetry, userFacing = false) {
+  // ユーザーには技術的な詳細(HTTPステータス等)を出さず、既定では同じやさしい文言にする。
+  // ただしサーバーが userFacing を立てた日本語の案内(レート制限など)は、そのまま出さないと
+  // 「通信がうまくいきませんでした」としか伝わらず、待てば直ることも分からない
+  // (2026-08-22、レート制限に当たったときの実挙動を確認して発覚)。
   // 原因調査用に生のメッセージはconsoleへ残す。
   console.error('renderError:', message);
   const wrap = el('div', { class: 'card' });
   wrap.appendChild(
-    el('p', { class: 'error', text: '通信がうまくいきませんでした。もう一度お試しください。' })
+    el('p', {
+      class: 'error',
+      text: userFacing && message ? message : '通信がうまくいきませんでした。もう一度お試しください。',
+    })
   );
   if (onRetry) wrap.appendChild(el('button', { class: 'btn btn-outline', text: '再読み込み', onclick: onRetry }));
   return wrap;
